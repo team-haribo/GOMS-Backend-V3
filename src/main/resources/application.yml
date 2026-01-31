@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: goms-server-v3
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:goms_v3_db}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:1234}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    open-in-view: false
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: ${JPA_FORMAT_SQL:false}
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  jackson:
+    time-zone: Asia/Seoul
+
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: ${HIBERNATE_SQL_LOG:OFF}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${HIBERNATE_BIND_LOG:OFF}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
