@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:goms_v3_db}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:1234}
+    password: ${DB_PASSWORD:qaqawesd12@}
 
   jpa:
     hibernate:
@@ -35,3 +35,8 @@ management:
     web:
       exposure:
         include: health,info
+
+jwt:
+  secret: "c2e9f7a1d4b8k3m6q9w2x5z8n1p4r7t0v3y6u9i2o5p8a1s4d7f0g3h6j9k2l5"
+  access-exp-seconds: 1800
+  refresh-exp-seconds: 1209600
