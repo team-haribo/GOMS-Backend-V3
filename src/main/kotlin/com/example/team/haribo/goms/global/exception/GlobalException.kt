@@ -1,4 +1,4 @@
-package com.example.team.haribo.goms.GomsServerV3.global.exception
+package com.example.team.haribo.goms.global.exception
 
 class GlobalException(
     val errorCode: ErrorCode
