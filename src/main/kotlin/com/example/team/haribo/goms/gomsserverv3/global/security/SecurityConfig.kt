@@ -1,8 +1,7 @@
-package com.example.team.haribo.goms.GomsServerV3.global.security
+package com.example.team.haribo.goms.gomsserverv3.global.security
 
-import com.example.team.haribo.goms.GomsServerV3.global.jwt.JwtProperties
-import com.example.team.haribo.goms.GomsServerV3.global.jwt.JwtProvider
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.example.team.haribo.goms.gomsserverv3.global.jwt.JwtProperties
+import com.example.team.haribo.goms.gomsserverv3.global.jwt.JwtProvider
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,16 +10,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import tools.jackson.databind.ObjectMapper
 
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtProperties::class)
 class SecurityConfig {
-
-    @Bean
-    fun objectMapper(): ObjectMapper {
-        return ObjectMapper()
-    }
 
     @Bean
     fun jwtProvider(jwtProperties: JwtProperties): JwtProvider {
@@ -61,7 +56,6 @@ class SecurityConfig {
                 ).permitAll()
 
                 it.requestMatchers("/api/v3/auth/**").permitAll()
-
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
