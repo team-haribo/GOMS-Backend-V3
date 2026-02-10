@@ -1,4 +1,4 @@
-package com.example.team.haribo.goms.gomsserverv3.global.exception
+package com.example.team.haribo.goms.global.exception
 
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus

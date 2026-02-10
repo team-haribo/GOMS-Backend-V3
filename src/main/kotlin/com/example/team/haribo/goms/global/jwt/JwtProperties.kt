@@ -1,4 +1,4 @@
-package com.example.team.haribo.goms.gomsserverv3.global.jwt
+package com.example.team.haribo.goms.global.jwt
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

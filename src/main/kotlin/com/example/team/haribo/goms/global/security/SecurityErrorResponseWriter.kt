@@ -1,7 +1,7 @@
-package com.example.team.haribo.goms.gomsserverv3.global.security
+package com.example.team.haribo.goms.global.security
 
-import com.example.team.haribo.goms.gomsserverv3.global.exception.ErrorCode
-import com.example.team.haribo.goms.gomsserverv3.global.exception.ErrorResponse
+import com.example.team.haribo.goms.global.exception.ErrorCode
+import com.example.team.haribo.goms.global.exception.ErrorResponse
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.MediaType
 import tools.jackson.databind.ObjectMapper

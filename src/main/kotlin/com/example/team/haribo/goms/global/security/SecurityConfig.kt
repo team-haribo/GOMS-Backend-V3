@@ -1,7 +1,7 @@
-package com.example.team.haribo.goms.gomsserverv3.global.security
+package com.example.team.haribo.goms.global.security
 
-import com.example.team.haribo.goms.gomsserverv3.global.jwt.JwtProperties
-import com.example.team.haribo.goms.gomsserverv3.global.jwt.JwtProvider
+import com.example.team.haribo.goms.global.jwt.JwtProperties
+import com.example.team.haribo.goms.global.jwt.JwtProvider
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

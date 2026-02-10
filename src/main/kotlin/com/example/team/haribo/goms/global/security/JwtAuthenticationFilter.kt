@@ -1,7 +1,7 @@
-package com.example.team.haribo.goms.gomsserverv3.global.security
+package com.example.team.haribo.goms.global.security
 
-import com.example.team.haribo.goms.gomsserverv3.global.exception.ErrorCode
-import com.example.team.haribo.goms.gomsserverv3.global.jwt.JwtProvider
+import com.example.team.haribo.goms.global.exception.ErrorCode
+import com.example.team.haribo.goms.global.jwt.JwtProvider
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain

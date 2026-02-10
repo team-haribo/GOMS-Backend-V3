@@ -1,6 +1,6 @@
-package com.example.team.haribo.goms.gomsserverv3.global.security
+package com.example.team.haribo.goms.global.security
 
-import com.example.team.haribo.goms.gomsserverv3.global.exception.ErrorCode
+import com.example.team.haribo.goms.global.exception.ErrorCode
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.access.AccessDeniedException
