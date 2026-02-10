@@ -1,7 +1,7 @@
-package com.example.team.haribo.goms.GomsServerV3.global.security
+package com.example.team.haribo.goms.gomsserverv3.global.security
 
-import com.example.team.haribo.goms.GomsServerV3.global.exception.ErrorCode
-import com.example.team.haribo.goms.GomsServerV3.global.exception.GlobalException
+import com.example.team.haribo.goms.gomsserverv3.global.exception.ErrorCode
+import com.example.team.haribo.goms.gomsserverv3.global.exception.GlobalException
 import org.springframework.security.core.context.SecurityContextHolder
 
 object SecurityUtil {

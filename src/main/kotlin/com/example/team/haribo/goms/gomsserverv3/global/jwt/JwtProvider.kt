@@ -1,4 +1,4 @@
-package com.example.team.haribo.goms.GomsServerV3.global.jwt
+package com.example.team.haribo.goms.gomsserverv3.global.jwt
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
@@ -23,6 +23,7 @@ class JwtProvider(
         return Jwts.builder()
             .subject(memberId.toString())
             .claim("role", role)
+            .claim("type", "ACCESS")
             .issuedAt(now)
             .expiration(exp)
             .signWith(key)
@@ -35,6 +36,7 @@ class JwtProvider(
 
         return Jwts.builder()
             .subject(memberId.toString())
+            .claim("type", "REFRESH")
             .issuedAt(now)
             .expiration(exp)
             .signWith(key)
@@ -59,13 +61,5 @@ class JwtProvider(
         } catch (e: IllegalArgumentException) {
             throw e
         }
-    }
-
-    fun getMemberId(token: String): Long {
-        return parseClaims(token).subject.toLong()
-    }
-
-    fun getRole(token: String): String? {
-        return parseClaims(token)["role"]?.toString()
     }
 }

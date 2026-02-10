@@ -1,4 +1,4 @@
-package com.example.team.haribo.goms.GomsServerV3
+package com.example.team.haribo.goms.gomsserverv3
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
