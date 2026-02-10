@@ -30,10 +30,6 @@ dependencies {
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 
-    // Jackson
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
-
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
