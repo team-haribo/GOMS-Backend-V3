@@ -1,7 +1,8 @@
 package com.example.team.haribo.goms.domain.auth.controller
 
 import com.example.team.haribo.goms.domain.auth.dto.request.*
-import com.example.team.haribo.goms.domain.auth.dto.response.*
+import com.example.team.haribo.goms.domain.auth.dto.response.EmailVerificationConfirmResponse
+import com.example.team.haribo.goms.domain.auth.dto.response.TokenResponse
 import com.example.team.haribo.goms.domain.auth.service.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -9,56 +10,70 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v3/auth")
 class AuthController(
-    private val emailVerificationService: EmailVerificationService,
-    private val authService: AuthService
+    private val signupService: SignupService,
+    private val signinService: SigninService,
+    private val reissueService: ReissueService,
+    private val passwordChangeService: PasswordChangeService,
+    private val signoutService: SignoutService,
+    private val emailVerificationService: EmailVerificationService
 ) {
 
     @PostMapping("/email-verifications/send")
-    fun send(@RequestBody request: EmailVerificationSendRequest)
-            : ResponseEntity<Void> {
+    fun sendVerificationCode(
+        @RequestBody request: EmailVerificationSendRequest
+    ): ResponseEntity<Void> {
         emailVerificationService.send(request)
         return ResponseEntity.ok().build()
     }
 
     @PostMapping("/email-verifications/confirm")
-    fun confirm(
+    fun confirmVerificationCode(
         @RequestBody request: EmailVerificationConfirmRequest
     ): ResponseEntity<EmailVerificationConfirmResponse> {
-        return ResponseEntity.ok(emailVerificationService.confirm(request))
+        return ResponseEntity.ok(
+            emailVerificationService.confirm(request)
+        )
     }
 
     @PostMapping("/signup")
-    fun signup(@RequestBody request: SignupRequest)
-            : ResponseEntity<Void> {
-        authService.signup(request)
-        return ResponseEntity.status(201).build()
+    fun signup(
+        @RequestBody request: SignupRequest
+    ): ResponseEntity<Void> {
+        signupService.signup(request)
+        return ResponseEntity.ok().build()
     }
 
     @PostMapping("/signin")
-    fun signin(@RequestBody request: SigninRequest)
-            : ResponseEntity<TokenResponse> {
-        return ResponseEntity.ok(authService.signin(request))
+    fun signin(
+        @RequestBody request: SigninRequest
+    ): ResponseEntity<TokenResponse> {
+        return ResponseEntity.ok(
+            signinService.signin(request)
+        )
     }
 
     @PatchMapping("/reissue")
     fun reissue(
-        @RequestHeader("RefreshToken") refreshToken: String
+        @RequestHeader("RefreshToken") refreshTokenHeader: String
     ): ResponseEntity<TokenResponse> {
-        return ResponseEntity.ok(authService.reissue(refreshToken))
+        return ResponseEntity.ok(
+            reissueService.reissue(refreshTokenHeader)
+        )
     }
 
     @PatchMapping("/password")
-    fun changePassword(@RequestBody request: PasswordChangeRequest)
-            : ResponseEntity<Void> {
-        authService.changePassword(request)
+    fun changePassword(
+        @RequestBody request: PasswordChangeRequest
+    ): ResponseEntity<Void> {
+        passwordChangeService.changePassword(request)
         return ResponseEntity.ok().build()
     }
 
     @DeleteMapping("/signout")
     fun signout(
-        @RequestHeader("RefreshToken") refreshToken: String
+        @RequestHeader("RefreshToken") refreshTokenHeader: String
     ): ResponseEntity<Void> {
-        authService.signout(refreshToken)
+        signoutService.signout(refreshTokenHeader)
         return ResponseEntity.ok().build()
     }
 }
