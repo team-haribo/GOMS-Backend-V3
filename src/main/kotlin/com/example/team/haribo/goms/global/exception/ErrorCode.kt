@@ -11,10 +11,12 @@ enum class ErrorCode(
     UNAUTHORIZED(401, "인증 정보가 유효하지 않습니다."),
     INVALID_MEMBER_PRINCIPAL(404, "존재하지 않는 사용자입니다."),
     INVALID_CREDENTIALS(401, "아이디 또는 비밀번호가 올바르지 않습니다."),
+    INVALID_PASSWORD_POLICY(400, "비밀번호 정책을 만족하지 않습니다."),
     INVALID_VERIFIED_TOKEN(401, "이메일 인증 정보가 유효하지 않습니다."),
     INVALID_REFRESH_TOKEN(401, "유효하지 않은 리프레시 토큰입니다."),
     VERIFICATION_CODE_MISMATCH(401, "인증번호가 일치하지 않습니다."),
     VERIFICATION_CODE_EXPIRED(410, "인증번호가 만료되었습니다."),
+
 
     // COMMON
     INTERNAL_SERVER_ERROR(500, "예기치 못한 서버 에러가 발생했습니다."),
