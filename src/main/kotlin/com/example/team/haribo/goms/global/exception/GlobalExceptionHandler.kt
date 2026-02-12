@@ -12,17 +12,17 @@ class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @ExceptionHandler(GlobalException::class)
-    fun handleGlobalException(exception: GlobalException): ResponseEntity<ErrorResponse> {
+    fun handleGlobalException(e: GlobalException): ResponseEntity<ErrorResponse> {
         val response = ErrorResponse(
-            status = exception.errorCode.status,
-            message = exception.errorCode.message
+            status = e.errorCode.status,
+            message = e.errorCode.message
         )
-        return ResponseEntity.status(response.status).body(response)
+        return ResponseEntity.status(e.errorCode.status).body(response)
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleException(exception: Exception): ResponseEntity<ErrorResponse> {
-        log.error("Unhandled Exception: ", exception)
+    fun handleException(e: Exception): ResponseEntity<ErrorResponse> {
+        log.error("Unhandled Exception: ", e)
 
         val response = ErrorResponse(
             status = HttpStatus.INTERNAL_SERVER_ERROR.value(),

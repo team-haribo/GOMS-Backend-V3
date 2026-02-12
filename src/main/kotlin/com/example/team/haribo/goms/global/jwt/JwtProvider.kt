@@ -6,6 +6,8 @@ import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import java.nio.charset.StandardCharsets
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.Date
 import javax.crypto.SecretKey
 
@@ -49,6 +51,14 @@ class JwtProvider(
             .build()
             .parseSignedClaims(token)
             .payload
+    }
+
+    fun getAccessExpirationDate(): LocalDateTime {
+        return LocalDateTime.now().plusSeconds(jwtProperties.accessExpSeconds)
+    }
+
+    fun getRefreshExpirationDate(): LocalDateTime {
+        return LocalDateTime.now().plusSeconds(jwtProperties.refreshExpSeconds)
     }
 
     fun validate(token: String) {

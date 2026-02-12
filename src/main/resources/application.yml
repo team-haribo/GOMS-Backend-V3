@@ -6,11 +6,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:goms_v3_db}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:qaqawesd12@}
+    password: ${DB_PASSWORD:1234}
 
   jpa:
     hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:validate}
+      ddl-auto: ${JPA_DDL_AUTO:update}
     open-in-view: false
     show-sql: ${JPA_SHOW_SQL:false}
     properties:
@@ -20,6 +20,18 @@ spring:
 
   jackson:
     time-zone: Asia/Seoul
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   port: ${SERVER_PORT:8080}
@@ -37,6 +49,6 @@ management:
         include: health,info
 
 jwt:
-  secret: "c2e9f7a1d4b8k3m6q9w2x5z8n1p4r7t0v3y6u9i2o5p8a1s4d7f0g3h6j9k2l5"
-  access-exp-seconds: 1800
-  refresh-exp-seconds: 1209600
+  secret: ${JWT_SECRET}
+  access-exp-seconds: ${JWT_ACCESS_EXP_SECONDS}
+  refresh-exp-seconds: ${JWT_REFRESH_EXP_SECONDS}
