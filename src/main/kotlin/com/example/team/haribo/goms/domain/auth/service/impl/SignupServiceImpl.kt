@@ -47,7 +47,7 @@ class SignupServiceImpl(
             email = request.email,
             password = encoded,
             name = request.name,
-            grade = request.grade,
+            grade = request.grade.toInt(),
             department = request.department,
             gender = request.gender,
             role = Role.ROLE_STUDENT

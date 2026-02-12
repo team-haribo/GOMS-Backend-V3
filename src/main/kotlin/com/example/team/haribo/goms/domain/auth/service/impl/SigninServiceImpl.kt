@@ -33,19 +33,21 @@ class SigninServiceImpl(
             throw GlobalException(ErrorCode.INVALID_CREDENTIALS)
         }
 
-        val accessToken = jwtProvider.createAccessToken(member.id, member.role.authority)
-        val refreshToken = jwtProvider.createRefreshToken(member.id)
+        val memberId = member.id ?: throw GlobalException(ErrorCode.NOT_FOUND_MEMBER)
+
+        val accessToken = jwtProvider.createAccessToken(memberId, member.role.name)
+        val refreshToken = jwtProvider.createRefreshToken(memberId)
 
         val refreshExpiresAt = jwtProvider.getRefreshExpirationDate()
 
-        val entity = refreshTokenRepository.findByMemberId(member.id).orElse(null)
+        val entity = refreshTokenRepository.findByMemberId(memberId).orElse(null)
             ?.apply {
                 this.refreshToken = refreshToken
                 this.expiresAt = refreshExpiresAt
                 this.revokedAt = null
             }
             ?: AuthRefreshToken(
-                memberId = member.id,
+                memberId = memberId,
                 refreshToken = refreshToken,
                 expiresAt = refreshExpiresAt
             )
