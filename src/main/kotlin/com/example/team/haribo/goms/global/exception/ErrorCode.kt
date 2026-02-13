@@ -30,6 +30,9 @@ enum class ErrorCode(
 
     // OUTING
     CANNOT_OUTING(403, "외출이 금지된 사용자입니다."),
+    ALREADY_OUTING(409, "이미 외출 중인 사용자입니다."),
+    NOT_OUTING(409, "현재 외출 중이 아닙니다."),
+    EMPTY_NAME(400, "name 값 누락 또는 공백입니다."),
 
     // QR
     QR_EXPIRED(400, "QR 코드가 만료되었습니다.");

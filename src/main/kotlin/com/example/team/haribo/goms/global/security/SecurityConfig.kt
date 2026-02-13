@@ -62,6 +62,7 @@ class SecurityConfig {
                     "/error"
                 ).permitAll()
 
+                // AUTH
                 it.requestMatchers("/api/v3/auth/email-verifications/send").permitAll()
                 it.requestMatchers("/api/v3/auth/email-verifications/confirm").permitAll()
                 it.requestMatchers("/api/v3/auth/signup").permitAll()
@@ -69,6 +70,17 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/auth/signout").permitAll()
                 it.requestMatchers("/api/v3/auth/reissue").permitAll()
                 it.requestMatchers("/api/v3/auth/password").permitAll()
+
+                // OUTING
+                it.requestMatchers("/api/v3/outing/status").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/outing/in").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/outing/out").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/outing/list").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/outing/count").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/outing/search").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+
+                // STUDENT-COUNCIL
+                it.requestMatchers("/api/v3/student-council/qr").hasAuthority("ROLE_STUDENT_COUNCIL")
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

@@ -3,6 +3,7 @@ package com.example.team.haribo.goms.domain.member.entity
 import com.example.team.haribo.goms.domain.common.enums.Department
 import com.example.team.haribo.goms.domain.common.enums.Gender
 import com.example.team.haribo.goms.domain.common.enums.Role
+import com.example.team.haribo.goms.domain.common.enums.Status
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
@@ -32,7 +33,11 @@ class Member(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var role: Role
+    var role: Role,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var status: Status = Status.COMING
 ) {
 
     @Id
