@@ -13,7 +13,7 @@ class QrIssueServiceImpl : QrIssueService {
         val uuid = UUID.randomUUID().toString()
 
         val exp = Instant.now()
-            .plusSeconds(300)
+            .plusSeconds(300) //5분
             .toEpochMilli()
 
         return QrIssueResponse(
