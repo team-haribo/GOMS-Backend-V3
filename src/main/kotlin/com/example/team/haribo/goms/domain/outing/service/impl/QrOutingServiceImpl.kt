@@ -1,5 +1,6 @@
 package com.example.team.haribo.goms.domain.outing.service.impl
 
+import com.example.team.haribo.goms.domain.common.enums.Action
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.outing.dto.request.QrToggleRequest
 import com.example.team.haribo.goms.domain.outing.dto.response.QrOutingResponse
@@ -46,7 +47,7 @@ class QrOutingServiceImpl(
         )
 
         return QrOutingResponse(
-            action = "OUT",
+            action = Action.OUT,
             outingId = outing.id!!,
             status = member.status,
             outingAt = now
