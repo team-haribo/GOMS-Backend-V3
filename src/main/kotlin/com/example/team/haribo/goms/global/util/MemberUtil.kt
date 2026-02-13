@@ -7,7 +7,6 @@ import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.exception.GlobalException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
-import java.util.Optional
 
 @Component
 class MemberUtil(
@@ -35,15 +34,7 @@ class MemberUtil(
     }
 
     private fun findMemberIdByEmail(email: String): Long {
-        val result = memberRepository.findByEmail(email)
-
-        val member = when (result) {
-            is Member -> result
-            is Optional<*> -> (result as Optional<Member>).orElseThrow { NotFoundMemberException() }
-            null -> throw NotFoundMemberException()
-            else -> throw NotFoundMemberException()
-        }
-
-        return member.id ?: throw NotFoundMemberException()
+        val member = memberRepository.findByEmail(email).orElseThrow { NotFoundMemberException() }
+        return member.id!!
     }
 }
