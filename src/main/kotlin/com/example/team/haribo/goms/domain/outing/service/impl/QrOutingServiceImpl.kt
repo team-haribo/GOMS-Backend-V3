@@ -1,8 +1,6 @@
 package com.example.team.haribo.goms.domain.outing.service.impl
 
 import com.example.team.haribo.goms.domain.common.enums.Status
-import com.example.team.haribo.goms.domain.member.exception.NotFoundMemberException
-import com.example.team.haribo.goms.domain.member.repository.MemberRepository
 import com.example.team.haribo.goms.domain.outing.dto.request.QrToggleRequest
 import com.example.team.haribo.goms.domain.outing.dto.response.QrOutingResponse
 import com.example.team.haribo.goms.domain.outing.entity.Outing
@@ -11,13 +9,14 @@ import com.example.team.haribo.goms.domain.outing.exception.CannotOutingExceptio
 import com.example.team.haribo.goms.domain.outing.repository.OutingRepository
 import com.example.team.haribo.goms.domain.outing.service.QrOutingService
 import com.example.team.haribo.goms.domain.outing.util.QrExpValidator
-import com.example.team.haribo.goms.global.security.SecurityUtil
+import com.example.team.haribo.goms.global.util.MemberUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class QrOutingServiceImpl(
-    private val memberRepository: MemberRepository,
+    private val memberUtil: MemberUtil,
     private val outingRepository: OutingRepository
 ) : QrOutingService {
 
@@ -25,26 +24,32 @@ class QrOutingServiceImpl(
     override fun outing(request: QrToggleRequest): QrOutingResponse {
         QrExpValidator.validate(request.exp)
 
-        val memberId = SecurityUtil.getCurrentMemberId()
-        val member = memberRepository.findById(memberId).orElseThrow { NotFoundMemberException() }
+        val member = memberUtil.currentMember()
 
         if (member.status == Status.CANNOT_OUTING) {
             throw CannotOutingException()
         }
 
-        val active = outingRepository.findTopByMemberIdAndComingAtIsNullOrderByIdDesc(memberId)
-        if (active != null) {
+        if (member.status == Status.OUTING) {
             throw AlreadyOutingException()
         }
 
-        val saved = outingRepository.save(Outing(member = member))
+        val now = LocalDateTime.now()
+
         member.status = Status.OUTING
+
+        val outing = outingRepository.save(
+            Outing(
+                member = member,
+                outingAt = now
+            )
+        )
 
         return QrOutingResponse(
             action = "OUT",
-            outingId = saved.id!!,
+            outingId = outing.id!!,
             status = member.status,
-            outingAt = saved.outingAt
+            outingAt = now
         )
     }
 }
