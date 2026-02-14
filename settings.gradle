@@ -1,1 +1,3 @@
 rootProject.name = 'GOMS-Server_V3'
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
