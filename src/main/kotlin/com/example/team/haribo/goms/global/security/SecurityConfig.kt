@@ -80,7 +80,7 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/outing/search").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
                 // STUDENT-COUNCIL
-                it.requestMatchers("/api/v3/student-council/qr").hasAuthority("ROLE_STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

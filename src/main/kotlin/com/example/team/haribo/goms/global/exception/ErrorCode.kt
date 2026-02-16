@@ -34,6 +34,10 @@ enum class ErrorCode(
     NOT_OUTING(409, "현재 외출 중이 아닙니다."),
     EMPTY_NAME(400, "name 값 누락 또는 공백입니다."),
 
+    // STUDENT-COUNCIL
+    ROLE_CONFLICT(409, "이미 동일한 권한입니다."),
+    STATUS_CONFLICT(409, "상태 변경이 불가능합니다."),
+
     // QR
     QR_EXPIRED(400, "QR 코드가 만료되었습니다.");
 }
