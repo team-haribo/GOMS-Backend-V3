@@ -17,48 +17,54 @@ interface MemberRepository : JpaRepository<Member, Long> {
 
     @Query(
         """
-        select m from Member m
-        order by m.grade asc,
-          case
-            when m.department = com.example.team.haribo.goms.domain.common.enums.Department.SW then 0
-            when m.department = com.example.team.haribo.goms.domain.common.enums.Department.IOT then 1
-            else 2
-          end,
-          m.name asc
+        SELECT m
+        FROM Member m
+        ORDER BY
+            m.grade ASC,
+            CASE
+                WHEN m.department = com.example.team.haribo.goms.domain.common.enums.Department.SW  THEN 0
+                WHEN m.department = com.example.team.haribo.goms.domain.common.enums.Department.IOT THEN 1
+                ELSE 2
+            END,
+            m.name ASC
         """
     )
     fun findAllSorted(): List<Member>
 
     @Query(
         """
-        select m from Member m
-        where lower(m.name) like lower(concat('%', :name, '%'))
-        order by m.grade asc,
-          case
-            when m.department = com.example.team.haribo.goms.domain.common.enums.Department.SW then 0
-            when m.department = com.example.team.haribo.goms.domain.common.enums.Department.IOT then 1
-            else 2
-          end,
-          m.name asc
+        SELECT m
+        FROM Member m
+        WHERE LOWER(m.name) LIKE LOWER(CONCAT('%', :name, '%'))
+        ORDER BY
+            m.grade ASC,
+            CASE
+                WHEN m.department = com.example.team.haribo.goms.domain.common.enums.Department.SW  THEN 0
+                WHEN m.department = com.example.team.haribo.goms.domain.common.enums.Department.IOT THEN 1
+                ELSE 2
+            END,
+            m.name ASC
         """
     )
     fun searchByNameSorted(@Param("name") name: String): List<Member>
 
     @Query(
         """
-        select m from Member m
-        where (:name is null or lower(m.name) like lower(concat('%', :name, '%')))
-          and (:grade is null or m.grade = :grade)
-          and (:department is null or m.department = :department)
-          and (:status is null or m.status = :status)
-          and (:role is null or m.role = :role)
-        order by m.grade asc,
-          case
-            when m.department = com.example.team.haribo.goms.domain.common.enums.Department.SW then 0
-            when m.department = com.example.team.haribo.goms.domain.common.enums.Department.IOT then 1
-            else 2
-          end,
-          m.name asc
+        SELECT m
+        FROM Member m
+        WHERE (:name IS NULL OR LOWER(m.name) LIKE LOWER(CONCAT('%', :name, '%')))
+          AND (:grade IS NULL OR m.grade = :grade)
+          AND (:department IS NULL OR m.department = :department)
+          AND (:status IS NULL OR m.status = :status)
+          AND (:role IS NULL OR m.role = :role)
+        ORDER BY
+            m.grade ASC,
+            CASE
+                WHEN m.department = com.example.team.haribo.goms.domain.common.enums.Department.SW  THEN 0
+                WHEN m.department = com.example.team.haribo.goms.domain.common.enums.Department.IOT THEN 1
+                ELSE 2
+            END,
+            m.name ASC
         """
     )
     fun filterSorted(

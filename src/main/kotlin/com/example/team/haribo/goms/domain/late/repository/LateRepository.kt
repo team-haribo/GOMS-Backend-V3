@@ -10,10 +10,11 @@ interface LateRepository : JpaRepository<Late, Long> {
 
     @Query(
         """
-        select l from Late l
-        join fetch l.member m
-        where l.comingAt >= :start and l.comingAt < :end
-        order by l.comingAt desc
+        SELECT l
+        FROM Late l
+        JOIN FETCH l.member m
+        WHERE l.comingAt >= :start AND l.comingAt < :end
+        ORDER BY l.comingAt DESC
         """
     )
     fun findAllByComingAtRangeWithMember(
