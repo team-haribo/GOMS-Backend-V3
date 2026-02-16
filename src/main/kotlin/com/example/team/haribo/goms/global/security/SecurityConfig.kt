@@ -80,15 +80,7 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/outing/search").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
                 // STUDENT-COUNCIL
-                it.requestMatchers("/api/v3/student-council/qr").hasAnyRole("STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/student-council/member").hasAnyRole("STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/student-council/search").hasAnyRole("STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/student-council/filter").hasAnyRole("STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/student-council/role/**").hasAnyRole("STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/student-council/outing-allowed/**").hasAnyRole("STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/student-council/status/out/**").hasAnyRole("STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/student-council/status/in/**").hasAnyRole("STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/student-council/late/**").hasAnyRole("STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
