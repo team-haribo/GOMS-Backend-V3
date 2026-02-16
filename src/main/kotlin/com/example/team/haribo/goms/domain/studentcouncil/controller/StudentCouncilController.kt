@@ -60,7 +60,7 @@ class StudentCouncilController(
     @GetMapping("/filter")
     fun filterMembers(
         @RequestParam("name", required = false) name: String?,
-        @RequestParam("grade", required = false) grade: Long?,
+        @RequestParam("grade", required = false) grade: Int?,
         @RequestParam("department", required = false) department: String?,
         @RequestParam("status", required = false) status: String?,
         @RequestParam("role", required = false) role: String?

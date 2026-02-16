@@ -16,7 +16,7 @@ class StudentCouncilMemberFilterServiceImpl(
 
     override fun filter(
         name: String?,
-        grade: Long?,
+        grade: Int?,
         department: Department?,
         status: Status?,
         role: Role?

@@ -8,7 +8,7 @@ import com.example.team.haribo.goms.domain.studentcouncil.dto.response.StudentsL
 interface StudentCouncilMemberFilterService {
     fun filter(
         name: String?,
-        grade: Long?,
+        grade: Int?,
         department: Department?,
         status: Status?,
         role: Role?
