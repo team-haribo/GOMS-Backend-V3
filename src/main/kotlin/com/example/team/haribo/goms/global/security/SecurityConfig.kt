@@ -79,6 +79,9 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/outing/count").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/outing/search").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
+                // LATE-RANK
+                it.requestMatchers("/api/v3/late/rank").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+
                 // STUDENT-COUNCIL
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
                 it.anyRequest().authenticated()
