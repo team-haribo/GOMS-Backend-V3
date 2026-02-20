@@ -23,13 +23,11 @@ import com.example.team.haribo.goms.domain.studentcouncil.service.StudentCouncil
 import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.exception.GlobalException
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 @RestController
 @RequestMapping("/api/v3/student-council")
-@PreAuthorize("hasAuthority('ROLE_STUDENT_COUNCIL')")
 class StudentCouncilController(
     private val qrIssueService: QrIssueService,
     private val memberListService: StudentCouncilMemberListService,
