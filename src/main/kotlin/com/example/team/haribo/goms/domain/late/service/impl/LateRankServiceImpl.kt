@@ -1,9 +1,9 @@
 package com.example.team.haribo.goms.domain.late.service.impl
 
-import com.example.team.haribo.goms.domain.late.dto.response.LateStudentsResponse
 import com.example.team.haribo.goms.domain.late.dto.response.LateRankListResponse
 import com.example.team.haribo.goms.domain.late.repository.LateRepository
 import com.example.team.haribo.goms.domain.late.service.LateRankService
+import com.example.team.haribo.goms.domain.studentcouncil.dto.response.LateStudentResponse
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,10 +19,12 @@ class LateRankServiceImpl(
 
         return LateRankListResponse(
             students = top5.map {
-                LateStudentsResponse(
+                LateStudentResponse(
+                    memberId = it.member.id!!,
                     name = it.member.name,
                     grade = it.member.grade,
-                    department = it.member.department
+                    department = it.member.department,
+                    comingAt = it.comingAt
                 )
             }
         )
