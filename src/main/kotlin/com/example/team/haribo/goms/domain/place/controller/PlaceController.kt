@@ -22,8 +22,8 @@ class PlaceController(
     }
 
     @GetMapping("/hot-place")
-    fun hotPlace(): ResponseEntity<PlacesResponse> {
-        return ResponseEntity.ok(hotPlaceService.getHotPlaces())
+    fun hotPlace(@RequestParam("days", required = false) days: Long?): ResponseEntity<PlacesResponse> {
+        return ResponseEntity.ok(hotPlaceService.getHotPlaces(days))
     }
 
     @GetMapping("/{placeId}")
