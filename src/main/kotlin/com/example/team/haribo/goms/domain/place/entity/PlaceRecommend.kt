@@ -2,6 +2,8 @@ package com.example.team.haribo.goms.domain.place.entity
 
 import com.example.team.haribo.goms.domain.member.entity.Member
 import jakarta.persistence.*
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 
 @Entity
@@ -11,6 +13,7 @@ import java.time.LocalDateTime
         UniqueConstraint(columnNames = ["place_id", "member_id"])
     ]
 )
+@EntityListeners(AuditingEntityListener::class)
 class PlaceRecommend(
 
     @Id
@@ -28,9 +31,10 @@ class PlaceRecommend(
     @Column(nullable = false)
     var recommended: Boolean = true,
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "created_at", nullable = false)
+    var createdAt: LocalDateTime,
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime? = null
 )
