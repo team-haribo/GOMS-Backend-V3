@@ -1,14 +1,13 @@
 package com.example.team.haribo.goms.domain.place.service.impl
 
-import com.example.team.haribo.goms.domain.place.dto.response.PlaceSearchResponse
 import com.example.team.haribo.goms.domain.place.dto.response.PlaceSearchListResponse
+import com.example.team.haribo.goms.domain.place.dto.response.PlaceSearchResponse
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
 import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
 import com.example.team.haribo.goms.domain.place.service.PlaceSearchService
 import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.exception.GlobalException
 import com.example.team.haribo.goms.global.util.MemberUtil
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -24,10 +23,17 @@ class PlaceSearchServiceImpl(
         val key = keyword?.trim()?.takeIf { it.isNotBlank() } ?: throw GlobalException(ErrorCode.INVALID_REQUEST)
 
         val memberId = memberUtil.currentMemberId()
+        val places = placeRepository.searchByKeyword(key)
+
+        if (places.isEmpty()) {
+            return PlaceSearchListResponse(places = emptyList())
+        }
+
+        val placeIds = places.mapNotNull { it.id }
         val recommendedIds = recommendRepository.findRecommendedPlaceIds(memberId).toSet()
 
-        val hotIds = recommendRepository.findHotPlaceIds(PageRequest.of(0, 50))
-        val places = placeRepository.findAllById(hotIds)
+        val recommendCountMap = recommendRepository.countRecommendedByPlaceIds(placeIds)
+            .associate { it.placeId to it.recommendCount }
 
         return PlaceSearchListResponse(
             places = places.map { place ->
@@ -37,7 +43,7 @@ class PlaceSearchServiceImpl(
                     longitude = place.longitude,
                     placeId = placeId,
                     reviewCount = 0,
-                    recommendCount = recommendRepository.countByPlaceIdAndRecommendedTrue(placeId),
+                    recommendCount = recommendCountMap[placeId] ?: 0L,
                     recommended = recommendedIds.contains(placeId)
                 )
             }

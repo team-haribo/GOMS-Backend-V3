@@ -1,8 +1,8 @@
 package com.example.team.haribo.goms.domain.place.dto.request
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 data class PlaceUpsertRequest(
+    val placeName: String,
+    val address: String,
     val latitude: Double,
     val longitude: Double
 )

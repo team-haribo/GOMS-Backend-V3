@@ -18,11 +18,16 @@ class PlaceUpsertServiceImpl(
         val existing = placeRepository.findByLatitudeAndLongitude(request.latitude, request.longitude).orElse(null)
 
         if (existing != null) {
+            existing.placeName = request.placeName
+            existing.address = request.address
+            placeRepository.save(existing)
             return PlaceUpsertResponse(placeId = existing.id!!)
         }
 
         val saved = placeRepository.save(
             Place(
+                placeName = request.placeName,
+                address = request.address,
                 latitude = request.latitude,
                 longitude = request.longitude
             )
