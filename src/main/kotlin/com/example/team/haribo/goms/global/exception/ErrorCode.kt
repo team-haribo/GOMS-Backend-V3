@@ -39,5 +39,9 @@ enum class ErrorCode(
     STATUS_CONFLICT(409, "상태 변경이 불가능합니다."),
 
     // QR
-    QR_EXPIRED(400, "QR 코드가 만료되었습니다.");
+    QR_EXPIRED(400, "QR 코드가 만료되었습니다."),
+
+    NOT_FOUND_PLACE(404, "장소를 찾을 수 없습니다."),
+    ALREADY_RECOMMENDED_PLACE(409, "이미 추천한 장소입니다."),
+    ALREADY_UNRECOMMENDED_PLACE(409, "이미 추천 취소된 장소입니다.");
 }
