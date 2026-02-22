@@ -51,7 +51,8 @@ class PlaceRecommendServiceImpl(
     @Transactional
     override fun unrecommend(placeId: Long): RecommendResponse {
         val memberId = memberUtil.currentMemberId()
-        placeRepository.findById(placeId).orElseThrow { NotFoundPlaceException() }
+
+        if (!placeRepository.existsById(placeId)) throw NotFoundPlaceException()
 
         val existing = recommendRepository.findByPlaceIdAndMemberId(placeId, memberId)
             .orElseThrow { AlreadyUnrecommendedPlaceException() }
@@ -69,13 +70,21 @@ class PlaceRecommendServiceImpl(
         val memberId = memberUtil.currentMemberId()
         val recommends = recommendRepository.findAllByMemberIdAndRecommendedTrue(memberId)
 
+        if (recommends.isEmpty()) {
+            return PlacesResponse(places = emptyList())
+        }
+
+        val placeIds = recommends.mapNotNull { it.place.id }
+        val recommendCountMap = recommendRepository.countRecommendedByPlaceIds(placeIds)
+            .associate { it.placeId to it.recommendCount }
+
         return PlacesResponse(
-            places = recommends.map {
-                val placeId = it.place.id!!
+            places = recommends.map { pr ->
+                val placeId = pr.place.id!!
                 PlaceSummaryResponse(
                     placeId = placeId,
                     reviewCount = 0,
-                    recommendCount = recommendRepository.countByPlaceIdAndRecommendedTrue(placeId),
+                    recommendCount = recommendCountMap[placeId] ?: 0L,
                     recommended = true
                 )
             }

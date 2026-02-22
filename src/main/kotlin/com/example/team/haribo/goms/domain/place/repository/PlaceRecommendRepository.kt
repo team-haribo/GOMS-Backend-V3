@@ -8,6 +8,11 @@ import java.util.*
 
 interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
 
+    interface PlaceRecommendCountProjection {
+        val placeId: Long
+        val recommendCount: Long
+    }
+
     fun findByPlaceIdAndMemberId(placeId: Long, memberId: Long): Optional<PlaceRecommend>
 
     fun countByPlaceIdAndRecommendedTrue(placeId: Long): Long
@@ -35,4 +40,15 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
         """
     )
     fun findHotPlaceIds(pageable: Pageable): List<Long>
+
+    @Query(
+        """
+        SELECT pr.place.id AS placeId, COUNT(pr.id) AS recommendCount
+        FROM PlaceRecommend pr
+        WHERE pr.recommended = true
+          AND pr.place.id IN :placeIds
+        GROUP BY pr.place.id
+        """
+    )
+    fun countRecommendedByPlaceIds(placeIds: List<Long>): List<PlaceRecommendCountProjection>
 }
