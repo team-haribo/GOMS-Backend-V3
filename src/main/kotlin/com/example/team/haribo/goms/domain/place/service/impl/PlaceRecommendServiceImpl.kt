@@ -14,6 +14,7 @@ import com.example.team.haribo.goms.domain.place.service.PlaceRecommendService
 import com.example.team.haribo.goms.global.util.MemberUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class PlaceRecommendServiceImpl(
@@ -34,7 +35,8 @@ class PlaceRecommendServiceImpl(
                 PlaceRecommend(
                     place = place,
                     member = member,
-                    recommended = true
+                    recommended = true,
+                    createdAt = LocalDateTime.now()
                 )
             )
             return RecommendResponse(true)
@@ -43,6 +45,7 @@ class PlaceRecommendServiceImpl(
         if (existing.recommended) throw AlreadyRecommendedPlaceException()
 
         existing.recommended = true
+        existing.createdAt = LocalDateTime.now()
         recommendRepository.save(existing)
 
         return RecommendResponse(true)
@@ -74,13 +77,13 @@ class PlaceRecommendServiceImpl(
             return PlacesResponse(places = emptyList())
         }
 
-        val placeIds = recommends.mapNotNull { it.place.id }
+        val placeIds = recommends.mapNotNull { it.place.id }.distinct()
+
         val recommendCountMap = recommendRepository.countRecommendedByPlaceIds(placeIds)
             .associate { it.placeId to it.recommendCount }
 
         return PlacesResponse(
-            places = recommends.map { pr ->
-                val placeId = pr.place.id!!
+            places = placeIds.map { placeId ->
                 PlaceSummaryResponse(
                     placeId = placeId,
                     reviewCount = 0,
@@ -94,6 +97,7 @@ class PlaceRecommendServiceImpl(
     @Transactional(readOnly = true)
     override fun getRecommendedCount(): RecommendCountResponse {
         val memberId = memberUtil.currentMemberId()
-        return RecommendCountResponse(recommendRepository.countByMemberIdAndRecommendedTrue(memberId))
+        val count = recommendRepository.countByMemberIdAndRecommendedTrue(memberId)
+        return RecommendCountResponse(recommendCount = count)
     }
 }
