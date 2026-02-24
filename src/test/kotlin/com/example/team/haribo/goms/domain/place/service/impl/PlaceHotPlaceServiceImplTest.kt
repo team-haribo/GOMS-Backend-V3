@@ -1,0 +1,93 @@
+package com.example.team.haribo.goms.domain.place.service.impl
+
+import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
+import com.example.team.haribo.goms.global.exception.ErrorCode
+import com.example.team.haribo.goms.global.exception.GlobalException
+import com.example.team.haribo.goms.global.util.MemberUtil
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import org.springframework.data.domain.Pageable
+import java.time.LocalDateTime
+
+class PlaceHotPlaceServiceImplTest : DescribeSpec({
+
+    val recommendRepository = mockk<PlaceRecommendRepository>()
+    val memberUtil = mockk<MemberUtil>()
+    val service = PlaceHotPlaceServiceImpl(recommendRepository, memberUtil)
+
+    val memberId = 1L
+
+    fun setupCommon(hotIds: List<Long>, days: Long = 3L) {
+        every { memberUtil.currentMemberId() } returns memberId
+        every { recommendRepository.findRecommendedPlaceIds(memberId) } returns emptyList()
+        every { recommendRepository.findHotPlaceIdsSince(any<LocalDateTime>(), any<Pageable>()) } returns hotIds
+        if (hotIds.isNotEmpty()) {
+            val projection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
+            every { projection.placeId } returns hotIds[0]
+            every { projection.recommendCount } returns 5L
+            every { recommendRepository.countRecommendedByPlaceIdsSince(any(), any<LocalDateTime>()) } returns
+                listOf(projection)
+        }
+    }
+
+    describe("PlaceHotPlaceService") {
+
+        context("Given: days=null (기본 3일)") {
+            setupCommon(listOf(1L, 2L, 3L))
+
+            it("When: 핫플레이스 조회 시 Then: Top3 결과를 반환한다") {
+                val response = service.getHotPlaces(null)
+                response.places.size shouldBe 3
+            }
+        }
+
+        context("Given: days=1 (최솟값)") {
+            setupCommon(listOf(1L))
+
+            it("When: 핫플레이스 조회 시 Then: 정상적으로 결과를 반환한다") {
+                val response = service.getHotPlaces(1L)
+                response.places.size shouldBe 1
+            }
+        }
+
+        context("Given: days=30 (최댓값)") {
+            setupCommon(listOf(10L, 20L))
+
+            it("When: 핫플레이스 조회 시 Then: 정상적으로 결과를 반환한다") {
+                val response = service.getHotPlaces(30L)
+                response.places.size shouldBe 2
+            }
+        }
+
+        context("Given: days=0 (범위 초과)") {
+            it("When: 핫플레이스 조회 시 Then: INVALID_REQUEST 예외가 발생한다") {
+                shouldThrow<GlobalException> {
+                    service.getHotPlaces(0L)
+                }.errorCode shouldBe ErrorCode.INVALID_REQUEST
+            }
+        }
+
+        context("Given: days=31 (범위 초과)") {
+            it("When: 핫플레이스 조회 시 Then: INVALID_REQUEST 예외가 발생한다") {
+                shouldThrow<GlobalException> {
+                    service.getHotPlaces(31L)
+                }.errorCode shouldBe ErrorCode.INVALID_REQUEST
+            }
+        }
+
+        context("Given: 결과 없음") {
+            every { memberUtil.currentMemberId() } returns memberId
+            every { recommendRepository.findRecommendedPlaceIds(memberId) } returns emptyList()
+            every { recommendRepository.findHotPlaceIdsSince(any<LocalDateTime>(), any<Pageable>()) } returns emptyList()
+
+            it("When: 핫플레이스 조회 시 Then: 빈 리스트를 반환한다") {
+                val response = service.getHotPlaces(3L)
+                response.places.shouldBeEmpty()
+            }
+        }
+    }
+})
