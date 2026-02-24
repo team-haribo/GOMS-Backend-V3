@@ -39,6 +39,6 @@ class ReviewGetServiceImpl(
     @Transactional(readOnly = true)
     override fun countPlaceReviews(placeId: Long): ReviewCountResponse {
         if (!placeRepository.existsById(placeId)) throw NotFoundPlaceException()
-        return ReviewCountResponse(review_count = reviewRepository.countActiveByPlaceId(placeId))
+        return ReviewCountResponse(reviewCount = reviewRepository.countActiveByPlaceId(placeId))
     }
 }
