@@ -83,13 +83,18 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/late/rank").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
                 // PLACE
-                it.requestMatchers("/api/v3/place").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/place/upsert").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/place/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/place/hot-place").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/place/search").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/place/recommend/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/place/recommended").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/place/recommended/count").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/place/review/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/place/review/count").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+
+                // REVIEW
+                it.requestMatchers("/api/v3/review/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
                 // STUDENT-COUNCIL
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
