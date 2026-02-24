@@ -17,7 +17,7 @@ class ReviewDeleteServiceImpl(
     @Transactional
     override fun delete(reviewId: Long) {
         val memberId = memberUtil.currentMemberId()
-        val review = reviewRepository.findAnyById(reviewId).orElseThrow { NotFoundReviewException() }
+        val review = reviewRepository.findById(reviewId).orElseThrow { NotFoundReviewException() }
 
         if (review.member.id != memberId) throw ReviewForbiddenException()
 
