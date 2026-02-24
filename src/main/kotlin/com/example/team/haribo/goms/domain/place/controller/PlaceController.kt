@@ -3,6 +3,8 @@ package com.example.team.haribo.goms.domain.place.controller
 import com.example.team.haribo.goms.domain.place.dto.request.PlaceUpsertRequest
 import com.example.team.haribo.goms.domain.place.dto.response.*
 import com.example.team.haribo.goms.domain.place.service.*
+import com.example.team.haribo.goms.domain.review.service.*
+import com.example.team.haribo.goms.domain.review.dto.response.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -13,10 +15,11 @@ class PlaceController(
     private val hotPlaceService: PlaceHotPlaceService,
     private val detailService: PlaceDetailService,
     private val searchService: PlaceSearchService,
-    private val recommendService: PlaceRecommendService
+    private val recommendService: PlaceRecommendService,
+    private val reviewGetService: ReviewGetService
 ) {
 
-    @PostMapping
+    @PostMapping("/upsert")
     fun upsert(@RequestBody request: PlaceUpsertRequest): ResponseEntity<PlaceUpsertResponse> {
         return ResponseEntity.status(201).body(upsertService.upsert(request))
     }
@@ -54,5 +57,15 @@ class PlaceController(
     @GetMapping("/recommended/count")
     fun recommendedCount(): ResponseEntity<RecommendCountResponse> {
         return ResponseEntity.ok(recommendService.getRecommendedCount())
+    }
+
+    @GetMapping("/review/{placeId}")
+    fun getPlaceReviews(@PathVariable placeId: Long): ResponseEntity<PlaceReviewListResponse> {
+        return ResponseEntity.ok(reviewGetService.getPlaceReviews(placeId))
+    }
+
+    @GetMapping("/review/count/{placeId}")
+    fun countPlaceReviews(@PathVariable placeId: Long): ResponseEntity<ReviewCountResponse> {
+        return ResponseEntity.ok(reviewGetService.countPlaceReviews(placeId))
     }
 }
