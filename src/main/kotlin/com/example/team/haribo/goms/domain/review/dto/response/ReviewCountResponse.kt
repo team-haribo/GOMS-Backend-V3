@@ -1,5 +1,8 @@
 package com.example.team.haribo.goms.domain.review.dto.response
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 data class ReviewCountResponse(
-    val review_count: Long
+    @JsonProperty("review_count")
+    val reviewCount: Long
 )
