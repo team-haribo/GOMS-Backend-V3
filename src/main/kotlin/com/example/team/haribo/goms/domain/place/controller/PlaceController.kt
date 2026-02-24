@@ -1,20 +1,10 @@
 package com.example.team.haribo.goms.domain.place.controller
 
 import com.example.team.haribo.goms.domain.place.dto.request.PlaceUpsertRequest
-import com.example.team.haribo.goms.domain.place.dto.response.PlaceDetailResponse
-import com.example.team.haribo.goms.domain.place.dto.response.PlaceSearchListResponse
-import com.example.team.haribo.goms.domain.place.dto.response.PlaceUpsertResponse
-import com.example.team.haribo.goms.domain.place.dto.response.PlacesResponse
-import com.example.team.haribo.goms.domain.place.dto.response.RecommendCountResponse
-import com.example.team.haribo.goms.domain.place.dto.response.RecommendResponse
-import com.example.team.haribo.goms.domain.place.service.PlaceDetailService
-import com.example.team.haribo.goms.domain.place.service.PlaceHotPlaceService
-import com.example.team.haribo.goms.domain.place.service.PlaceRecommendService
-import com.example.team.haribo.goms.domain.place.service.PlaceSearchService
-import com.example.team.haribo.goms.domain.place.service.PlaceUpsertService
-import com.example.team.haribo.goms.domain.review.dto.response.PlaceReviewListResponse
-import com.example.team.haribo.goms.domain.review.dto.response.ReviewCountResponse
-import com.example.team.haribo.goms.domain.review.service.ReviewGetService
+import com.example.team.haribo.goms.domain.place.dto.response.*
+import com.example.team.haribo.goms.domain.place.service.*
+import com.example.team.haribo.goms.domain.review.service.*
+import com.example.team.haribo.goms.domain.review.dto.response.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
