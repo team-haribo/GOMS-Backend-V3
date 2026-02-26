@@ -118,12 +118,12 @@ class StudentCouncilController(
         return ResponseEntity.ok(lateListService.list(parsed))
     }
 
-    @GetMapping("/report/pending/list")
+    @GetMapping("/report/pending")
     fun pendingReportList(): ResponseEntity<ReportListResponse> {
         return ResponseEntity.ok(pendingReportListService.getPendingReports())
     }
 
-    @GetMapping("/report/resolved/list")
+    @GetMapping("/report/resolved")
     fun resolvedReportList(): ResponseEntity<ReportListResponse> {
         return ResponseEntity.ok(resolvedReportListService.getResolvedReports())
     }
