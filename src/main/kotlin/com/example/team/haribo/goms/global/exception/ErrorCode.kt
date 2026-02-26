@@ -51,5 +51,14 @@ enum class ErrorCode(
     REVIEW_FORBIDDEN(403, "후기에 대한 권한이 없습니다."),
     REVIEW_CONTENT_EMPTY(400, "후기 내용이 비어있습니다."),
     REVIEW_CONTENT_TOO_LONG(400, "후기 내용이 너무 깁니다."),
-    ALREADY_REVIEWED_PLACE(409, "이미 해당 장소에 후기를 작성했습니다.");
+    ALREADY_REVIEWED_PLACE(409, "이미 해당 장소에 후기를 작성했습니다."),
+
+    // REPORT
+    NOT_FOUND_REPORT(404, "신고를 찾을 수 없습니다."),
+    REPORT_FORBIDDEN(403, "신고에 대한 권한이 없습니다."),
+    REPORT_CONTENT_EMPTY(400, "신고 내용이 비어있습니다."),
+    REPORT_CONTENT_TOO_LONG(400, "신고 내용이 너무 깁니다."),
+    ALREADY_REPORTED_REVIEW(409, "이미 해당 후기를 신고했습니다."),
+    REPORT_ALREADY_RESOLVED(409, "이미 처리된 신고입니다."),
+    INVALID_REPORT_STATUS(400, "유효하지 않은 신고 상태입니다.");
 }
