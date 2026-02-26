@@ -1,37 +1,14 @@
 package com.example.team.haribo.goms.domain.report.repository
 
-import com.example.team.haribo.goms.domain.report.entity.ReviewReport
 import com.example.team.haribo.goms.domain.common.enums.ReportStatus
+import com.example.team.haribo.goms.domain.report.entity.ReviewReport
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import java.util.Optional
 
 interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
 
-    fun existsByReviewIdAndMemberId(reviewId: Long, memberId: Long): Boolean
-
-    @Query(
-        """
-        SELECT rr
-        FROM ReviewReport rr
-        JOIN FETCH rr.review r
-        JOIN FETCH r.member m
-        WHERE rr.status = :status
-        ORDER BY rr.createdAt DESC
-        """
-    )
-    fun findAllByStatusWithReviewAndReviewer(status: ReportStatus): List<ReviewReport>
-
-    @Query(
-        """
-        SELECT rr
-        FROM ReviewReport rr
-        JOIN FETCH rr.review r
-        JOIN FETCH r.member m
-        WHERE rr.id = :reportId
-        """
-    )
-    fun findByIdWithReviewAndReviewer(reportId: Long): Optional<ReviewReport>
+    fun existsByReview_IdAndMemberId(reviewId: Long, memberId: Long): Boolean
 
     @Query(
         """
@@ -52,8 +29,31 @@ interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
         JOIN FETCH rr.review r
         JOIN FETCH r.member m
         WHERE rr.id = :reportId
-          AND rr.memberId = :memberId
         """
     )
-    fun findByIdAndMemberIdWithReviewAndReviewer(reportId: Long, memberId: Long): Optional<ReviewReport>
+    fun findByIdWithReviewAndReviewer(reportId: Long): Optional<ReviewReport>
+
+    @Query(
+        """
+        SELECT rr
+        FROM ReviewReport rr
+        JOIN FETCH rr.review r
+        JOIN FETCH r.member m
+        WHERE rr.status = :status
+        ORDER BY rr.createdAt DESC
+        """
+    )
+    fun findAllByStatusWithReviewAndReviewer(status: ReportStatus): List<ReviewReport>
+
+    @Query(
+        """
+        SELECT rr
+        FROM ReviewReport rr
+        JOIN FETCH rr.review r
+        JOIN FETCH r.member m
+        WHERE rr.status IN :statuses
+        ORDER BY rr.createdAt DESC
+        """
+    )
+    fun findAllByStatusInWithReviewAndReviewer(statuses: List<ReportStatus>): List<ReviewReport>
 }
