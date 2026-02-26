@@ -31,8 +31,8 @@ class StudentCouncilPendingReportListServiceImpl(
                     reviewer_department = reviewer.department,
                     report_created_at = it.createdAt!!,
                     report_status = it.status,
-                    deleted_at = null,
-                    deleted_by = null
+                    deleted_at = review.deletedAt,
+                    deleted_by = review.deletedBy
                 )
             }
         )
