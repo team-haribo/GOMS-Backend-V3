@@ -33,10 +33,10 @@ class Review(
     @Column(name = "deleted_at")
     var deletedAt: LocalDateTime? = null
 
-    @Column(name = "deleted_by")
-    var deletedBy: Long? = null
+    @Column(name = "deleted_by", length = 30)
+    var deletedBy: String? = null
 
-    fun softDelete(deletedBy: Long) {
+    fun softDelete(deletedBy: String) {
         this.deletedBy = deletedBy
         this.deletedAt = LocalDateTime.now()
     }
