@@ -29,7 +29,7 @@ class StudentCouncilReportResolveServiceImpl(
 
         if (report.isResolved()) throw ReportAlreadyResolvedException()
 
-        val status = request.report_status
+        val status = request.reportStatus
         if (status == ReportStatus.PENDING) throw InvalidReportStatusException()
 
         report.resolve(status, resolverId)
@@ -39,11 +39,11 @@ class StudentCouncilReportResolveServiceImpl(
         }
 
         return ReportResolveResponse(
-            report_id = report.id!!,
-            review_id = report.review.id!!,
-            report_status = report.status,
-            resolved_at = report.resolvedAt!!,
-            resolved_by = report.resolvedBy!!
+            reportId = report.id!!,
+            reviewId = report.review.id!!,
+            reportStatus = report.status,
+            resolvedAt = report.resolvedAt!!,
+            resolvedBy = report.resolvedBy!!
         )
     }
 }

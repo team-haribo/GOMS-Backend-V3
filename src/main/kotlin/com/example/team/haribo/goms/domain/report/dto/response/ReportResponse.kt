@@ -3,18 +3,41 @@ package com.example.team.haribo.goms.domain.report.dto.response
 import com.example.team.haribo.goms.domain.common.enums.Department
 import com.example.team.haribo.goms.domain.common.enums.ReportReason
 import com.example.team.haribo.goms.domain.common.enums.ReportStatus
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDateTime
 
 data class ReportResponse(
-    val report_id: Long,
+
+    @JsonProperty("report_id")
+    val reportId: Long,
+
+    @JsonProperty("reason")
     val reason: ReportReason,
-    val review_id: Long,
-    val reviewer_member_id: Long,
-    val reviewer_name: String,
-    val reviewer_grade: Int,
-    val reviewer_department: Department,
-    val report_created_at: LocalDateTime,
-    val report_status: ReportStatus,
-    val deleted_at: LocalDateTime?,
-    val deleted_by: String?
+
+    @JsonProperty("review_id")
+    val reviewId: Long,
+
+    @JsonProperty("reviewer_member_id")
+    val reviewerMemberId: Long,
+
+    @JsonProperty("reviewer_name")
+    val reviewerName: String,
+
+    @JsonProperty("reviewer_grade")
+    val reviewerGrade: Int,
+
+    @JsonProperty("reviewer_department")
+    val reviewerDepartment: Department,
+
+    @JsonProperty("report_created_at")
+    val reportCreatedAt: LocalDateTime,
+
+    @JsonProperty("report_status")
+    val reportStatus: ReportStatus,
+
+    @JsonProperty("deleted_at")
+    val deletedAt: LocalDateTime?,
+
+    @JsonProperty("deleted_by")
+    val deletedBy: String?
 )

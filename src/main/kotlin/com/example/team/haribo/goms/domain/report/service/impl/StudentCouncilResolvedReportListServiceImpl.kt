@@ -15,26 +15,26 @@ class StudentCouncilResolvedReportListServiceImpl(
 
     @Transactional(readOnly = true)
     override fun getResolvedReports(): ReportListResponse {
-        val approved = reviewReportRepository.findAllByStatusWithReviewAndReviewer(ReportStatus.APPROVED)
-        val rejected = reviewReportRepository.findAllByStatusWithReviewAndReviewer(ReportStatus.REJECTED)
-        val merged = (approved + rejected).sortedByDescending { it.createdAt }
+        val reports = reviewReportRepository.findAllByStatusInWithReviewAndReviewer(
+            listOf(ReportStatus.APPROVED, ReportStatus.REJECTED)
+        )
 
         return ReportListResponse(
-            reports = merged.map {
+            reports = reports.map {
                 val review = it.review
                 val reviewer = review.member
                 ReportResponse(
-                    report_id = it.id!!,
+                    reportId = it.id!!,
                     reason = it.reason,
-                    review_id = review.id!!,
-                    reviewer_member_id = reviewer.id!!,
-                    reviewer_name = reviewer.name,
-                    reviewer_grade = reviewer.grade,
-                    reviewer_department = reviewer.department,
-                    report_created_at = it.createdAt!!,
-                    report_status = it.status,
-                    deleted_at = review.deletedAt,
-                    deleted_by = review.deletedBy
+                    reviewId = review.id!!,
+                    reviewerMemberId = reviewer.id!!,
+                    reviewerName = reviewer.name,
+                    reviewerGrade = reviewer.grade,
+                    reviewerDepartment = reviewer.department,
+                    reportCreatedAt = it.createdAt!!,
+                    reportStatus = it.status,
+                    deletedAt = review.deletedAt,
+                    deletedBy = review.deletedBy
                 )
             }
         )

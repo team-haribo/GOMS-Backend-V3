@@ -30,7 +30,7 @@ class ReportCreateServiceImpl(
         if (content.isBlank()) throw ReportContentEmptyException()
         if (content.length > 500) throw ReportContentTooLongException()
 
-        if (reviewReportRepository.existsByReviewIdAndMemberId(reviewId, reporterId)) {
+        if (reviewReportRepository.existsByReview_IdAndMemberId(reviewId, reporterId)) {
             throw AlreadyReportedReviewException()
         }
 
@@ -47,6 +47,6 @@ class ReportCreateServiceImpl(
             )
         )
 
-        return ReportCreateResponse(report_id = report.id!!)
+        return ReportCreateResponse(reportId = report.id!!)
     }
 }

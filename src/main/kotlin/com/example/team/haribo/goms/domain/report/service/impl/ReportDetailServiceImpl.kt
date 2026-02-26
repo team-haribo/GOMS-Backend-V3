@@ -31,20 +31,20 @@ class ReportDetailServiceImpl(
         val reviewer = review.member
 
         return ReportDetailResponse(
-            report_id = report.id!!,
+            reportId = report.id!!,
             reason = report.reason,
-            review_id = review.id!!,
-            review_created_at = review.createdAt!!,
-            reviewer_member_id = reviewer.id!!,
-            reviewer_name = reviewer.name,
-            reviewer_grade = reviewer.grade,
-            reviewer_department = reviewer.department,
-            review_content = review.content,
-            report_content = report.content,
-            report_created_at = report.createdAt!!,
-            report_status = report.status,
-            deleted_at = review.deletedAt,
-            deleted_by = review.deletedBy
+            reviewId = review.id!!,
+            reviewCreatedAt = review.createdAt!!,
+            reviewerMemberId = reviewer.id!!,
+            reviewerName = reviewer.name,
+            reviewerGrade = reviewer.grade,
+            reviewerDepartment = reviewer.department,
+            reviewContent = review.content,
+            reportContent = report.content,
+            reportCreatedAt = report.createdAt!!,
+            reportStatus = report.status,
+            deletedAt = review.deletedAt,
+            deletedBy = review.deletedBy
         )
     }
 }
