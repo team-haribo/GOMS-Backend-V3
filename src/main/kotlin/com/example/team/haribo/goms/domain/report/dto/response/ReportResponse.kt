@@ -1,7 +1,6 @@
 package com.example.team.haribo.goms.domain.report.dto.response
 
 import com.example.team.haribo.goms.domain.common.enums.Department
-import com.example.team.haribo.goms.domain.common.enums.ReportReason
 import com.example.team.haribo.goms.domain.common.enums.ReportStatus
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDateTime
@@ -10,9 +9,6 @@ data class ReportResponse(
 
     @JsonProperty("report_id")
     val reportId: Long,
-
-    @JsonProperty("reason")
-    val reason: ReportReason,
 
     @JsonProperty("review_id")
     val reviewId: Long,

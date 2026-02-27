@@ -1,6 +1,5 @@
 package com.example.team.haribo.goms.domain.report.entity
 
-import com.example.team.haribo.goms.domain.common.enums.ReportReason
 import com.example.team.haribo.goms.domain.common.enums.ReportStatus
 import com.example.team.haribo.goms.domain.review.entity.Review
 import jakarta.persistence.*
@@ -24,10 +23,6 @@ class ReviewReport(
 
     @Column(name = "member_id", nullable = false)
     val memberId: Long,
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val reason: ReportReason,
 
     @Column(nullable = false, length = 500)
     val content: String,

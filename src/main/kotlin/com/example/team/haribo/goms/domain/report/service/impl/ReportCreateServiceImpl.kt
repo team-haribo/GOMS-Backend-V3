@@ -41,7 +41,6 @@ class ReportCreateServiceImpl(
             ReviewReport(
                 review = review,
                 memberId = reporterId,
-                reason = request.reason,
                 content = content,
                 status = ReportStatus.PENDING
             )

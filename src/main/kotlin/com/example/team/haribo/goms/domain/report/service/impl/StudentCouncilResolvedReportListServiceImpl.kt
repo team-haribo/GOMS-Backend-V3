@@ -25,7 +25,6 @@ class StudentCouncilResolvedReportListServiceImpl(
                 val reviewer = review.member
                 ReportResponse(
                     reportId = it.id!!,
-                    reason = it.reason,
                     reviewId = review.id!!,
                     reviewerMemberId = reviewer.id!!,
                     reviewerName = reviewer.name,
