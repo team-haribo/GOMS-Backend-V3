@@ -32,7 +32,6 @@ class ReportDetailServiceImpl(
 
         return ReportDetailResponse(
             reportId = report.id!!,
-            reason = report.reason,
             reviewId = review.id!!,
             reviewCreatedAt = review.createdAt!!,
             reviewerMemberId = reviewer.id!!,
