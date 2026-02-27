@@ -5,6 +5,13 @@ import com.example.team.haribo.goms.domain.common.enums.Role
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.outing.dto.response.QrComingResponse
 import com.example.team.haribo.goms.domain.outing.dto.response.QrOutingResponse
+import com.example.team.haribo.goms.domain.report.dto.request.ReportResolveRequest
+import com.example.team.haribo.goms.domain.report.dto.response.ReportDetailResponse
+import com.example.team.haribo.goms.domain.report.dto.response.ReportListResponse
+import com.example.team.haribo.goms.domain.report.dto.response.ReportResolveResponse
+import com.example.team.haribo.goms.domain.report.service.StudentCouncilPendingReportListService
+import com.example.team.haribo.goms.domain.report.service.StudentCouncilReportResolveService
+import com.example.team.haribo.goms.domain.report.service.StudentCouncilResolvedReportListService
 import com.example.team.haribo.goms.domain.studentcouncil.dto.request.UpdateRoleRequest
 import com.example.team.haribo.goms.domain.studentcouncil.dto.request.UpdateStatusRequest
 import com.example.team.haribo.goms.domain.studentcouncil.dto.response.LateStudentsListResponse
@@ -37,7 +44,10 @@ class StudentCouncilController(
     private val outingAllowedService: StudentCouncilOutingAllowedService,
     private val forceOutService: StudentCouncilForceOutService,
     private val forceInService: StudentCouncilForceInService,
-    private val lateListService: StudentCouncilLateListService
+    private val lateListService: StudentCouncilLateListService,
+    private val pendingReportListService: StudentCouncilPendingReportListService,
+    private val resolvedReportListService: StudentCouncilResolvedReportListService,
+    private val reportResolveService: StudentCouncilReportResolveService
 ) {
 
     @PostMapping("/qr")
@@ -106,6 +116,24 @@ class StudentCouncilController(
     fun listLate(@RequestParam("date", required = false) date: String?): ResponseEntity<LateStudentsListResponse> {
         val parsed = date?.let { parseDate(it) }
         return ResponseEntity.ok(lateListService.list(parsed))
+    }
+
+    @GetMapping("/report/pending")
+    fun pendingReportList(): ResponseEntity<ReportListResponse> {
+        return ResponseEntity.ok(pendingReportListService.getPendingReports())
+    }
+
+    @GetMapping("/report/resolved")
+    fun resolvedReportList(): ResponseEntity<ReportListResponse> {
+        return ResponseEntity.ok(resolvedReportListService.getResolvedReports())
+    }
+
+    @PatchMapping("/report/{reportId}")
+    fun resolveReport(
+        @PathVariable reportId: Long,
+        @RequestBody request: ReportResolveRequest
+    ): ResponseEntity<ReportResolveResponse> {
+        return ResponseEntity.ok(reportResolveService.resolve(reportId, request))
     }
 
     private fun parseDepartment(value: String): Department {

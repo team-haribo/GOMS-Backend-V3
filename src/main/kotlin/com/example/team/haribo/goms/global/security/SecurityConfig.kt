@@ -96,6 +96,10 @@ class SecurityConfig {
                 // REVIEW
                 it.requestMatchers("/api/v3/review/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
+                // REPORT
+                it.requestMatchers("/api/v3/report/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/report/my").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+
                 // STUDENT-COUNCIL
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
                 it.anyRequest().authenticated()
