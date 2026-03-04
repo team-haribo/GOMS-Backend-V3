@@ -43,3 +43,6 @@ out/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Firebase
+secrets/
