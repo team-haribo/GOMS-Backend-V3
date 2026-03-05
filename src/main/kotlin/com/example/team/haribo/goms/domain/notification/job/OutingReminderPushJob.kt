@@ -20,7 +20,7 @@ class OutingReminderPushJob(
 
         pushSendService.send(
             tokens = tokens,
-            title = "복귀 시간 임밤",
+            title = "복귀 시간 임박",
             body = "현재 외출 상태입니다. 복귀까지 10분 남았어요!"
         )
     }
