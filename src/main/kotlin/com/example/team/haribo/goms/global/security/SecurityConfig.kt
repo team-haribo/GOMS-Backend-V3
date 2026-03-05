@@ -102,7 +102,6 @@ class SecurityConfig {
 
                 // DEVICE TOKEN
                 it.requestMatchers("/api/v3/notification/token").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
-                it.requestMatchers("/api/v3/notification/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
                 // STUDENT-COUNCIL
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
