@@ -75,5 +75,5 @@ interface MemberRepository : JpaRepository<Member, Long> {
         @Param("role") role: Role?
     ): List<Member>
 
-    fun findAllByStatus(status: com.example.team.haribo.goms.domain.common.enums.Status): List<com.example.team.haribo.goms.domain.member.entity.Member>
+    fun findAllByStatus(status: Status): List<Member>
 }
