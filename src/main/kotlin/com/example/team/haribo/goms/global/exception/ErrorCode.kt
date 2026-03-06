@@ -60,5 +60,8 @@ enum class ErrorCode(
     REPORT_CONTENT_TOO_LONG(400, "신고 내용이 너무 깁니다."),
     ALREADY_REPORTED_REVIEW(409, "이미 해당 후기를 신고했습니다."),
     REPORT_ALREADY_RESOLVED(409, "이미 처리된 신고입니다."),
-    INVALID_REPORT_STATUS(400, "유효하지 않은 신고 상태입니다.");
+    INVALID_REPORT_STATUS(400, "유효하지 않은 신고 상태입니다."),
+
+    // DEVICE TOKEN
+    NOT_FOUND_DEVICE_TOKEN(404, "해당 디바이스 토큰을 찾을 수 없습니다.");
 }

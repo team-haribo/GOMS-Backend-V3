@@ -100,6 +100,9 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/report/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/report/my").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
+                // DEVICE TOKEN
+                it.requestMatchers("/api/v3/notification/token/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+
                 // STUDENT-COUNCIL
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
                 it.anyRequest().authenticated()

@@ -52,3 +52,6 @@ jwt:
   secret: ${JWT_SECRET}
   access-exp-seconds: ${JWT_ACCESS_EXP_SECONDS}
   refresh-exp-seconds: ${JWT_REFRESH_EXP_SECONDS}
+
+fcm:
+  credentials-path: ${FCM_CREDENTIALS_PATH}

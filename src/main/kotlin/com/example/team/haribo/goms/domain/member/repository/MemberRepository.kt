@@ -74,4 +74,6 @@ interface MemberRepository : JpaRepository<Member, Long> {
         @Param("status") status: Status?,
         @Param("role") role: Role?
     ): List<Member>
+
+    fun findAllByStatus(status: Status): List<Member>
 }
