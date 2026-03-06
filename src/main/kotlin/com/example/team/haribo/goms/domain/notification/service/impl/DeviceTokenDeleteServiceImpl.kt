@@ -16,9 +16,10 @@ class DeviceTokenDeleteServiceImpl(
     @Transactional
     override fun delete(deviceId: String) {
         val memberId = memberUtil.currentMemberId()
-        val token = deviceTokenRepository.findByMember_IdAndDeviceId(memberId, deviceId)
-            ?: throw NotFoundDeviceTokenException()
+        val deletedCount = deviceTokenRepository.deleteByMember_IdAndDeviceId(memberId, deviceId)
 
-        deviceTokenRepository.delete(token)
+        if (deletedCount == 0L) {
+            throw NotFoundDeviceTokenException()
+        }
     }
 }
