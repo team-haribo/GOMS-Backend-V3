@@ -16,6 +16,5 @@ class DeviceTokenQueryServiceImpl(
 
         return deviceTokenRepository.findAllByMember_IdIn(memberIds)
             .map { it.fcmToken }
-            .distinct()
     }
 }
