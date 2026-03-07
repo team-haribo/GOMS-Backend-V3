@@ -8,6 +8,10 @@ import java.time.Duration
 class RefreshTokenRedisRepository(
     private val redisTemplate: StringRedisTemplate
 ) {
+    companion object {
+        private const val KEY_PREFIX = "auth:refresh"
+    }
+
     fun save(memberId: Long, refreshToken: String, ttlSeconds: Long) {
         redisTemplate.opsForValue().set(
             key(memberId),
@@ -25,6 +29,6 @@ class RefreshTokenRedisRepository(
     }
 
     private fun key(memberId: Long): String {
-        return "auth:refresh:$memberId"
+        return "$KEY_PREFIX:$memberId"
     }
 }
