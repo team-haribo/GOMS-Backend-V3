@@ -73,10 +73,10 @@ class SigninServiceImplTest : DescribeSpec({
         context("Given: 존재하지 않는 이메일") {
             every { memberRepository.findByEmail(any()) } returns Optional.empty()
 
-            it("When: 로그인 시 Then: INVALID_CREDENTIALS 예외가 발생한다") {
+            it("When: 로그인 시 Then: NOT_FOUND_EMAIL 예외가 발생한다") {
                 shouldThrow<GlobalException> {
                     service.signin(validRequest)
-                }.errorCode shouldBe ErrorCode.INVALID_CREDENTIALS
+                }.errorCode shouldBe ErrorCode.NOT_FOUND_EMAIL
             }
         }
 
@@ -84,10 +84,10 @@ class SigninServiceImplTest : DescribeSpec({
             every { memberRepository.findByEmail(any()) } returns Optional.of(member)
             every { passwordEncoder.matches(any(), any()) } returns false
 
-            it("When: 로그인 시 Then: INVALID_CREDENTIALS 예외가 발생한다") {
+            it("When: 로그인 시 Then: PASSWORD_MISMATCH 예외가 발생한다") {
                 shouldThrow<GlobalException> {
                     service.signin(validRequest.copy(password = "wrongPassword"))
-                }.errorCode shouldBe ErrorCode.INVALID_CREDENTIALS
+                }.errorCode shouldBe ErrorCode.PASSWORD_MISMATCH
             }
         }
 
