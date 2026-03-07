@@ -71,6 +71,9 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/auth/reissue").permitAll()
                 it.requestMatchers("/api/v3/auth/password").permitAll()
 
+                // MEMBER
+                it.requestMatchers("/api/v3/member/withdraw").permitAll()
+
                 // OUTING
                 it.requestMatchers("/api/v3/outing/status").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/outing/in").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
