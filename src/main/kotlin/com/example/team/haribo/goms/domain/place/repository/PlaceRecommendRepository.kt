@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Optional
 
 interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
 
@@ -21,6 +21,8 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
     fun countByMemberIdAndRecommendedTrue(memberId: Long): Long
 
     fun findAllByMemberIdAndRecommendedTrue(memberId: Long): List<PlaceRecommend>
+
+    fun deleteAllByMember_Id(memberId: Long): Long
 
     @Query(
         """

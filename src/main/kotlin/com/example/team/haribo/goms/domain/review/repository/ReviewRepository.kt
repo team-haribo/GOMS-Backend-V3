@@ -29,4 +29,6 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun countActiveByPlaceId(placeId: Long): Long
 
     fun existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId: Long, memberId: Long): Boolean
+
+    fun deleteAllByMember_Id(memberId: Long): Long
 }

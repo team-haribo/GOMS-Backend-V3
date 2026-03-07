@@ -9,4 +9,6 @@ interface AuthRefreshTokenRepository : JpaRepository<AuthRefreshToken, Long> {
     fun findByMemberId(memberId: Long): Optional<AuthRefreshToken>
 
     fun findByRefreshToken(refreshToken: String): Optional<AuthRefreshToken>
+
+    fun deleteByMemberId(memberId: Long): Long
 }
