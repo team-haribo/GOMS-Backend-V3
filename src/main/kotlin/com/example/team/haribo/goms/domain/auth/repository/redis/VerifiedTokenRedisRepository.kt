@@ -9,6 +9,10 @@ import java.time.Duration
 class VerifiedTokenRedisRepository(
     private val redisTemplate: StringRedisTemplate
 ) {
+    companion object {
+        private const val KEY_PREFIX = "auth:verified-token"
+    }
+
     fun save(email: String, purpose: Purpose, verifiedToken: String, ttlSeconds: Long) {
         redisTemplate.opsForValue().set(
             key(email, purpose),
@@ -26,6 +30,6 @@ class VerifiedTokenRedisRepository(
     }
 
     private fun key(email: String, purpose: Purpose): String {
-        return "auth:verified-token:${purpose.name}:$email"
+        return "$KEY_PREFIX:${purpose.name}:$email"
     }
 }
