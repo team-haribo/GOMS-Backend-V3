@@ -6,7 +6,6 @@ import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.exception.GlobalException
 import com.example.team.haribo.goms.global.jwt.JwtProvider
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class SignoutServiceImpl(
@@ -14,7 +13,6 @@ class SignoutServiceImpl(
     private val jwtProvider: JwtProvider
 ) : SignoutService {
 
-    @Transactional
     override fun signout(refreshTokenHeader: String) {
         val token = refreshTokenHeader.removePrefix("Bearer ").trim()
         val claims = jwtProvider.parseClaims(token)
