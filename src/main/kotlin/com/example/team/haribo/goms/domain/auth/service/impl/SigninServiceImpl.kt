@@ -3,6 +3,8 @@ package com.example.team.haribo.goms.domain.auth.service.impl
 import com.example.team.haribo.goms.domain.auth.dto.request.SigninRequest
 import com.example.team.haribo.goms.domain.auth.dto.response.TokenResponse
 import com.example.team.haribo.goms.domain.auth.entity.AuthRefreshToken
+import com.example.team.haribo.goms.domain.auth.exception.NotFoundEmailException
+import com.example.team.haribo.goms.domain.auth.exception.PasswordMismatchException
 import com.example.team.haribo.goms.domain.auth.repository.AuthRefreshTokenRepository
 import com.example.team.haribo.goms.domain.auth.service.SigninService
 import com.example.team.haribo.goms.domain.auth.util.AuthValidators
@@ -27,10 +29,10 @@ class SigninServiceImpl(
         AuthValidators.validateEmail(request.email)
 
         val member = memberRepository.findByEmail(request.email)
-            .orElseThrow { GlobalException(ErrorCode.INVALID_CREDENTIALS) }
+            .orElseThrow { NotFoundEmailException() }
 
         if (!passwordEncoder.matches(request.password, member.password)) {
-            throw GlobalException(ErrorCode.INVALID_CREDENTIALS)
+            throw PasswordMismatchException()
         }
 
         val memberId = member.id ?: throw GlobalException(ErrorCode.NOT_FOUND_MEMBER)
