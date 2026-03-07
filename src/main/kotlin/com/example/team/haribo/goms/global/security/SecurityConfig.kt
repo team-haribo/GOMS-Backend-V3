@@ -53,14 +53,8 @@ class SecurityConfig {
                 it.accessDeniedHandler(JwtAccessDeniedHandler(objectMapper))
             }
             .authorizeHttpRequests {
-                it.requestMatchers(
-                    "/",
-                    "/health",
-                    "/healthz",
-                    "/actuator/health",
-                    "/actuator/info",
-                    "/error"
-                ).permitAll()
+                // COMMON
+                it.requestMatchers("/error").permitAll()
 
                 // AUTH
                 it.requestMatchers("/api/v3/auth/email-verifications/send").permitAll()
@@ -70,6 +64,9 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/auth/signout").permitAll()
                 it.requestMatchers("/api/v3/auth/reissue").permitAll()
                 it.requestMatchers("/api/v3/auth/password").permitAll()
+
+                // HEALTH CHECK
+                it.requestMatchers("/api/v3/health").permitAll()
 
                 // MEMBER
                 it.requestMatchers("/api/v3/member/withdraw").authenticated()
