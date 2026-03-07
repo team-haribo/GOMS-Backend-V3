@@ -1,7 +1,7 @@
 package com.example.team.haribo.goms.domain.auth.service.impl
 
 import com.example.team.haribo.goms.domain.auth.dto.request.SignupRequest
-import com.example.team.haribo.goms.domain.auth.repository.EmailVerificationRepository
+import com.example.team.haribo.goms.domain.auth.repository.redis.VerifiedTokenRedisRepository
 import com.example.team.haribo.goms.domain.auth.service.SignupService
 import com.example.team.haribo.goms.domain.auth.util.AuthValidators
 import com.example.team.haribo.goms.domain.common.enums.Purpose
@@ -13,12 +13,11 @@ import com.example.team.haribo.goms.global.exception.GlobalException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Service
 class SignupServiceImpl(
     private val memberRepository: MemberRepository,
-    private val emailVerificationRepository: EmailVerificationRepository,
+    private val verifiedTokenRedisRepository: VerifiedTokenRedisRepository,
     private val passwordEncoder: PasswordEncoder
 ) : SignupService {
 
@@ -28,13 +27,10 @@ class SignupServiceImpl(
             throw GlobalException(ErrorCode.ALREADY_REGISTERED_EMAIL)
         }
 
-        val verification = emailVerificationRepository
-            .findByEmailAndPurpose(request.email, Purpose.SIGNUP)
-            .orElseThrow { GlobalException(ErrorCode.INVALID_VERIFIED_TOKEN) }
+        val storedVerifiedToken = verifiedTokenRedisRepository.find(request.email, Purpose.SIGNUP)
+            ?: throw GlobalException(ErrorCode.INVALID_VERIFIED_TOKEN)
 
-        val isTokenMismatched = verification.verifiedToken != request.verifiedToken
-        val isExpired = verification.verifiedTokenExpiresAt?.isBefore(LocalDateTime.now()) ?: true
-        if (isTokenMismatched || isExpired) {
+        if (storedVerifiedToken != request.verifiedToken) {
             throw GlobalException(ErrorCode.INVALID_VERIFIED_TOKEN)
         }
 
@@ -54,5 +50,6 @@ class SignupServiceImpl(
         )
 
         memberRepository.save(member)
+        verifiedTokenRedisRepository.delete(request.email, Purpose.SIGNUP)
     }
 }
