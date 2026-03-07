@@ -117,9 +117,11 @@ class EmailVerificationServiceImplTest : DescribeSpec({
 
         context("Given: 유효한 코드") {
             beforeEach {
+                every { codeRedisRepository.getConfirmFailCount(email, Purpose.SIGNUP) } returns 0L
                 every { codeRedisRepository.find(email, Purpose.SIGNUP) } returns "123456"
                 justRun { verifiedTokenRedisRepository.save(email, Purpose.SIGNUP, any(), 600) }
                 justRun { codeRedisRepository.delete(email, Purpose.SIGNUP) }
+                justRun { codeRedisRepository.deleteConfirmFailCount(email, Purpose.SIGNUP) }
             }
 
             it("When: 코드 확인 시 Then: UUID 토큰을 반환하고 verifiedToken을 저장한다") {
@@ -130,11 +132,13 @@ class EmailVerificationServiceImplTest : DescribeSpec({
                 response.verifiedToken.length shouldBe 36
                 verify(exactly = 1) { verifiedTokenRedisRepository.save(email, Purpose.SIGNUP, response.verifiedToken, 600) }
                 verify(exactly = 1) { codeRedisRepository.delete(email, Purpose.SIGNUP) }
+                verify(exactly = 1) { codeRedisRepository.deleteConfirmFailCount(email, Purpose.SIGNUP) }
             }
         }
 
         context("Given: 코드 만료") {
             beforeEach {
+                every { codeRedisRepository.getConfirmFailCount(email, Purpose.SIGNUP) } returns 0L
                 every { codeRedisRepository.find(email, Purpose.SIGNUP) } returns null
             }
 
@@ -149,7 +153,9 @@ class EmailVerificationServiceImplTest : DescribeSpec({
 
         context("Given: 코드 불일치") {
             beforeEach {
+                every { codeRedisRepository.getConfirmFailCount(email, Purpose.SIGNUP) } returns 0L
                 every { codeRedisRepository.find(email, Purpose.SIGNUP) } returns "123456"
+                every { codeRedisRepository.increaseConfirmFailCount(email, Purpose.SIGNUP, 300) } returns 1L
             }
 
             it("When: 잘못된 코드로 확인 시 Then: VerificationCodeMismatchException이 발생한다") {
