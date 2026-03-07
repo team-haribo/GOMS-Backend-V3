@@ -43,7 +43,7 @@ class MemberWithdrawServiceImpl(
         reviewRepository.deleteAllByMember_Id(memberId)
         placeRecommendRepository.deleteAllByMember_Id(memberId)
         outingRepository.deleteAllByMember_Id(memberId)
-        authRefreshTokenRepository.deleteByMemberId(memberId)
+        authRefreshTokenRepository.deleteAllByMemberId(memberId)
         memberRepository.delete(member)
     }
 }

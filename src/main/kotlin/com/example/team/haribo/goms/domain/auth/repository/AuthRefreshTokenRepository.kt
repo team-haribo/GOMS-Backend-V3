@@ -10,5 +10,5 @@ interface AuthRefreshTokenRepository : JpaRepository<AuthRefreshToken, Long> {
 
     fun findByRefreshToken(refreshToken: String): Optional<AuthRefreshToken>
 
-    fun deleteByMemberId(memberId: Long): Long
+    fun deleteAllByMemberId(memberId: Long): Long
 }
