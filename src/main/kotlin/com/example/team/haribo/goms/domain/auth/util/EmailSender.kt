@@ -15,7 +15,7 @@ class EmailSender(
     fun sendVerificationCode(email: String, code: String) {
         val html = ClassPathResource("templates/mail/verification.html")
             .inputStream
-            .readBytes()
+            .use { it.readBytes() }
             .toString(StandardCharsets.UTF_8)
             .replace("{{code}}", code)
 
