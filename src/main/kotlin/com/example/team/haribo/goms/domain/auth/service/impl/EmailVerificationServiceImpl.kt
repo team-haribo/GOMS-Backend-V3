@@ -16,7 +16,7 @@ import com.example.team.haribo.goms.domain.auth.util.EmailSender
 import com.example.team.haribo.goms.domain.common.enums.Purpose
 import com.example.team.haribo.goms.domain.member.repository.MemberRepository
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
+import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -28,7 +28,6 @@ class EmailVerificationServiceImpl(
     private val emailSender: EmailSender
 ) : EmailVerificationService {
 
-    @Transactional
     override fun send(request: EmailVerificationSendRequest) {
         AuthValidators.validateEmail(request.email)
 
@@ -44,7 +43,7 @@ class EmailVerificationServiceImpl(
             throw TooManyRequestsException()
         }
 
-        val code = (100000..999999).random().toString()
+        val code = (SecureRandom().nextInt(900000) + 100000).toString()
 
         emailVerificationCodeRedisRepository.save(request.email, request.purpose, code, 300)
         emailVerificationCodeRedisRepository.saveCooldown(request.email, request.purpose, 60)
@@ -52,12 +51,27 @@ class EmailVerificationServiceImpl(
         emailSender.sendVerificationCode(request.email, code)
     }
 
-    @Transactional
     override fun confirm(request: EmailVerificationConfirmRequest): EmailVerificationConfirmResponse {
+        if (emailVerificationCodeRedisRepository.getConfirmFailCount(request.email, request.purpose) >= 5) {
+            throw TooManyRequestsException()
+        }
+
         val storedCode = emailVerificationCodeRedisRepository.find(request.email, request.purpose)
             ?: throw VerificationCodeExpiredException()
 
         if (storedCode != request.code) {
+            val failCount = emailVerificationCodeRedisRepository.increaseConfirmFailCount(
+                request.email,
+                request.purpose,
+                300
+            )
+
+            if (failCount >= 5) {
+                emailVerificationCodeRedisRepository.delete(request.email, request.purpose)
+                emailVerificationCodeRedisRepository.deleteConfirmFailCount(request.email, request.purpose)
+                throw TooManyRequestsException()
+            }
+
             throw VerificationCodeMismatchException()
         }
 
@@ -66,6 +80,7 @@ class EmailVerificationServiceImpl(
 
         verifiedTokenRedisRepository.save(request.email, request.purpose, verifiedToken, 600)
         emailVerificationCodeRedisRepository.delete(request.email, request.purpose)
+        emailVerificationCodeRedisRepository.deleteConfirmFailCount(request.email, request.purpose)
 
         return EmailVerificationConfirmResponse(
             verifiedToken = verifiedToken,
