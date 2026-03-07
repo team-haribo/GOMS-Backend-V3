@@ -44,6 +44,9 @@ dependencies {
     // Kotlin
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
 
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     // DB
     runtimeOnly 'com.mysql:mysql-connector-j'
 
