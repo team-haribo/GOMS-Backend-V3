@@ -27,6 +27,7 @@ enum class ErrorCode(
     // MEMBER
     NOT_FOUND_MEMBER(404, "해당 사용자를 찾을 수 없습니다."),
     ALREADY_REGISTERED_EMAIL(409, "이미 가입된 이메일입니다."),
+    MEMBER_WITHDRAW_PASSWORD_MISMATCH(403, "회원 탈퇴 비밀번호가 일치하지 않습니다."),
 
     // OUTING
     CANNOT_OUTING(403, "외출이 금지된 사용자입니다."),

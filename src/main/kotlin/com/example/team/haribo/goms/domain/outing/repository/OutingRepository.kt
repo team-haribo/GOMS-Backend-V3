@@ -9,6 +9,8 @@ interface OutingRepository : JpaRepository<Outing, Long> {
 
     fun findTopByMemberIdAndComingAtIsNullOrderByIdDesc(memberId: Long): Outing?
 
+    fun deleteAllByMember_Id(memberId: Long): Long
+
     @Query(
         """
         select o from Outing o

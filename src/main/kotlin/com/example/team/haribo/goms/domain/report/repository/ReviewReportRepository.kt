@@ -10,6 +10,10 @@ interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
 
     fun existsByReview_IdAndMemberId(reviewId: Long, memberId: Long): Boolean
 
+    fun deleteAllByMemberId(memberId: Long): Long
+
+    fun deleteAllByReview_Member_Id(memberId: Long): Long
+
     @Query(
         """
         SELECT rr
