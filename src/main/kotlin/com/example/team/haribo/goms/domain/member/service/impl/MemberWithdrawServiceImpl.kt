@@ -1,6 +1,6 @@
 package com.example.team.haribo.goms.domain.member.service.impl
 
-import com.example.team.haribo.goms.domain.auth.repository.AuthRefreshTokenRepository
+import com.example.team.haribo.goms.domain.auth.repository.redis.RefreshTokenRedisRepository
 import com.example.team.haribo.goms.domain.late.repository.LateRepository
 import com.example.team.haribo.goms.domain.member.dto.request.MemberWithdrawRequest
 import com.example.team.haribo.goms.domain.member.exception.MemberWithdrawPasswordMismatchException
@@ -24,7 +24,7 @@ class MemberWithdrawServiceImpl(
     private val reviewRepository: ReviewRepository,
     private val placeRecommendRepository: PlaceRecommendRepository,
     private val outingRepository: OutingRepository,
-    private val authRefreshTokenRepository: AuthRefreshTokenRepository,
+    private val refreshTokenRedisRepository: RefreshTokenRedisRepository,
     private val memberRepository: MemberRepository
 ) : MemberWithdrawService {
 
@@ -43,7 +43,7 @@ class MemberWithdrawServiceImpl(
         reviewRepository.deleteAllByMember_Id(memberId)
         placeRecommendRepository.deleteAllByMember_Id(memberId)
         outingRepository.deleteAllByMember_Id(memberId)
-        authRefreshTokenRepository.deleteAllByMemberId(memberId)
+        refreshTokenRedisRepository.deleteByMemberId(memberId)
         memberRepository.delete(member)
     }
 }

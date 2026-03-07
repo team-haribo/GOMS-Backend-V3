@@ -18,6 +18,13 @@ spring:
         format_sql: ${JPA_FORMAT_SQL:false}
         dialect: org.hibernate.dialect.MySQLDialect
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3s
+
   jackson:
     time-zone: Asia/Seoul
 

@@ -1,25 +1,27 @@
 package com.example.team.haribo.goms.domain.auth.service.impl
 
 import com.example.team.haribo.goms.domain.auth.dto.response.TokenResponse
-import com.example.team.haribo.goms.domain.auth.repository.AuthRefreshTokenRepository
+import com.example.team.haribo.goms.domain.auth.repository.redis.RefreshTokenRedisRepository
 import com.example.team.haribo.goms.domain.auth.service.ReissueService
+import com.example.team.haribo.goms.domain.member.repository.MemberRepository
 import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.exception.GlobalException
 import com.example.team.haribo.goms.global.jwt.JwtProvider
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Service
 class ReissueServiceImpl(
-    private val refreshTokenRepository: AuthRefreshTokenRepository,
+    private val refreshTokenRedisRepository: RefreshTokenRedisRepository,
+    private val memberRepository: MemberRepository,
     private val jwtProvider: JwtProvider
 ) : ReissueService {
 
-    @Transactional
+    @Transactional(readOnly = true)
     override fun reissue(refreshTokenHeader: String): TokenResponse {
         val token = refreshTokenHeader.removePrefix("Bearer ").trim()
-
         val claims = jwtProvider.parseClaims(token)
 
         if (claims["type"] != "REFRESH") {
@@ -28,33 +30,31 @@ class ReissueServiceImpl(
 
         val memberId = claims.subject.toLong()
 
-        val stored = refreshTokenRepository.findByMemberId(memberId)
-            .orElseThrow { GlobalException(ErrorCode.INVALID_REFRESH_TOKEN) }
+        val storedToken = refreshTokenRedisRepository.findByMemberId(memberId)
+            ?: throw GlobalException(ErrorCode.INVALID_REFRESH_TOKEN)
 
-        val isTokenMismatched = stored.refreshToken != token
-        val isExpired = stored.expiresAt.isBefore(LocalDateTime.now())
-        val isRevoked = stored.revokedAt != null
-
-        if (isTokenMismatched || isExpired || isRevoked) {
+        if (storedToken != token) {
             throw GlobalException(ErrorCode.INVALID_REFRESH_TOKEN)
         }
 
-        val role = claims["role"]?.toString() ?: "ROLE_STUDENT"
+        val member = memberRepository.findById(memberId)
+            .orElseThrow { GlobalException(ErrorCode.NOT_FOUND_MEMBER) }
 
-        val newAccess = jwtProvider.createAccessToken(memberId, role)
-        val newRefresh = jwtProvider.createRefreshToken(memberId)
+        val newAccessToken = jwtProvider.createAccessToken(memberId, member.role.name)
+        val newRefreshToken = jwtProvider.createRefreshToken(memberId)
+        val accessExpiresAt = jwtProvider.getAccessExpirationDate()
+        val refreshExpiresAt = jwtProvider.getRefreshExpirationDate()
 
-        stored.refreshToken = newRefresh
-        stored.expiresAt = jwtProvider.getRefreshExpirationDate()
-        stored.revokedAt = null
+        val refreshTtlSeconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), refreshExpiresAt)
+            .coerceAtLeast(1)
 
-        refreshTokenRepository.save(stored)
+        refreshTokenRedisRepository.save(memberId, newRefreshToken, refreshTtlSeconds)
 
         return TokenResponse(
-            accessToken = newAccess,
-            refreshToken = newRefresh,
-            accessTokenExpiresIn = jwtProvider.getAccessExpirationDate(),
-            refreshTokenExpiresIn = jwtProvider.getRefreshExpirationDate()
+            accessToken = newAccessToken,
+            refreshToken = newRefreshToken,
+            accessTokenExpiresIn = accessExpiresAt,
+            refreshTokenExpiresIn = refreshExpiresAt
         )
     }
 }
