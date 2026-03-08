@@ -62,3 +62,12 @@ jwt:
 
 fcm:
   credentials-path: ${FCM_CREDENTIALS_PATH}
+
+springdoc:
+  api-docs:
+    path: ${SPRINGDOC_API_DOCS_PATH}
+  swagger-ui:
+    path: ${SPRINGDOC_SWAGGER_UI_PATH}
+    operations-sorter: ${SPRINGDOC_OPERATIONS_SORTER}
+    tags-sorter: ${SPRINGDOC_TAGS_SORTER}
+    display-request-duration: ${SPRINGDOC_DISPLAY_REQUEST_DURATION}
