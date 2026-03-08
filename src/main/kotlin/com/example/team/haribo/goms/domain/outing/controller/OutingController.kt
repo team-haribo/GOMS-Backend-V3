@@ -13,6 +13,7 @@ import com.example.team.haribo.goms.domain.outing.service.OutingStudentSearchSer
 import com.example.team.haribo.goms.domain.outing.service.QrComingService
 import com.example.team.haribo.goms.domain.outing.service.QrOutingService
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
@@ -49,7 +50,7 @@ class OutingController(
 
     @Operation(
         summary = "QR 외출 처리",
-        description = "QR 토큰을 사용해 외출 처리합니다.",
+        description = "QR 정보를 사용해 외출 처리합니다.",
         requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
             content = [
@@ -59,7 +60,8 @@ class OutingController(
                         ExampleObject(
                             value = """
                             {
-                              "token": "eyJhbGciOiJIUzI1NiJ9..."
+                              "uuid": "c55a20d8-6039-45a0-9e53-332120365214",
+                              "exp": 1672531199
                             }
                             """
                         )
@@ -69,7 +71,7 @@ class OutingController(
         ),
         responses = [
             ApiResponse(responseCode = "200", description = "외출 처리 성공"),
-            ApiResponse(responseCode = "400", description = "QR 토큰 오류")
+            ApiResponse(responseCode = "400", description = "QR 정보 오류")
         ]
     )
     @PostMapping("/in")
@@ -79,7 +81,7 @@ class OutingController(
 
     @Operation(
         summary = "QR 복귀 처리",
-        description = "QR 토큰을 사용해 복귀 처리합니다.",
+        description = "QR 정보를 사용해 복귀 처리합니다.",
         requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
             content = [
@@ -89,7 +91,8 @@ class OutingController(
                         ExampleObject(
                             value = """
                             {
-                              "token": "eyJhbGciOiJIUzI1NiJ9..."
+                              "uuid": "c55a20d8-6039-45a0-9e53-332120365214",
+                              "exp": 1672531199
                             }
                             """
                         )
@@ -99,7 +102,7 @@ class OutingController(
         ),
         responses = [
             ApiResponse(responseCode = "200", description = "복귀 처리 성공"),
-            ApiResponse(responseCode = "400", description = "QR 토큰 오류")
+            ApiResponse(responseCode = "400", description = "QR 정보 오류")
         ]
     )
     @PostMapping("/out")
@@ -134,6 +137,14 @@ class OutingController(
     @Operation(
         summary = "외출 학생 이름 검색",
         description = "현재 외출 중인 학생을 이름으로 검색합니다.",
+        parameters = [
+            Parameter(
+                name = "name",
+                description = "검색할 학생 이름",
+                required = false,
+                example = "김준표"
+            )
+        ],
         responses = [
             ApiResponse(responseCode = "200", description = "검색 성공")
         ]
