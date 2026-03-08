@@ -15,6 +15,7 @@ import com.example.team.haribo.goms.domain.auth.service.SignoutService
 import com.example.team.haribo.goms.domain.auth.service.SignupService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
@@ -170,6 +171,7 @@ class AuthController(
         parameters = [
             Parameter(
                 name = "RefreshToken",
+                `in` = ParameterIn.HEADER,
                 description = "리프레시 토큰",
                 required = true,
                 example = "Bearer eyJhbGciOiJIUzI1NiJ9..."
@@ -219,6 +221,7 @@ class AuthController(
         parameters = [
             Parameter(
                 name = "RefreshToken",
+                `in` = ParameterIn.HEADER,
                 description = "리프레시 토큰",
                 required = true,
                 example = "Bearer eyJhbGciOiJIUzI1NiJ9..."
