@@ -28,7 +28,7 @@ class CorsConfig(
             )
             allowedHeaders = listOf("*")
             exposedHeaders = listOf("Authorization")
-            allowCredentials = false
+            allowCredentials = true
             maxAge = 3600
         }
 
