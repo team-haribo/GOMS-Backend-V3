@@ -48,7 +48,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // DB
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    // runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -72,6 +73,7 @@ dependencies {
     testImplementation 'io.kotest:kotest-property:6.1.3'
     testImplementation 'io.mockk:mockk:1.14.9'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
