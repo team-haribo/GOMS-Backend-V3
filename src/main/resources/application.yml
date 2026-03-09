@@ -2,46 +2,11 @@ spring:
   application:
     name: goms-server-v3
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:goms_v3_db}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:1234}
-
-  jpa:
-    hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:update}
-    open-in-view: false
-    show-sql: ${JPA_SHOW_SQL:false}
-    properties:
-      hibernate:
-        format_sql: ${JPA_FORMAT_SQL:false}
-        dialect: org.hibernate.dialect.MySQLDialect
-
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      timeout: 3s
-
   jackson:
     time-zone: Asia/Seoul
 
-  mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${PORT:8080}
 
 logging:
   level:
@@ -55,19 +20,11 @@ management:
       exposure:
         include: health,info
 
-jwt:
-  secret: ${JWT_SECRET}
-  access-exp-seconds: ${JWT_ACCESS_EXP_SECONDS}
-  refresh-exp-seconds: ${JWT_REFRESH_EXP_SECONDS}
-
-fcm:
-  credentials-path: ${FCM_CREDENTIALS_PATH}
-
 springdoc:
   api-docs:
-    path: ${SPRINGDOC_API_DOCS_PATH}
+    path: ${SPRINGDOC_API_DOCS_PATH:/v3/api-docs}
   swagger-ui:
-    path: ${SPRINGDOC_SWAGGER_UI_PATH}
-    operations-sorter: ${SPRINGDOC_OPERATIONS_SORTER}
-    tags-sorter: ${SPRINGDOC_TAGS_SORTER}
-    display-request-duration: ${SPRINGDOC_DISPLAY_REQUEST_DURATION}
+    path: ${SPRINGDOC_SWAGGER_UI_PATH:/swagger-ui.html}
+    operations-sorter: ${SPRINGDOC_OPERATIONS_SORTER:method}
+    tags-sorter: ${SPRINGDOC_TAGS_SORTER:alpha}
+    display-request-duration: ${SPRINGDOC_DISPLAY_REQUEST_DURATION:true}

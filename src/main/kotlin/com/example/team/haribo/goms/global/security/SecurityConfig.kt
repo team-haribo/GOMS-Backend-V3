@@ -44,6 +44,7 @@ class SecurityConfig {
         objectMapper: ObjectMapper
     ): SecurityFilterChain {
         return http
+            .cors {  }
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
