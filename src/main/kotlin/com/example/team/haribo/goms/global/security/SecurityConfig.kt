@@ -55,6 +55,9 @@ class SecurityConfig {
             .authorizeHttpRequests {
                 // COMMON
                 it.requestMatchers("/error").permitAll()
+                it.requestMatchers("/v3/api-docs/**").permitAll()
+                it.requestMatchers("/swagger-ui.html").permitAll()
+                it.requestMatchers("/swagger-ui/**").permitAll()
 
                 // AUTH
                 it.requestMatchers("/api/v3/auth/email-verifications/send").permitAll()
