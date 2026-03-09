@@ -40,4 +40,4 @@ jwt:
   refresh-exp-seconds: ${JWT_REFRESH_EXP_SECONDS:1209600}
 
 fcm:
-  credentials-path: ${FCM_CREDENTIALS_PATH}
+  credentials-json: ${FCM_CREDENTIALS_JSON}
