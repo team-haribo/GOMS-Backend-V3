@@ -1,4 +1,8 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
+
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
@@ -41,3 +45,7 @@ jwt:
 
 fcm:
   credentials-path: ${FCM_CREDENTIALS_PATH}
+
+discord:
+  webhook-url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1485603494437195786/_BmSfjiKZMuPIMFVaSQzLn2ZZFkztXh9dbu-YFu7QaHwpSR_CVk0mC66kklut5P7BnxK}
+  deploy-env: ${DEPLOY_ENV:local}

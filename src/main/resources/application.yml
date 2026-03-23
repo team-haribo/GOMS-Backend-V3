@@ -2,6 +2,9 @@ spring:
   application:
     name: goms-server-v3
 
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+
   jackson:
     time-zone: Asia/Seoul
 
