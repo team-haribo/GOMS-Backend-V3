@@ -145,7 +145,7 @@ class OutingController(
             Parameter(
                 name = "name",
                 description = "검색할 학생 이름",
-                required = false,
+                required = true,
                 example = "김준표"
             )
         ],
