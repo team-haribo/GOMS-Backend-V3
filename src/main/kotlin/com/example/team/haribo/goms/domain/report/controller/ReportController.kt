@@ -7,10 +7,14 @@ import com.example.team.haribo.goms.domain.report.dto.response.ReportListRespons
 import com.example.team.haribo.goms.domain.report.service.ReportCreateService
 import com.example.team.haribo.goms.domain.report.service.ReportDetailService
 import com.example.team.haribo.goms.domain.report.service.ReportMyListService
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Positive
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@Validated
 @RequestMapping("/api/v3/report")
 class ReportController(
     private val reportCreateService: ReportCreateService,
@@ -20,8 +24,10 @@ class ReportController(
 
     @PostMapping("/{reviewId}")
     fun create(
-        @PathVariable reviewId: Long,
-        @RequestBody request: ReportCreateRequest
+        @PathVariable
+        @Positive(message = "reviewId 는 1 이상이어야 합니다.")
+        reviewId: Long,
+        @Valid @RequestBody request: ReportCreateRequest
     ): ResponseEntity<ReportCreateResponse> {
         return ResponseEntity.status(201).body(reportCreateService.create(reviewId, request))
     }
@@ -32,7 +38,11 @@ class ReportController(
     }
 
     @GetMapping("/{reportId}")
-    fun reportDetail(@PathVariable reportId: Long): ResponseEntity<ReportDetailResponse> {
+    fun reportDetail(
+        @PathVariable
+        @Positive(message = "reportId 는 1 이상이어야 합니다.")
+        reportId: Long
+    ): ResponseEntity<ReportDetailResponse> {
         return ResponseEntity.ok(reportDetailService.getReportDetail(reportId))
     }
 }

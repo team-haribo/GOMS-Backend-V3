@@ -12,16 +12,16 @@ import com.example.team.haribo.goms.domain.studentcouncil.service.StudentCouncil
 import com.example.team.haribo.goms.domain.studentcouncil.service.StudentCouncilMemberSearchService
 import com.example.team.haribo.goms.domain.studentcouncil.service.StudentCouncilOutingAllowedService
 import com.example.team.haribo.goms.domain.studentcouncil.service.StudentCouncilRoleUpdateService
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.Positive
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.*
 
 @RestController
+@Validated
 @RequestMapping("/api/v3/student-council")
 class StudentCouncilMemberController(
     private val memberListService: StudentCouncilMemberListService,
@@ -46,7 +46,10 @@ class StudentCouncilMemberController(
     @GetMapping("/filter")
     fun filterMembers(
         @RequestParam("name", required = false) name: String?,
-        @RequestParam("grade", required = false) grade: Int?,
+        @RequestParam("grade", required = false)
+        @Min(value = 1, message = "grade 는 1 이상이어야 합니다.")
+        @Max(value = 3, message = "grade 는 3 이하여야 합니다.")
+        grade: Int?,
         @RequestParam("department", required = false) department: Department?,
         @RequestParam("status", required = false) status: Status?,
         @RequestParam("role", required = false) role: Role?
@@ -64,8 +67,10 @@ class StudentCouncilMemberController(
 
     @PatchMapping("/role/{memberId}")
     fun updateRole(
-        @PathVariable memberId: Long,
-        @RequestBody request: UpdateRoleRequest
+        @PathVariable
+        @Positive(message = "memberId 는 1 이상이어야 합니다.")
+        memberId: Long,
+        @Valid @RequestBody request: UpdateRoleRequest
     ): ResponseEntity<Void> {
         roleUpdateService.update(memberId, request.role)
         return ResponseEntity.ok().build()
@@ -73,8 +78,10 @@ class StudentCouncilMemberController(
 
     @PatchMapping("/outing-allowed/{memberId}")
     fun updateOutingAllowed(
-        @PathVariable memberId: Long,
-        @RequestBody request: UpdateStatusRequest
+        @PathVariable
+        @Positive(message = "memberId 는 1 이상이어야 합니다.")
+        memberId: Long,
+        @Valid @RequestBody request: UpdateStatusRequest
     ): ResponseEntity<Void> {
         outingAllowedService.update(memberId, request.status)
         return ResponseEntity.ok().build()

@@ -1,8 +1,10 @@
 package com.example.team.haribo.goms.global.exception
 
+import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -22,13 +24,13 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(e.errorCode.status).body(response)
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
-    fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
-        return invalidRequestResponse()
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+    @ExceptionHandler(
+        MethodArgumentTypeMismatchException::class,
+        MethodArgumentNotValidException::class,
+        ConstraintViolationException::class,
+        HttpMessageNotReadableException::class
+    )
+    fun handleInvalidRequestException(e: Exception): ResponseEntity<ErrorResponse> {
         return invalidRequestResponse()
     }
 
