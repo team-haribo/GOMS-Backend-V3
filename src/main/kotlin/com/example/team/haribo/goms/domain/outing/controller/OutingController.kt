@@ -74,7 +74,7 @@ class OutingController(
             ApiResponse(responseCode = "400", description = "QR 정보 오류")
         ]
     )
-    @PostMapping("/in")
+    @PostMapping("/out")
     fun outing(@RequestBody request: QrToggleRequest): ResponseEntity<QrOutingResponse> {
         return ResponseEntity.ok(qrOutingService.outing(request))
     }
@@ -105,7 +105,7 @@ class OutingController(
             ApiResponse(responseCode = "400", description = "QR 정보 오류")
         ]
     )
-    @PostMapping("/out")
+    @PostMapping("/in")
     fun coming(@RequestBody request: QrToggleRequest): ResponseEntity<QrComingResponse> {
         return ResponseEntity.ok(qrComingService.coming(request))
     }
