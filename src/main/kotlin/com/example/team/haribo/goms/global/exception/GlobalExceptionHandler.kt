@@ -24,20 +24,12 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
-        val response = ErrorResponse(
-            status = ErrorCode.INVALID_REQUEST.status,
-            message = ErrorCode.INVALID_REQUEST.message
-        )
-        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(response)
+        return invalidRequestResponse()
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
-        val response = ErrorResponse(
-            status = ErrorCode.INVALID_REQUEST.status,
-            message = ErrorCode.INVALID_REQUEST.message
-        )
-        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(response)
+        return invalidRequestResponse()
     }
 
     @ExceptionHandler(Exception::class)
@@ -49,5 +41,13 @@ class GlobalExceptionHandler {
             message = ErrorCode.INTERNAL_SERVER_ERROR.message
         )
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response)
+    }
+
+    private fun invalidRequestResponse(): ResponseEntity<ErrorResponse> {
+        val response = ErrorResponse(
+            status = ErrorCode.INVALID_REQUEST.status,
+            message = ErrorCode.INVALID_REQUEST.message
+        )
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(response)
     }
 }
