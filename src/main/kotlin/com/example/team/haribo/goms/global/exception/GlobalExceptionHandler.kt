@@ -24,23 +24,13 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(e.errorCode.status).body(response)
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
-    fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
-        return invalidRequestResponse()
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
-        return invalidRequestResponse()
-    }
-
-    @ExceptionHandler(ConstraintViolationException::class)
-    fun handleConstraintViolationException(e: ConstraintViolationException): ResponseEntity<ErrorResponse> {
-        return invalidRequestResponse()
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> {
+    @ExceptionHandler(
+        MethodArgumentTypeMismatchException::class,
+        MethodArgumentNotValidException::class,
+        ConstraintViolationException::class,
+        HttpMessageNotReadableException::class
+    )
+    fun handleInvalidRequestException(e: Exception): ResponseEntity<ErrorResponse> {
         return invalidRequestResponse()
     }
 
