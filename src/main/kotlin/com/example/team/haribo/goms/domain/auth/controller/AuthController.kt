@@ -21,11 +21,15 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Auth", description = "인증 관련 API")
 @RestController
+@Validated
 @RequestMapping("/api/v3/auth")
 class AuthController(
     private val signupService: SignupService,
@@ -64,7 +68,7 @@ class AuthController(
     )
     @PostMapping("/email-verifications/send")
     fun sendVerificationCode(
-        @RequestBody request: EmailVerificationSendRequest
+        @Valid @RequestBody request: EmailVerificationSendRequest
     ): ResponseEntity<Void> {
         emailVerificationService.send(request)
         return ResponseEntity.ok().build()
@@ -99,7 +103,7 @@ class AuthController(
     )
     @PostMapping("/email-verifications/confirm")
     fun confirmVerificationCode(
-        @RequestBody request: EmailVerificationConfirmRequest
+        @Valid @RequestBody request: EmailVerificationConfirmRequest
     ): ResponseEntity<EmailVerificationConfirmResponse> {
         return ResponseEntity.ok(
             emailVerificationService.confirm(request)
@@ -124,7 +128,7 @@ class AuthController(
     )
     @PostMapping("/signup")
     fun signup(
-        @RequestBody request: SignupRequest
+        @Valid @RequestBody request: SignupRequest
     ): ResponseEntity<Void> {
         signupService.signup(request)
         return ResponseEntity.ok().build()
@@ -158,7 +162,7 @@ class AuthController(
     )
     @PostMapping("/signin")
     fun signin(
-        @RequestBody request: SigninRequest
+        @Valid @RequestBody request: SigninRequest
     ): ResponseEntity<TokenResponse> {
         return ResponseEntity.ok(
             signinService.signin(request)
@@ -184,7 +188,9 @@ class AuthController(
     )
     @PatchMapping("/reissue")
     fun reissue(
-        @RequestHeader("RefreshToken") refreshTokenHeader: String
+        @RequestHeader("RefreshToken")
+        @NotBlank(message = "RefreshToken 헤더는 비어 있을 수 없습니다.")
+        refreshTokenHeader: String
     ): ResponseEntity<TokenResponse> {
         return ResponseEntity.ok(
             reissueService.reissue(refreshTokenHeader)
@@ -209,7 +215,7 @@ class AuthController(
     )
     @PatchMapping("/password")
     fun changePassword(
-        @RequestBody request: PasswordChangeRequest
+        @Valid @RequestBody request: PasswordChangeRequest
     ): ResponseEntity<Void> {
         passwordChangeService.changePassword(request)
         return ResponseEntity.ok().build()
@@ -228,14 +234,17 @@ class AuthController(
             )
         ],
         responses = [
-            ApiResponse(responseCode = "200", description = "로그아웃 성공")
+            ApiResponse(responseCode = "204", description = "로그아웃 성공"),
+            ApiResponse(responseCode = "401", description = "유효하지 않은 토큰")
         ]
     )
     @DeleteMapping("/signout")
     fun signout(
-        @RequestHeader("RefreshToken") refreshTokenHeader: String
+        @RequestHeader("RefreshToken")
+        @NotBlank(message = "RefreshToken 헤더는 비어 있을 수 없습니다.")
+        refreshTokenHeader: String
     ): ResponseEntity<Void> {
         signoutService.signout(refreshTokenHeader)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
     }
 }

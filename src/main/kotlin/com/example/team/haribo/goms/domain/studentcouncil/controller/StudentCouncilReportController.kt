@@ -6,7 +6,10 @@ import com.example.team.haribo.goms.domain.report.dto.response.ReportResolveResp
 import com.example.team.haribo.goms.domain.report.service.StudentCouncilPendingReportListService
 import com.example.team.haribo.goms.domain.report.service.StudentCouncilReportResolveService
 import com.example.team.haribo.goms.domain.report.service.StudentCouncilResolvedReportListService
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Positive
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Validated
 @RequestMapping("/api/v3/student-council")
 class StudentCouncilReportController(
     private val pendingReportListService: StudentCouncilPendingReportListService,
@@ -34,8 +38,10 @@ class StudentCouncilReportController(
 
     @PatchMapping("/report/{reportId}")
     fun resolveReport(
-        @PathVariable reportId: Long,
-        @RequestBody request: ReportResolveRequest
+        @PathVariable
+        @Positive(message = "reportId 는 1 이상이어야 합니다.")
+        reportId: Long,
+        @Valid @RequestBody request: ReportResolveRequest
     ): ResponseEntity<ReportResolveResponse> {
         return ResponseEntity.ok(reportResolveService.resolve(reportId, request))
     }

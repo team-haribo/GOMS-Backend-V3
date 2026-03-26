@@ -20,12 +20,16 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Outing", description = "외출 관련 API")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
+@Validated
 @RequestMapping("/api/v3/outing")
 class OutingController(
     private val myOutingStatusService: MyOutingStatusService,
@@ -75,7 +79,7 @@ class OutingController(
         ]
     )
     @PostMapping("/out")
-    fun outing(@RequestBody request: QrToggleRequest): ResponseEntity<QrOutingResponse> {
+    fun outing(@Valid @RequestBody request: QrToggleRequest): ResponseEntity<QrOutingResponse> {
         return ResponseEntity.ok(qrOutingService.outing(request))
     }
 
@@ -106,7 +110,7 @@ class OutingController(
         ]
     )
     @PostMapping("/in")
-    fun coming(@RequestBody request: QrToggleRequest): ResponseEntity<QrComingResponse> {
+    fun coming(@Valid @RequestBody request: QrToggleRequest): ResponseEntity<QrComingResponse> {
         return ResponseEntity.ok(qrComingService.coming(request))
     }
 
@@ -150,7 +154,11 @@ class OutingController(
         ]
     )
     @GetMapping("/search")
-    fun searchOutingStudents(@RequestParam("name") name: String?): ResponseEntity<OutingStudentListResponse> {
+    fun searchOutingStudents(
+        @RequestParam("name")
+        @NotBlank(message = "name 은 비어 있을 수 없습니다.")
+        name: String
+    ): ResponseEntity<OutingStudentListResponse> {
         return ResponseEntity.ok(outingStudentSearchService.search(name))
     }
 }
