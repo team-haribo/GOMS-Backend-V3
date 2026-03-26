@@ -3,8 +3,10 @@ package com.example.team.haribo.goms.global.exception
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -18,6 +20,24 @@ class GlobalExceptionHandler {
             message = e.errorCode.message
         )
         return ResponseEntity.status(e.errorCode.status).body(response)
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
+        val response = ErrorResponse(
+            status = ErrorCode.INVALID_REQUEST.status,
+            message = ErrorCode.INVALID_REQUEST.message
+        )
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(response)
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+        val response = ErrorResponse(
+            status = ErrorCode.INVALID_REQUEST.status,
+            message = ErrorCode.INVALID_REQUEST.message
+        )
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.status).body(response)
     }
 
     @ExceptionHandler(Exception::class)
