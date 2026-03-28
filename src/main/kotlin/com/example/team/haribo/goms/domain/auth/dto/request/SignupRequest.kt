@@ -20,7 +20,7 @@ data class SignupRequest(
 
     @field:NotBlank(message = "비밀번호는 비어 있을 수 없습니다.")
     @field:Pattern(
-        regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^&?~])[a-zA-Z!@#$%^&?~]{6,15}$",
+        regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&?~])[a-zA-Z0-9!@#$%^&?~]{6,15}$",
         message = "비밀번호 형식이 올바르지 않습니다."
     )
     val password: String,
@@ -29,9 +29,7 @@ data class SignupRequest(
     @field:Size(max = 20, message = "이름은 20자 이하여야 합니다.")
     val name: String,
 
-    @field:NotNull(message = "학년은 필수입니다.")
-    @field:Min(value = 1, message = "학년은 1 이상이어야 합니다.")
-    @field:Max(value = 3, message = "학년은 3 이하여야 합니다.")
+    @field:NotNull(message = "기수는 필수입니다.")
     val grade: Long,
 
     @field:NotNull(message = "학과는 필수입니다.")
