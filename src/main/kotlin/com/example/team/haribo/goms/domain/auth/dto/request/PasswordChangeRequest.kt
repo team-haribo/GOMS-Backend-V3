@@ -14,7 +14,7 @@ data class PasswordChangeRequest(
 
     @field:NotBlank(message = "새 비밀번호는 비어 있을 수 없습니다.")
     @field:Pattern(
-        regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^&?~])[a-zA-Z!@#$%^&?~]{6,15}$",
+        regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&?~])[a-zA-Z0-9!@#$%^&?~]{6,15}$",
         message = "비밀번호 형식이 올바르지 않습니다."
     )
     val newPassword: String
