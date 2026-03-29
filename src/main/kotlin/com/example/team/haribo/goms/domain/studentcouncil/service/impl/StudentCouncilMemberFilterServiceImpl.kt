@@ -41,7 +41,6 @@ class StudentCouncilMemberFilterServiceImpl(
                     name = it.name,
                     grade = it.grade,
                     department = it.department,
-                    gender = it.gender
                 )
             }
         )
