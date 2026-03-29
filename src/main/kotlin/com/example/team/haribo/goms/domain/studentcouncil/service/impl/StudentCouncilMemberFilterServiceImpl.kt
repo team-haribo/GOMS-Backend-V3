@@ -1,6 +1,7 @@
 package com.example.team.haribo.goms.domain.studentcouncil.service.impl
 
 import com.example.team.haribo.goms.domain.common.enums.Department
+import com.example.team.haribo.goms.domain.common.enums.Gender
 import com.example.team.haribo.goms.domain.common.enums.Role
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.member.repository.MemberRepository
@@ -18,16 +19,17 @@ class StudentCouncilMemberFilterServiceImpl(
         name: String?,
         grade: Int?,
         department: Department?,
+        gender: Gender?,
         status: Status?,
         role: Role?
     ): StudentsListResponse {
         val keyword = name?.trim()?.takeIf { it.isNotBlank() }
-        val gradeInt = grade?.toInt()
 
         val members = memberRepository.filterSorted(
             name = keyword,
-            grade = gradeInt,
+            grade = grade,
             department = department,
+            gender = gender,
             status = status,
             role = role
         )
@@ -38,7 +40,8 @@ class StudentCouncilMemberFilterServiceImpl(
                     memberId = it.id!!,
                     name = it.name,
                     grade = it.grade,
-                    department = it.department
+                    department = it.department,
+                    gender = it.gender
                 )
             }
         )

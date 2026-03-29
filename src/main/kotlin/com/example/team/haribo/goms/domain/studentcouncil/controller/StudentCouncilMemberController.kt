@@ -1,6 +1,7 @@
 package com.example.team.haribo.goms.domain.studentcouncil.controller
 
 import com.example.team.haribo.goms.domain.common.enums.Department
+import com.example.team.haribo.goms.domain.common.enums.Gender
 import com.example.team.haribo.goms.domain.common.enums.Role
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.studentcouncil.dto.request.UpdateRoleRequest
@@ -82,11 +83,12 @@ class StudentCouncilMemberController(
 
     @Operation(
         summary = "학생 필터 조회",
-        description = "이름, 학년, 학과, 상태, 권한 기준으로 학생 목록을 필터링합니다.",
+        description = "이름, 학년, 학과, 성별, 상태, 권한 기준으로 학생 목록을 필터링합니다.",
         parameters = [
             Parameter(name = "name", description = "학생 이름", required = false, example = "김의준"),
             Parameter(name = "grade", description = "학년", required = false, example = "2"),
             Parameter(name = "department", description = "학과", required = false, example = "SW"),
+            Parameter(name = "gender", description = "성별", required = false, example = "MALE"),
             Parameter(name = "status", description = "상태", required = false, example = "COMING"),
             Parameter(name = "role", description = "권한", required = false, example = "ROLE_STUDENT")
         ],
@@ -102,6 +104,7 @@ class StudentCouncilMemberController(
         @Max(value = 3, message = "grade 는 3 이하여야 합니다.")
         grade: Int?,
         @RequestParam("department", required = false) department: Department?,
+        @RequestParam("gender", required = false) gender: Gender?,
         @RequestParam("status", required = false) status: Status?,
         @RequestParam("role", required = false) role: Role?
     ): ResponseEntity<StudentsListResponse> {
@@ -110,6 +113,7 @@ class StudentCouncilMemberController(
                 name = name,
                 grade = grade,
                 department = department,
+                gender = gender,
                 status = status,
                 role = role
             )
