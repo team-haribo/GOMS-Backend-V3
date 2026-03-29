@@ -1,6 +1,7 @@
 package com.example.team.haribo.goms.domain.member.repository
 
 import com.example.team.haribo.goms.domain.common.enums.Department
+import com.example.team.haribo.goms.domain.common.enums.Gender
 import com.example.team.haribo.goms.domain.common.enums.Role
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.member.entity.Member
@@ -55,6 +56,7 @@ interface MemberRepository : JpaRepository<Member, Long> {
         WHERE (:name IS NULL OR LOWER(m.name) LIKE LOWER(CONCAT('%', :name, '%')))
           AND (:grade IS NULL OR m.grade = :grade)
           AND (:department IS NULL OR m.department = :department)
+          AND (:gender IS NULL OR m.gender = :gender)
           AND (:status IS NULL OR m.status = :status)
           AND (:role IS NULL OR m.role = :role)
         ORDER BY
@@ -71,6 +73,7 @@ interface MemberRepository : JpaRepository<Member, Long> {
         @Param("name") name: String?,
         @Param("grade") grade: Int?,
         @Param("department") department: Department?,
+        @Param("gender") gender: Gender?,
         @Param("status") status: Status?,
         @Param("role") role: Role?
     ): List<Member>
