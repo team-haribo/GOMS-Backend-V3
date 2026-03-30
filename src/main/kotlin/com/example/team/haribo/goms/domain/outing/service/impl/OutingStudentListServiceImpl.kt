@@ -15,14 +15,17 @@ class OutingStudentListServiceImpl(
     @Transactional(readOnly = true)
     override fun getList(): OutingStudentListResponse {
         val outings = outingRepository.findAllActiveWithMember()
-        val students = outings.map {
-            OutingStudentResponse(
-                name = it.member.name,
-                grade = it.member.grade.toLong(),
-                department = it.member.department.name,
-                outingAt = it.outingAt
-            )
-        }
-        return OutingStudentListResponse(students)
+
+        return OutingStudentListResponse(
+            students = outings.map {
+                OutingStudentResponse(
+                    memberId = requireNotNull(it.member.id) { "member.id must not be null" },
+                    name = it.member.name,
+                    grade = it.member.grade,
+                    department = it.member.department.name,
+                    outingAt = it.outingAt
+                )
+            }
+        )
     }
 }
