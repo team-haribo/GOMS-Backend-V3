@@ -4,6 +4,7 @@ import com.example.team.haribo.goms.domain.outing.dto.response.OutingStudentList
 import com.example.team.haribo.goms.domain.outing.dto.response.OutingStudentResponse
 import com.example.team.haribo.goms.domain.outing.repository.OutingRepository
 import com.example.team.haribo.goms.domain.outing.service.OutingStudentSearchService
+import com.example.team.haribo.goms.domain.outing.exception.EmptyNameException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,7 +15,11 @@ class OutingStudentSearchServiceImpl(
 
     @Transactional(readOnly = true)
     override fun search(name: String?): OutingStudentListResponse {
-        val outings = outingRepository.searchActiveWithMemberByName(name ?: "")
+        if (name.isNullOrBlank()) {
+            throw EmptyNameException()
+        }
+
+        val outings = outingRepository.searchActiveWithMemberByName(name)
 
         return OutingStudentListResponse(
             students = outings.map {
