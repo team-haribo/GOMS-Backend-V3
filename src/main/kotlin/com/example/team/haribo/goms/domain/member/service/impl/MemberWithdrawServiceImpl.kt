@@ -10,7 +10,9 @@ import com.example.team.haribo.goms.domain.outing.repository.OutingRepository
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
 import com.example.team.haribo.goms.domain.report.repository.ReviewReportRepository
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
+import com.example.team.haribo.goms.global.log.LogFormat
 import com.example.team.haribo.goms.global.util.MemberUtil
+import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,12 +30,32 @@ class MemberWithdrawServiceImpl(
     private val memberRepository: MemberRepository
 ) : MemberWithdrawService {
 
+    private val log = LoggerFactory.getLogger(MemberWithdrawServiceImpl::class.java)
+
     @Transactional
     override fun withdraw(request: MemberWithdrawRequest) {
         val member = memberUtil.currentMember()
         val memberId = member.id!!
 
+        log.info(
+            LogFormat.message(
+                domain = "MEMBER",
+                event = "회원 탈퇴 시도",
+                "memberId" to memberId,
+                "email" to member.email
+            )
+        )
+
         if (!passwordEncoder.matches(request.password, member.password)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "MEMBER",
+                    event = "회원 탈퇴 실패",
+                    "memberId" to memberId,
+                    "email" to member.email,
+                    "reason" to "비밀번호 불일치"
+                )
+            )
             throw MemberWithdrawPasswordMismatchException()
         }
 
@@ -45,5 +67,14 @@ class MemberWithdrawServiceImpl(
         outingRepository.deleteAllByMember_Id(memberId)
         refreshTokenRedisRepository.deleteByMemberId(memberId)
         memberRepository.delete(member)
+
+        log.info(
+            LogFormat.message(
+                domain = "MEMBER",
+                event = "회원 탈퇴 완료",
+                "memberId" to memberId,
+                "email" to member.email
+            )
+        )
     }
 }

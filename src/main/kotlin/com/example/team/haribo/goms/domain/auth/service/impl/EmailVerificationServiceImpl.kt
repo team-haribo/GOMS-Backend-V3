@@ -15,6 +15,8 @@ import com.example.team.haribo.goms.domain.auth.util.AuthValidators
 import com.example.team.haribo.goms.domain.auth.util.EmailSender
 import com.example.team.haribo.goms.domain.common.enums.Purpose
 import com.example.team.haribo.goms.domain.member.repository.MemberRepository
+import com.example.team.haribo.goms.global.log.LogFormat
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
 import java.time.LocalDateTime
@@ -28,18 +30,56 @@ class EmailVerificationServiceImpl(
     private val emailSender: EmailSender
 ) : EmailVerificationService {
 
+    private val log = LoggerFactory.getLogger(EmailVerificationServiceImpl::class.java)
+
     override fun send(request: EmailVerificationSendRequest) {
         AuthValidators.validateEmail(request.email)
 
+        log.info(
+            LogFormat.message(
+                domain = "AUTH",
+                event = "인증코드 발송 시도",
+                "email" to request.email,
+                "purpose" to request.purpose
+            )
+        )
+
         if (request.purpose == Purpose.SIGNUP && memberRepository.existsByEmail(request.email)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "AUTH",
+                    event = "인증코드 발송 실패",
+                    "email" to request.email,
+                    "purpose" to request.purpose,
+                    "reason" to "이미 가입된 이메일"
+                )
+            )
             throw EmailAlreadyExistsException()
         }
 
         if (request.purpose == Purpose.PASSWORD_CHANGE && !memberRepository.existsByEmail(request.email)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "AUTH",
+                    event = "인증코드 발송 실패",
+                    "email" to request.email,
+                    "purpose" to request.purpose,
+                    "reason" to "존재하지 않는 사용자"
+                )
+            )
             throw NotFoundUserException()
         }
 
         if (emailVerificationCodeRedisRepository.existsCooldown(request.email, request.purpose)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "AUTH",
+                    event = "인증코드 발송 제한",
+                    "email" to request.email,
+                    "purpose" to request.purpose,
+                    "reason" to "재요청 제한"
+                )
+            )
             throw TooManyRequestsException()
         }
 
@@ -49,15 +89,53 @@ class EmailVerificationServiceImpl(
         emailVerificationCodeRedisRepository.saveCooldown(request.email, request.purpose, 60)
 
         emailSender.sendVerificationCode(request.email, code)
+
+        log.info(
+            LogFormat.message(
+                domain = "AUTH",
+                event = "인증코드 발송 완료",
+                "email" to request.email,
+                "purpose" to request.purpose
+            )
+        )
     }
 
     override fun confirm(request: EmailVerificationConfirmRequest): EmailVerificationConfirmResponse {
+        log.info(
+            LogFormat.message(
+                domain = "AUTH",
+                event = "이메일 인증 시도",
+                "email" to request.email,
+                "purpose" to request.purpose
+            )
+        )
+
         if (emailVerificationCodeRedisRepository.getConfirmFailCount(request.email, request.purpose) >= 5) {
+            log.warn(
+                LogFormat.message(
+                    domain = "AUTH",
+                    event = "이메일 인증 차단",
+                    "email" to request.email,
+                    "purpose" to request.purpose,
+                    "reason" to "실패 횟수 초과"
+                )
+            )
             throw TooManyRequestsException()
         }
 
         val storedCode = emailVerificationCodeRedisRepository.find(request.email, request.purpose)
-            ?: throw VerificationCodeExpiredException()
+            ?: run {
+                log.warn(
+                    LogFormat.message(
+                        domain = "AUTH",
+                        event = "이메일 인증 실패",
+                        "email" to request.email,
+                        "purpose" to request.purpose,
+                        "reason" to "인증코드 만료"
+                    )
+                )
+                throw VerificationCodeExpiredException()
+            }
 
         if (storedCode != request.code) {
             val failCount = emailVerificationCodeRedisRepository.increaseConfirmFailCount(
@@ -69,9 +147,29 @@ class EmailVerificationServiceImpl(
             if (failCount >= 5) {
                 emailVerificationCodeRedisRepository.delete(request.email, request.purpose)
                 emailVerificationCodeRedisRepository.deleteConfirmFailCount(request.email, request.purpose)
+
+                log.warn(
+                    LogFormat.message(
+                        domain = "AUTH",
+                        event = "이메일 인증 차단",
+                        "email" to request.email,
+                        "purpose" to request.purpose,
+                        "reason" to "실패 횟수 초과"
+                    )
+                )
                 throw TooManyRequestsException()
             }
 
+            log.warn(
+                LogFormat.message(
+                    domain = "AUTH",
+                    event = "이메일 인증 실패",
+                    "email" to request.email,
+                    "purpose" to request.purpose,
+                    "reason" to "코드 불일치",
+                    "failCount" to failCount
+                )
+            )
             throw VerificationCodeMismatchException()
         }
 
@@ -81,6 +179,15 @@ class EmailVerificationServiceImpl(
         verifiedTokenRedisRepository.save(request.email, request.purpose, verifiedToken, 600)
         emailVerificationCodeRedisRepository.delete(request.email, request.purpose)
         emailVerificationCodeRedisRepository.deleteConfirmFailCount(request.email, request.purpose)
+
+        log.info(
+            LogFormat.message(
+                domain = "AUTH",
+                event = "이메일 인증 성공",
+                "email" to request.email,
+                "purpose" to request.purpose
+            )
+        )
 
         return EmailVerificationConfirmResponse(
             verifiedToken = verifiedToken,

@@ -2,6 +2,7 @@ package com.example.team.haribo.goms.domain.notification.service.impl
 
 import com.example.team.haribo.goms.domain.notification.repository.DeviceTokenRepository
 import com.example.team.haribo.goms.domain.notification.service.PushSendService
+import com.example.team.haribo.goms.global.log.LogFormat
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingException
 import com.google.firebase.messaging.MulticastMessage
@@ -17,7 +18,26 @@ class PushSendServiceImpl(
     private val log = LoggerFactory.getLogger(PushSendServiceImpl::class.java)
 
     override fun send(tokens: List<String>, title: String, body: String) {
-        if (tokens.isEmpty()) return
+        if (tokens.isEmpty()) {
+            log.info(
+                LogFormat.message(
+                    domain = "NOTIFICATION",
+                    event = "푸시 발송 스킵",
+                    "title" to title,
+                    "reason" to "대상 토큰 없음"
+                )
+            )
+            return
+        }
+
+        log.info(
+            LogFormat.message(
+                domain = "NOTIFICATION",
+                event = "푸시 발송 시작",
+                "title" to title,
+                "targetCount" to tokens.size
+            )
+        )
 
         val message = MulticastMessage.builder()
             .setNotification(
@@ -32,11 +52,31 @@ class PushSendServiceImpl(
         val response = try {
             FirebaseMessaging.getInstance().sendEachForMulticast(message)
         } catch (e: FirebaseMessagingException) {
-            log.error("FCM 멀티캐스트 전송 중 오류가 발생했습니다.", e)
+            log.error(
+                LogFormat.message(
+                    domain = "NOTIFICATION",
+                    event = "푸시 발송 실패",
+                    "title" to title,
+                    "reason" to "Firebase 오류"
+                ),
+                e
+            )
             return
         }
 
-        if (response.failureCount == 0) return
+        if (response.failureCount == 0) {
+            log.info(
+                LogFormat.message(
+                    domain = "NOTIFICATION",
+                    event = "푸시 발송 완료",
+                    "title" to title,
+                    "targetCount" to tokens.size,
+                    "successCount" to response.successCount,
+                    "failureCount" to response.failureCount
+                )
+            )
+            return
+        }
 
         val invalidTokens = mutableListOf<String>()
 
@@ -48,6 +88,25 @@ class PushSendServiceImpl(
 
         if (invalidTokens.isNotEmpty()) {
             deviceTokenRepository.deleteAllByFcmTokenIn(invalidTokens)
+
+            log.warn(
+                LogFormat.message(
+                    domain = "NOTIFICATION",
+                    event = "유효하지 않은 토큰 정리",
+                    "count" to invalidTokens.size
+                )
+            )
         }
+
+        log.info(
+            LogFormat.message(
+                domain = "NOTIFICATION",
+                event = "푸시 발송 완료",
+                "title" to title,
+                "targetCount" to tokens.size,
+                "successCount" to response.successCount,
+                "failureCount" to response.failureCount
+            )
+        )
     }
 }
