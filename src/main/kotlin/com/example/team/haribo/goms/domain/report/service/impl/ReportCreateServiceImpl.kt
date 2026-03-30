@@ -11,7 +11,9 @@ import com.example.team.haribo.goms.domain.report.repository.ReviewReportReposit
 import com.example.team.haribo.goms.domain.report.service.ReportCreateService
 import com.example.team.haribo.goms.domain.review.exception.NotFoundReviewException
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
+import com.example.team.haribo.goms.global.log.LogFormat
 import com.example.team.haribo.goms.global.util.MemberUtil
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,20 +24,87 @@ class ReportCreateServiceImpl(
     private val memberUtil: MemberUtil
 ) : ReportCreateService {
 
+    private val log = LoggerFactory.getLogger(ReportCreateServiceImpl::class.java)
+
     @Transactional
     override fun create(reviewId: Long, request: ReportCreateRequest): ReportCreateResponse {
         val reporterId = memberUtil.currentMemberId()
-
         val content = request.content.trim()
-        if (content.isBlank()) throw ReportContentEmptyException()
-        if (content.length > 500) throw ReportContentTooLongException()
+
+        log.info(
+            LogFormat.message(
+                domain = "REPORT",
+                event = "신고 작성 시도",
+                "reporterId" to reporterId,
+                "reviewId" to reviewId,
+                "contentLength" to content.length
+            )
+        )
+
+        if (content.isBlank()) {
+            log.warn(
+                LogFormat.message(
+                    domain = "REPORT",
+                    event = "신고 작성 실패",
+                    "reporterId" to reporterId,
+                    "reviewId" to reviewId,
+                    "reason" to "내용 없음"
+                )
+            )
+            throw ReportContentEmptyException()
+        }
+
+        if (content.length > 500) {
+            log.warn(
+                LogFormat.message(
+                    domain = "REPORT",
+                    event = "신고 작성 실패",
+                    "reporterId" to reporterId,
+                    "reviewId" to reviewId,
+                    "reason" to "내용 길이 초과"
+                )
+            )
+            throw ReportContentTooLongException()
+        }
 
         if (reviewReportRepository.existsByReview_IdAndMemberId(reviewId, reporterId)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "REPORT",
+                    event = "신고 작성 실패",
+                    "reporterId" to reporterId,
+                    "reviewId" to reviewId,
+                    "reason" to "이미 신고한 리뷰"
+                )
+            )
             throw AlreadyReportedReviewException()
         }
 
-        val review = reviewRepository.findById(reviewId).orElseThrow { NotFoundReviewException() }
-        if (review.isDeleted()) throw NotFoundReviewException()
+        val review = reviewRepository.findById(reviewId).orElseThrow {
+            log.warn(
+                LogFormat.message(
+                    domain = "REPORT",
+                    event = "신고 작성 실패",
+                    "reporterId" to reporterId,
+                    "reviewId" to reviewId,
+                    "reason" to "존재하지 않는 리뷰"
+                )
+            )
+            NotFoundReviewException()
+        }
+
+        if (review.isDeleted()) {
+            log.warn(
+                LogFormat.message(
+                    domain = "REPORT",
+                    event = "신고 작성 실패",
+                    "reporterId" to reporterId,
+                    "reviewId" to reviewId,
+                    "reason" to "이미 삭제된 리뷰"
+                )
+            )
+            throw NotFoundReviewException()
+        }
 
         val report = reviewReportRepository.save(
             ReviewReport(
@@ -43,6 +112,16 @@ class ReportCreateServiceImpl(
                 memberId = reporterId,
                 content = content,
                 status = ReportStatus.PENDING
+            )
+        )
+
+        log.info(
+            LogFormat.message(
+                domain = "REPORT",
+                event = "신고 작성 완료",
+                "reporterId" to reporterId,
+                "reviewId" to reviewId,
+                "reportId" to report.id
             )
         )
 

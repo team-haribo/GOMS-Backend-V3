@@ -4,7 +4,9 @@ import com.example.team.haribo.goms.domain.review.exception.NotFoundReviewExcept
 import com.example.team.haribo.goms.domain.review.exception.ReviewForbiddenException
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
 import com.example.team.haribo.goms.domain.review.service.ReviewDeleteService
+import com.example.team.haribo.goms.global.log.LogFormat
 import com.example.team.haribo.goms.global.util.MemberUtil
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,23 +16,56 @@ class ReviewDeleteServiceImpl(
     private val memberUtil: MemberUtil
 ) : ReviewDeleteService {
 
-    /**
-     * 작성자 본인이 직접 삭제하는 경우 물리적으로 제거합니다.
-     *
-     * 신고를 통한 학생회 처리 삭제는 감사 추적(audit trail)을 위해 소프트 딜리트로 처리하며,
-     * 해당 로직은 신고/학생회 도메인의 별도 서비스에서 담당합니다.
-     *
-     * @param reviewId 삭제할 리뷰의 ID
-     * @throws NotFoundReviewException 리뷰가 존재하지 않는 경우
-     * @throws ReviewForbiddenException 본인이 작성한 리뷰가 아닌 경우
-     */
+    private val log = LoggerFactory.getLogger(ReviewDeleteServiceImpl::class.java)
+
     @Transactional
     override fun delete(reviewId: Long) {
         val memberId = memberUtil.currentMemberId()
-        val review = reviewRepository.findById(reviewId).orElseThrow { NotFoundReviewException() }
 
-        if (review.member.id != memberId) throw ReviewForbiddenException()
+        log.info(
+            LogFormat.message(
+                domain = "REVIEW",
+                event = "리뷰 삭제 시도",
+                "memberId" to memberId,
+                "reviewId" to reviewId
+            )
+        )
+
+        val review = reviewRepository.findById(reviewId).orElseThrow {
+            log.warn(
+                LogFormat.message(
+                    domain = "REVIEW",
+                    event = "리뷰 삭제 실패",
+                    "memberId" to memberId,
+                    "reviewId" to reviewId,
+                    "reason" to "존재하지 않는 리뷰"
+                )
+            )
+            NotFoundReviewException()
+        }
+
+        if (review.member.id != memberId) {
+            log.warn(
+                LogFormat.message(
+                    domain = "REVIEW",
+                    event = "리뷰 삭제 실패",
+                    "memberId" to memberId,
+                    "reviewId" to reviewId,
+                    "reason" to "삭제 권한 없음"
+                )
+            )
+            throw ReviewForbiddenException()
+        }
 
         reviewRepository.delete(review)
+
+        log.info(
+            LogFormat.message(
+                domain = "REVIEW",
+                event = "리뷰 삭제 완료",
+                "memberId" to memberId,
+                "reviewId" to reviewId
+            )
+        )
     }
 }

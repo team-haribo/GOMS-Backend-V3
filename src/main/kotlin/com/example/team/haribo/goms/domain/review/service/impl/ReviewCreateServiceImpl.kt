@@ -10,7 +10,9 @@ import com.example.team.haribo.goms.domain.review.exception.ReviewContentEmptyEx
 import com.example.team.haribo.goms.domain.review.exception.ReviewContentTooLongException
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
 import com.example.team.haribo.goms.domain.review.service.ReviewCreateService
+import com.example.team.haribo.goms.global.log.LogFormat
 import com.example.team.haribo.goms.global.util.MemberUtil
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,17 +23,69 @@ class ReviewCreateServiceImpl(
     private val memberUtil: MemberUtil
 ) : ReviewCreateService {
 
+    private val log = LoggerFactory.getLogger(ReviewCreateServiceImpl::class.java)
+
     @Transactional
     override fun create(placeId: Long, request: ReviewCreateRequest): ReviewCreateResponse {
         val content = request.content.trim()
 
-        if (content.isBlank()) throw ReviewContentEmptyException()
-        if (content.length > 500) throw ReviewContentTooLongException()
+        log.info(
+            LogFormat.message(
+                domain = "REVIEW",
+                event = "리뷰 작성 시도",
+                "placeId" to placeId,
+                "contentLength" to content.length
+            )
+        )
 
-        val place = placeRepository.findById(placeId).orElseThrow { NotFoundPlaceException() }
+        if (content.isBlank()) {
+            log.warn(
+                LogFormat.message(
+                    domain = "REVIEW",
+                    event = "리뷰 작성 실패",
+                    "placeId" to placeId,
+                    "reason" to "내용 없음"
+                )
+            )
+            throw ReviewContentEmptyException()
+        }
+
+        if (content.length > 500) {
+            log.warn(
+                LogFormat.message(
+                    domain = "REVIEW",
+                    event = "리뷰 작성 실패",
+                    "placeId" to placeId,
+                    "reason" to "내용 길이 초과"
+                )
+            )
+            throw ReviewContentTooLongException()
+        }
+
+        val place = placeRepository.findById(placeId).orElseThrow {
+            log.warn(
+                LogFormat.message(
+                    domain = "REVIEW",
+                    event = "리뷰 작성 실패",
+                    "placeId" to placeId,
+                    "reason" to "존재하지 않는 장소"
+                )
+            )
+            NotFoundPlaceException()
+        }
+
         val member = memberUtil.currentMember()
 
         if (reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "REVIEW",
+                    event = "리뷰 작성 실패",
+                    "memberId" to member.id,
+                    "placeId" to placeId,
+                    "reason" to "이미 리뷰 작성함"
+                )
+            )
             throw AlreadyReviewedPlaceException()
         }
 
@@ -40,6 +94,16 @@ class ReviewCreateServiceImpl(
                 place = place,
                 member = member,
                 content = content
+            )
+        )
+
+        log.info(
+            LogFormat.message(
+                domain = "REVIEW",
+                event = "리뷰 작성 완료",
+                "memberId" to member.id,
+                "placeId" to placeId,
+                "reviewId" to saved.id
             )
         )
 
