@@ -74,6 +74,7 @@ class SecurityConfig {
 
                 // MEMBER
                 it.requestMatchers("/api/v3/member/withdraw").authenticated()
+                it.requestMatchers("/api/v3/member/myrole").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
 
                 // OUTING
                 it.requestMatchers("/api/v3/outing/status").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
