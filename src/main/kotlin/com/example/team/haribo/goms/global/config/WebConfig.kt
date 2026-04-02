@@ -12,5 +12,6 @@ class WebConfig(
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(loggingInterceptor)
+            .addPathPatterns("/api/v3/**")
     }
 }
