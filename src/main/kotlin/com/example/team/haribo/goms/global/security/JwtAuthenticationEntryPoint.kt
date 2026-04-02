@@ -17,7 +17,7 @@ class JwtAuthenticationEntryPoint(
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
-        request.setAttribute(RequestLogConstants.FAILURE_REASON, "UNAUTHORIZED")
+        request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.UNAUTHORIZED.name)
         SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.UNAUTHORIZED)
     }
 }

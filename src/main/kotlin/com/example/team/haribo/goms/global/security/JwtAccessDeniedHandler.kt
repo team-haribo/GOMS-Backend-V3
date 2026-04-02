@@ -17,7 +17,7 @@ class JwtAccessDeniedHandler(
         response: HttpServletResponse,
         accessDeniedException: AccessDeniedException
     ) {
-        request.setAttribute(RequestLogConstants.FAILURE_REASON, "FORBIDDEN")
+        request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.FORBIDDEN.name)
         SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.FORBIDDEN)
     }
 }

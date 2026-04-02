@@ -23,7 +23,9 @@ class RequestLoggingFilter : OncePerRequestFilter() {
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val requestId = UUID.randomUUID().toString().replace("-", "").take(16)
+        val requestId = request.getHeader("X-Request-Id")
+            ?.takeIf { it.isNotBlank() }
+            ?: UUID.randomUUID().toString().replace("-", "").take(16)
         val startTime = System.currentTimeMillis()
 
         request.setAttribute(RequestLogConstants.REQUEST_ID, requestId)
@@ -57,7 +59,7 @@ class RequestLoggingFilter : OncePerRequestFilter() {
                 )
             }
 
-            MDC.clear()
+            MDC.remove("requestId")
         }
     }
 

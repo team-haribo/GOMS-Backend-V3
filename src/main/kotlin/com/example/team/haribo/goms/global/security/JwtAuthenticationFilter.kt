@@ -32,7 +32,7 @@ class JwtAuthenticationFilter(
 
                 val type = claims["type"]?.toString()
                 if (type != "ACCESS") {
-                    request.setAttribute(RequestLogConstants.FAILURE_REASON, "INVALID_TOKEN")
+                    request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.INVALID_TOKEN.name)
                     SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.INVALID_TOKEN)
                     return
                 }
@@ -51,15 +51,15 @@ class JwtAuthenticationFilter(
 
                 SecurityContextHolder.getContext().authentication = authentication
             } catch (e: ExpiredJwtException) {
-                request.setAttribute(RequestLogConstants.FAILURE_REASON, "EXPIRED_TOKEN")
+                request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.EXPIRED_TOKEN.name)
                 SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.EXPIRED_TOKEN)
                 return
             } catch (e: JwtException) {
-                request.setAttribute(RequestLogConstants.FAILURE_REASON, "INVALID_TOKEN")
+                request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.INVALID_TOKEN.name)
                 SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.INVALID_TOKEN)
                 return
             } catch (e: IllegalArgumentException) {
-                request.setAttribute(RequestLogConstants.FAILURE_REASON, "INVALID_TOKEN")
+                request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.INVALID_TOKEN.name)
                 SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.INVALID_TOKEN)
                 return
             }
