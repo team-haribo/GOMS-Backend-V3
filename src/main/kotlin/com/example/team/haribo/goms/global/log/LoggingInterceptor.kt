@@ -16,7 +16,9 @@ class LoggingInterceptor : HandlerInterceptor {
         response: HttpServletResponse,
         handler: Any
     ): Boolean {
-        request.setAttribute("startTime", System.currentTimeMillis())
+        if (request.method != "GET") {
+            request.setAttribute("startTime", System.currentTimeMillis())
+        }
         return true
     }
 
@@ -26,6 +28,10 @@ class LoggingInterceptor : HandlerInterceptor {
         handler: Any,
         ex: Exception?
     ) {
+        if (request.method == "GET") {
+            return
+        }
+
         val startTime = request.getAttribute("startTime") as? Long ?: return
         val durationMs = System.currentTimeMillis() - startTime
 
