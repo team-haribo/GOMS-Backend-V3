@@ -2,6 +2,7 @@ package com.example.team.haribo.goms.global.security
 
 import com.example.team.haribo.goms.global.jwt.JwtProperties
 import com.example.team.haribo.goms.global.jwt.JwtProvider
+import com.example.team.haribo.goms.global.log.RequestLoggingFilter
 import tools.jackson.databind.ObjectMapper
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -41,6 +42,7 @@ class SecurityConfig {
     fun securityFilterChain(
         http: HttpSecurity,
         jwtAuthenticationFilter: JwtAuthenticationFilter,
+        requestLoggingFilter: RequestLoggingFilter, // 🔥 추가
         objectMapper: ObjectMapper
     ): SecurityFilterChain {
         return http
@@ -112,6 +114,8 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
                 it.anyRequest().authenticated()
             }
+            .addFilterBefore(requestLoggingFilter, JwtAuthenticationFilter::class.java)
+
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
     }
