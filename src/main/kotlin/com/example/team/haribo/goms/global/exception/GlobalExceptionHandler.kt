@@ -1,6 +1,8 @@
 package com.example.team.haribo.goms.global.exception
 
 import com.example.team.haribo.goms.global.log.LogFormat
+import com.example.team.haribo.goms.global.log.RequestLogConstants
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -17,7 +19,13 @@ class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @ExceptionHandler(GlobalException::class)
-    fun handleGlobalException(e: GlobalException): ResponseEntity<ErrorResponse> {
+    fun handleGlobalException(
+        e: GlobalException,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
+        request.setAttribute(RequestLogConstants.FAILURE_REASON, e.errorCode.name)
+        request.setAttribute(RequestLogConstants.EXCEPTION_TYPE, e::class.simpleName)
+
         log.warn(
             LogFormat.message(
                 domain = "EXCEPTION",
@@ -40,7 +48,13 @@ class GlobalExceptionHandler {
         ConstraintViolationException::class,
         HttpMessageNotReadableException::class
     )
-    fun handleInvalidRequestException(e: Exception): ResponseEntity<ErrorResponse> {
+    fun handleInvalidRequestException(
+        e: Exception,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
+        request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.INVALID_REQUEST.name)
+        request.setAttribute(RequestLogConstants.EXCEPTION_TYPE, e::class.simpleName)
+
         log.warn(
             LogFormat.message(
                 domain = "EXCEPTION",
@@ -53,7 +67,13 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleException(e: Exception): ResponseEntity<ErrorResponse> {
+    fun handleException(
+        e: Exception,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
+        request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.INTERNAL_SERVER_ERROR.name)
+        request.setAttribute(RequestLogConstants.EXCEPTION_TYPE, e::class.simpleName)
+
         log.error(
             LogFormat.message(
                 domain = "EXCEPTION",

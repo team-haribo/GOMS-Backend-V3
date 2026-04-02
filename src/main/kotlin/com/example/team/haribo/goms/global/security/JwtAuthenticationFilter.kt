@@ -2,6 +2,7 @@ package com.example.team.haribo.goms.global.security
 
 import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.jwt.JwtProvider
+import com.example.team.haribo.goms.global.log.RequestLogConstants
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain
@@ -31,12 +32,16 @@ class JwtAuthenticationFilter(
 
                 val type = claims["type"]?.toString()
                 if (type != "ACCESS") {
+                    request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.INVALID_TOKEN.name)
                     SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.INVALID_TOKEN)
                     return
                 }
 
                 val memberId = claims.subject.toLong()
                 val role = claims["role"]?.toString() ?: "ROLE_STUDENT"
+
+                request.setAttribute(RequestLogConstants.MEMBER_ID, memberId)
+                request.setAttribute(RequestLogConstants.ROLE, role)
 
                 val authentication = UsernamePasswordAuthenticationToken(
                     memberId,
@@ -46,12 +51,15 @@ class JwtAuthenticationFilter(
 
                 SecurityContextHolder.getContext().authentication = authentication
             } catch (e: ExpiredJwtException) {
+                request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.EXPIRED_TOKEN.name)
                 SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.EXPIRED_TOKEN)
                 return
             } catch (e: JwtException) {
+                request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.INVALID_TOKEN.name)
                 SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.INVALID_TOKEN)
                 return
             } catch (e: IllegalArgumentException) {
+                request.setAttribute(RequestLogConstants.FAILURE_REASON, ErrorCode.INVALID_TOKEN.name)
                 SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.INVALID_TOKEN)
                 return
             }
