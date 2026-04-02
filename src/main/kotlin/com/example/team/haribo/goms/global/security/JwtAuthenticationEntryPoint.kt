@@ -1,6 +1,7 @@
 package com.example.team.haribo.goms.global.security
 
 import com.example.team.haribo.goms.global.exception.ErrorCode
+import com.example.team.haribo.goms.global.log.RequestLogConstants
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.AuthenticationException
@@ -16,6 +17,7 @@ class JwtAuthenticationEntryPoint(
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
+        request.setAttribute(RequestLogConstants.FAILURE_REASON, "UNAUTHORIZED")
         SecurityErrorResponseWriter.write(response, objectMapper, ErrorCode.UNAUTHORIZED)
     }
 }
