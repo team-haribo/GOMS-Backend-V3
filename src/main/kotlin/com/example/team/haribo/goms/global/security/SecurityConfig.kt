@@ -3,8 +3,9 @@ package com.example.team.haribo.goms.global.security
 import com.example.team.haribo.goms.global.jwt.JwtProperties
 import com.example.team.haribo.goms.global.jwt.JwtProvider
 import com.example.team.haribo.goms.global.log.RequestLoggingFilter
-import tools.jackson.databind.ObjectMapper
+import jakarta.servlet.Filter
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import tools.jackson.databind.ObjectMapper
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +36,24 @@ class SecurityConfig {
     }
 
     @Bean
+    fun jwtAuthenticationFilterRegistration(
+        jwtAuthenticationFilter: JwtAuthenticationFilter
+    ): FilterRegistrationBean<JwtAuthenticationFilter> {
+        val registration = FilterRegistrationBean(jwtAuthenticationFilter)
+        registration.isEnabled = false
+        return registration
+    }
+
+    @Bean
+    fun requestLoggingFilterRegistration(
+        requestLoggingFilter: RequestLoggingFilter
+    ): FilterRegistrationBean<RequestLoggingFilter> {
+        val registration = FilterRegistrationBean(requestLoggingFilter)
+        registration.isEnabled = false
+        return registration
+    }
+
+    @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
@@ -42,7 +62,7 @@ class SecurityConfig {
     fun securityFilterChain(
         http: HttpSecurity,
         jwtAuthenticationFilter: JwtAuthenticationFilter,
-        requestLoggingFilter: RequestLoggingFilter, // 🔥 추가
+        requestLoggingFilter: RequestLoggingFilter,
         objectMapper: ObjectMapper
     ): SecurityFilterChain {
         return http
@@ -114,9 +134,8 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
                 it.anyRequest().authenticated()
             }
-            .addFilterBefore(requestLoggingFilter, JwtAuthenticationFilter::class.java)
-
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(requestLoggingFilter, JwtAuthenticationFilter::class.java)
             .build()
     }
 }
