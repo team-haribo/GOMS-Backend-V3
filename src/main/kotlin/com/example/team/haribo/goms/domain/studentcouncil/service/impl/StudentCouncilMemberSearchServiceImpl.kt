@@ -23,7 +23,9 @@ class StudentCouncilMemberSearchServiceImpl(
                     memberId = it.id!!,
                     name = it.name,
                     grade = it.grade,
-                    department = it.department
+                    department = it.department,
+                    role = it.role,
+                    status = it.status
                 )
             }
         )

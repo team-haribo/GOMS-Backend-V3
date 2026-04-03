@@ -2,9 +2,9 @@ package com.example.team.haribo.goms.domain.outing.service.impl
 
 import com.example.team.haribo.goms.domain.outing.dto.response.OutingStudentListResponse
 import com.example.team.haribo.goms.domain.outing.dto.response.OutingStudentResponse
+import com.example.team.haribo.goms.domain.outing.exception.EmptyNameException
 import com.example.team.haribo.goms.domain.outing.repository.OutingRepository
 import com.example.team.haribo.goms.domain.outing.service.OutingStudentSearchService
-import com.example.team.haribo.goms.domain.outing.exception.EmptyNameException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,6 +28,8 @@ class OutingStudentSearchServiceImpl(
                     name = it.member.name,
                     grade = it.member.grade,
                     department = it.member.department.name,
+                    role = it.member.role,
+                    status = it.member.status,
                     outingAt = it.outingAt
                 )
             }
