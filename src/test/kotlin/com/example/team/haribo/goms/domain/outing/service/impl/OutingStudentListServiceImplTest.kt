@@ -26,8 +26,10 @@ class OutingStudentListServiceImplTest : DescribeSpec({
                 val response = service.getList()
                 response.students.size shouldBe 1
                 response.students[0].name shouldBe member.name
-                response.students[0].grade shouldBe member.grade.toLong()
+                response.students[0].grade shouldBe member.grade
                 response.students[0].department shouldBe Department.SW.name
+                response.students[0].role shouldBe member.role
+                response.students[0].status shouldBe member.status
             }
         }
 

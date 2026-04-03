@@ -26,7 +26,11 @@ class StudentCouncilMemberListServiceImplTest : DescribeSpec({
                 val response = service.list()
                 response.students.size shouldBe 2
                 response.students[0].memberId shouldBe 1L
+                response.students[0].role shouldBe members[0].role
+                response.students[0].status shouldBe members[0].status
                 response.students[1].memberId shouldBe 2L
+                response.students[1].role shouldBe members[1].role
+                response.students[1].status shouldBe members[1].status
             }
         }
 

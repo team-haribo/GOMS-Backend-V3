@@ -31,6 +31,10 @@ class LateRankServiceImplTest : DescribeSpec({
                 response.students.size shouldBe 2
                 response.students[0].memberId shouldBe member1.id!!
                 response.students[0].name shouldBe member1.name
+                response.students[0].role shouldBe member1.role
+                response.students[0].status shouldBe member1.status
+                response.students[1].role shouldBe member2.role
+                response.students[1].status shouldBe member2.status
             }
         }
 
