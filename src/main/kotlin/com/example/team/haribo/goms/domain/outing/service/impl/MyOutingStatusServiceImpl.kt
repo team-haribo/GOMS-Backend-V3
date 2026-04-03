@@ -16,10 +16,11 @@ class MyOutingStatusServiceImpl(
     @Transactional(readOnly = true)
     override fun getStatus(): MyOutingStatusResponse {
         val member = memberUtil.currentMember()
-        val lateCount = lateRepository.countByMember_Id(member.id!!)
+        val memberId = member.id!!
+        val lateCount = lateRepository.countByMemberId(memberId)
 
         return MyOutingStatusResponse(
-            memberId = member.id!!,
+            memberId = memberId,
             status = member.status,
             name = member.name,
             grade = member.grade,
