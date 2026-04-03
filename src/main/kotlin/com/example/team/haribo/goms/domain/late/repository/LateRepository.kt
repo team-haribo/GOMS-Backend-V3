@@ -37,5 +37,7 @@ interface LateRepository : JpaRepository<Late, Long> {
     )
     fun findAllByComingAtRangeWithMember(start: LocalDateTime, end: LocalDateTime): List<Late>
 
+    fun countByMember_Id(memberId: Long): Long
+
     fun deleteAllByMember_Id(memberId: Long): Long
 }
