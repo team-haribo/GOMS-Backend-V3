@@ -36,6 +36,8 @@ class StudentCouncilLateListServiceImplTest : DescribeSpec({
                 val response = service.list(targetDate)
                 response.students.size shouldBe 1
                 response.students[0].memberId shouldBe member.id!!
+                response.students[0].role shouldBe member.role
+                response.students[0].status shouldBe member.status
                 startSlot.captured shouldBe expectedStart
                 endSlot.captured shouldBe expectedEnd
             }

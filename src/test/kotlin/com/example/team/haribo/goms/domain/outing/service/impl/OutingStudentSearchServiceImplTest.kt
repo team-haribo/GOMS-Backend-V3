@@ -26,6 +26,8 @@ class OutingStudentSearchServiceImplTest : DescribeSpec({
                 val response = service.search("홍길동")
                 response.students.size shouldBe 1
                 response.students[0].name shouldBe member.name
+                response.students[0].role shouldBe member.role
+                response.students[0].status shouldBe member.status
             }
         }
 

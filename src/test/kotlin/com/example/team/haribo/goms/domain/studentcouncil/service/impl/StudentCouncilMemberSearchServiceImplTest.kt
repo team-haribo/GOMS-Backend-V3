@@ -24,6 +24,8 @@ class StudentCouncilMemberSearchServiceImplTest : DescribeSpec({
                 val response = service.search("홍길동")
                 response.students.size shouldBe 1
                 response.students[0].name shouldBe "홍길동"
+                response.students[0].role shouldBe members[0].role
+                response.students[0].status shouldBe members[0].status
             }
         }
 

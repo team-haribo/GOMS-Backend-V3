@@ -24,6 +24,8 @@ class LateRankServiceImpl(
                     name = it.member.name,
                     grade = it.member.grade,
                     department = it.member.department,
+                    role = it.member.role,
+                    status = it.member.status,
                     comingAt = it.comingAt
                 )
             }

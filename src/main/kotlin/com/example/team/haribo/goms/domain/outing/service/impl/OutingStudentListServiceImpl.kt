@@ -23,6 +23,8 @@ class OutingStudentListServiceImpl(
                     name = it.member.name,
                     grade = it.member.grade,
                     department = it.member.department.name,
+                    role = it.member.role,
+                    status = it.member.status,
                     outingAt = it.outingAt
                 )
             }

@@ -2,8 +2,6 @@ package com.example.team.haribo.goms.domain.studentcouncil.service.impl
 
 import com.example.team.haribo.goms.domain.common.enums.Department
 import com.example.team.haribo.goms.domain.common.enums.Gender
-import com.example.team.haribo.goms.domain.common.enums.Role
-import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.member.repository.MemberRepository
 import com.example.team.haribo.goms.fixture.MemberFixture
 import io.kotest.core.spec.style.DescribeSpec
@@ -27,6 +25,10 @@ class StudentCouncilMemberFilterServiceImplTest : DescribeSpec({
             it("When: 필터 조회 시 Then: 전체 목록을 반환한다") {
                 val response = service.filter(null, null, null, null, null, null)
                 response.students.size shouldBe 2
+                response.students[0].role shouldBe allMembers[0].role
+                response.students[0].status shouldBe allMembers[0].status
+                response.students[1].role shouldBe allMembers[1].role
+                response.students[1].status shouldBe allMembers[1].status
             }
         }
 
@@ -40,6 +42,8 @@ class StudentCouncilMemberFilterServiceImplTest : DescribeSpec({
                 val response = service.filter(null, 1, null, null, null, null)
                 response.students.size shouldBe 1
                 response.students[0].grade shouldBe 1
+                response.students[0].role shouldBe grade1Members[0].role
+                response.students[0].status shouldBe grade1Members[0].status
             }
         }
 
@@ -53,6 +57,8 @@ class StudentCouncilMemberFilterServiceImplTest : DescribeSpec({
                 val response = service.filter("홍길동", null, Department.SW, null, null, null)
                 response.students.size shouldBe 1
                 response.students[0].department shouldBe Department.SW
+                response.students[0].role shouldBe filtered[0].role
+                response.students[0].status shouldBe filtered[0].status
             }
         }
 
@@ -65,6 +71,8 @@ class StudentCouncilMemberFilterServiceImplTest : DescribeSpec({
             it("When: 성별로 필터 시 Then: 해당 성별 멤버만 반환한다") {
                 val response = service.filter(null, null, null, Gender.MALE, null, null)
                 response.students.size shouldBe 1
+                response.students[0].role shouldBe maleMembers[0].role
+                response.students[0].status shouldBe maleMembers[0].status
             }
         }
     }
