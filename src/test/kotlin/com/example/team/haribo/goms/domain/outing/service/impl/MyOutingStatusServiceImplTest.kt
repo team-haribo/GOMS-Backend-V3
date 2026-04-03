@@ -20,7 +20,7 @@ class MyOutingStatusServiceImplTest : DescribeSpec({
         context("Given: COMING 상태 멤버") {
             val member = MemberFixture.student(status = Status.COMING)
             every { memberUtil.currentMember() } returns member
-            every { lateRepository.countByMember_Id(member.id!!) } returns 0L
+            every { lateRepository.countByMemberId(member.id!!) } returns 0L
 
             it("When: 외출 상태 조회 시 Then: COMING 상태를 반환한다") {
                 val response = service.getStatus()
@@ -36,7 +36,7 @@ class MyOutingStatusServiceImplTest : DescribeSpec({
         context("Given: OUTING 상태 멤버") {
             val member = MemberFixture.outing()
             every { memberUtil.currentMember() } returns member
-            every { lateRepository.countByMember_Id(member.id!!) } returns 2L
+            every { lateRepository.countByMemberId(member.id!!) } returns 2L
 
             it("When: 외출 상태 조회 시 Then: OUTING 상태를 반환한다") {
                 val response = service.getStatus()
