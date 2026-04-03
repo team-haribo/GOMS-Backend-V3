@@ -114,9 +114,8 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
                 it.anyRequest().authenticated()
             }
-            .addFilterBefore(requestLoggingFilter, JwtAuthenticationFilter::class.java)
-
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAfter(jwtAuthenticationFilter, RequestLoggingFilter::class.java)
             .build()
     }
 }
