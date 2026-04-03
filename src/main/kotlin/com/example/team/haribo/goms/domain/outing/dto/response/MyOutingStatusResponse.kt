@@ -7,5 +7,6 @@ data class MyOutingStatusResponse(
     val status: Status,
     val name: String,
     val grade: Int,
-    val department: String
+    val department: String,
+    val lateCount: Long
 )

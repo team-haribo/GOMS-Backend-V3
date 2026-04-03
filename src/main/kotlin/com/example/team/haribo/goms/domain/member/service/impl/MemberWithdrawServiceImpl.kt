@@ -61,7 +61,7 @@ class MemberWithdrawServiceImpl(
 
         reviewReportRepository.deleteAllByMemberId(memberId)
         reviewReportRepository.deleteAllByReview_Member_Id(memberId)
-        lateRepository.deleteAllByMember_Id(memberId)
+        lateRepository.deleteAllByMemberId(memberId)
         reviewRepository.deleteAllByMember_Id(memberId)
         placeRecommendRepository.deleteAllByMember_Id(memberId)
         outingRepository.deleteAllByMember_Id(memberId)

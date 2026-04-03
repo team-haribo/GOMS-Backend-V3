@@ -1,5 +1,6 @@
 package com.example.team.haribo.goms.domain.outing.service.impl
 
+import com.example.team.haribo.goms.domain.late.repository.LateRepository
 import com.example.team.haribo.goms.domain.outing.dto.response.MyOutingStatusResponse
 import com.example.team.haribo.goms.domain.outing.service.MyOutingStatusService
 import com.example.team.haribo.goms.global.util.MemberUtil
@@ -8,19 +9,23 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MyOutingStatusServiceImpl(
-    private val memberUtil: MemberUtil
+    private val memberUtil: MemberUtil,
+    private val lateRepository: LateRepository
 ) : MyOutingStatusService {
 
     @Transactional(readOnly = true)
     override fun getStatus(): MyOutingStatusResponse {
         val member = memberUtil.currentMember()
+        val memberId = member.id!!
+        val lateCount = lateRepository.countByMemberId(memberId)
 
         return MyOutingStatusResponse(
-            memberId = member.id!!,
+            memberId = memberId,
             status = member.status,
             name = member.name,
             grade = member.grade,
-            department = member.department.name
+            department = member.department.name,
+            lateCount = lateCount
         )
     }
 }
