@@ -6,5 +6,6 @@ data class MyRoleResponse(
     val memberId: Long,
     val email: String,
     val name: String,
-    val role: Role
+    val role: Role,
+    val profileImageUrl: String?
 )
