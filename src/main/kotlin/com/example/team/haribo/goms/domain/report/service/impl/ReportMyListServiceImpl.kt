@@ -23,6 +23,7 @@ class ReportMyListServiceImpl(
             reports = reports.map {
                 val review = it.review
                 val reviewer = review.member
+
                 ReportResponse(
                     reportId = it.id!!,
                     reviewId = review.id!!,
@@ -30,6 +31,7 @@ class ReportMyListServiceImpl(
                     reviewerName = reviewer.name,
                     reviewerGrade = reviewer.grade,
                     reviewerDepartment = reviewer.department,
+                    reviewerProfileImageUrl = reviewer.profileImageUrl,
                     reportCreatedAt = it.createdAt!!,
                     reportStatus = it.status,
                     deletedAt = review.deletedAt,

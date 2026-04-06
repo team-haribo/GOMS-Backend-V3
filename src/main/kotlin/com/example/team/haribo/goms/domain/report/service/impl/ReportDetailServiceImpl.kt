@@ -38,6 +38,7 @@ class ReportDetailServiceImpl(
             reviewerName = reviewer.name,
             reviewerGrade = reviewer.grade,
             reviewerDepartment = reviewer.department,
+            reviewerProfileImageUrl = reviewer.profileImageUrl,
             reviewContent = review.content,
             reportContent = report.content,
             reportCreatedAt = report.createdAt!!,

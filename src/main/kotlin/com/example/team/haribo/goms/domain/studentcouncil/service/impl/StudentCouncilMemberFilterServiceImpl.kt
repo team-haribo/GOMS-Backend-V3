@@ -42,7 +42,8 @@ class StudentCouncilMemberFilterServiceImpl(
                     grade = it.grade,
                     department = it.department,
                     role = it.role,
-                    status = it.status
+                    status = it.status,
+                    profileImageUrl = it.profileImageUrl
                 )
             }
         )

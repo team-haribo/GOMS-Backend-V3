@@ -13,6 +13,7 @@ class StudentCouncilMemberListServiceImpl(
 
     override fun list(): StudentsListResponse {
         val members = memberRepository.findAllSorted()
+
         return StudentsListResponse(
             students = members.map {
                 StudentResponse(
@@ -21,7 +22,8 @@ class StudentCouncilMemberListServiceImpl(
                     grade = it.grade,
                     department = it.department,
                     role = it.role,
-                    status = it.status
+                    status = it.status,
+                    profileImageUrl = it.profileImageUrl
                 )
             }
         )

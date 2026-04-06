@@ -10,5 +10,6 @@ data class StudentResponse(
     val grade: Int,
     val department: Department,
     val role: Role,
-    val status: Status
+    val status: Status,
+    val profileImageUrl: String?
 )
