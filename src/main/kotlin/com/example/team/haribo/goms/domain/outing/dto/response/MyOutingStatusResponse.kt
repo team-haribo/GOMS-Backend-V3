@@ -8,5 +8,6 @@ data class MyOutingStatusResponse(
     val name: String,
     val grade: Int,
     val department: String,
-    val lateCount: Long
+    val lateCount: Long,
+    val profileImageUrl: String?
 )

@@ -17,6 +17,7 @@ class StudentCouncilMemberSearchServiceImpl(
         if (keyword.isNullOrBlank()) throw EmptyNameException()
 
         val members = memberRepository.searchByNameSorted(keyword)
+
         return StudentSearchResponse(
             students = members.map {
                 StudentResponse(
@@ -25,7 +26,8 @@ class StudentCouncilMemberSearchServiceImpl(
                     grade = it.grade,
                     department = it.department,
                     role = it.role,
-                    status = it.status
+                    status = it.status,
+                    profileImageUrl = it.profileImageUrl
                 )
             }
         )

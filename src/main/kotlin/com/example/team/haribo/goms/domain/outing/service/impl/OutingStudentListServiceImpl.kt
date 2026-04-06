@@ -25,6 +25,7 @@ class OutingStudentListServiceImpl(
                     department = it.member.department.name,
                     role = it.member.role,
                     status = it.member.status,
+                    profileImageUrl = it.member.profileImageUrl,
                     outingAt = it.outingAt
                 )
             }

@@ -11,5 +11,6 @@ data class OutingStudentResponse(
     val department: String,
     val role: Role,
     val status: Status,
+    val profileImageUrl: String?,
     val outingAt: LocalDateTime
 )

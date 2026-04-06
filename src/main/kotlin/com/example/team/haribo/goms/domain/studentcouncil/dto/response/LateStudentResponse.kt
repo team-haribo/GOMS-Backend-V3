@@ -12,5 +12,6 @@ data class LateStudentResponse(
     val department: Department,
     val role: Role,
     val status: Status,
+    val profileImageUrl: String?,
     val comingAt: LocalDateTime
 )

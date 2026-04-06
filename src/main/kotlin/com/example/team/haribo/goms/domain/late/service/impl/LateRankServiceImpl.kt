@@ -26,6 +26,7 @@ class LateRankServiceImpl(
                     department = it.member.department,
                     role = it.member.role,
                     status = it.member.status,
+                    profileImageUrl = it.member.profileImageUrl,
                     comingAt = it.comingAt
                 )
             }

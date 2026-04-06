@@ -8,6 +8,7 @@ data class ReviewResponse(
     val name: String,
     val grade: Int,
     val department: Department,
+    val profileImageUrl: String?,
     val content: String,
     val reviewed_at: LocalDateTime
 )

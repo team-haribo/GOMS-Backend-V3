@@ -29,6 +29,7 @@ class ReviewGetServiceImpl(
                     name = it.member.name,
                     grade = it.member.grade,
                     department = it.member.department,
+                    profileImageUrl = it.member.profileImageUrl,
                     content = it.content,
                     reviewed_at = it.createdAt!!
                 )

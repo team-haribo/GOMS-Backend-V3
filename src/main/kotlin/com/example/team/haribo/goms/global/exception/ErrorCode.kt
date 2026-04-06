@@ -29,6 +29,8 @@ enum class ErrorCode(
     NOT_FOUND_MEMBER(404, "해당 사용자를 찾을 수 없습니다."),
     ALREADY_REGISTERED_EMAIL(409, "이미 가입된 이메일입니다."),
     MEMBER_WITHDRAW_PASSWORD_MISMATCH(403, "회원 탈퇴 비밀번호가 일치하지 않습니다."),
+    ALREADY_PROFILE_IMAGE(409, "이미 프로필 이미지가 존재합니다."),
+    NOT_EXISTS_PROFILE_IMAGE(409, "프로필 이미지가 존재하지 않습니다."),
 
     // OUTING
     CANNOT_OUTING(403, "외출이 금지된 사용자입니다."),
@@ -63,6 +65,11 @@ enum class ErrorCode(
     ALREADY_REPORTED_REVIEW(409, "이미 해당 후기를 신고했습니다."),
     REPORT_ALREADY_RESOLVED(409, "이미 처리된 신고입니다."),
     INVALID_REPORT_STATUS(400, "유효하지 않은 신고 상태입니다."),
+
+    // S3
+    EMPTY_PROFILE_IMAGE(400, "프로필 이미지 파일이 비어 있습니다."),
+    INVALID_PROFILE_IMAGE_TYPE(415, "지원하지 않는 프로필 이미지 형식입니다."),
+    IMAGE_SIZE_EXCEEDED(413, "이미지 파일 크기가 너무 큽니다."),
 
     // DEVICE TOKEN
     NOT_FOUND_DEVICE_TOKEN(404, "해당 디바이스 토큰을 찾을 수 없습니다.");

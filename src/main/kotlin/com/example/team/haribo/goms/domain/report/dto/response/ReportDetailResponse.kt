@@ -12,6 +12,7 @@ data class ReportDetailResponse(
     val reviewerName: String,
     val reviewerGrade: Int,
     val reviewerDepartment: Department,
+    val reviewerProfileImageUrl: String?,
     val reviewContent: String,
     val reportContent: String,
     val reportCreatedAt: LocalDateTime,
