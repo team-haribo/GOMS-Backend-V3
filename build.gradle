@@ -8,7 +8,7 @@ plugins {
 
 group = 'com.example.team.haribo.goms'
 version = '0.0.1-SNAPSHOT'
-description = 'GOMS-Server_V3'
+description = 'GOMS-Server-V3'
 
 java {
     toolchain {
@@ -62,6 +62,9 @@ dependencies {
 
     // Firebase
     implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+    // AWS S3
+    implementation 'software.amazon.awssdk:s3:2.25.26'
 
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'

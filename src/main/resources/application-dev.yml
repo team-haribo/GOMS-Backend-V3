@@ -49,3 +49,13 @@ fcm:
 discord:
   webhook-url: ${DISCORD_WEBHOOK_URL}
   deploy-env: ${DEPLOY_ENV:local}
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION:ap-northeast-2}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
