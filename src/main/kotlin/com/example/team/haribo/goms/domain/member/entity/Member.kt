@@ -37,9 +37,11 @@ class Member(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: Status = Status.COMING
-) {
+    var status: Status = Status.COMING,
 
+    @Column(name = "profile_image_url")
+    var profileImageUrl: String? = null
+) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
