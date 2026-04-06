@@ -22,10 +22,10 @@ class ProfileImageUpdateServiceImpl(
         val member = memberUtil.currentMember()
         val currentImageUrl = member.profileImageUrl ?: throw NotExistsProfileImageException()
 
-        imageDeleteService.deleteByUrl(currentImageUrl)
-
         val uploaded = imageUploadService.uploadProfileImage(member.id!!, image)
         member.profileImageUrl = uploaded.imageUrl
+
+        imageDeleteService.deleteByUrl(currentImageUrl)
 
         return ProfileImageResponse(
             imageUrl = member.profileImageUrl
