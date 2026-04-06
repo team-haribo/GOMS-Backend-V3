@@ -47,7 +47,9 @@ class ImageUploadServiceImpl(
             .contentType(image.contentType)
             .build()
 
-        s3Client.putObject(request, RequestBody.fromBytes(image.bytes))
+        image.inputStream.use {
+            s3Client.putObject(request, RequestBody.fromInputStream(it, image.size))
+        }
 
         return ImageUploadResponse(
             imageUrl = "https://${s3Properties.s3.bucket}.s3.${s3Properties.region.static}.amazonaws.com/$key"
