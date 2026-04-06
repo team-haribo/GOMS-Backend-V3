@@ -8,7 +8,11 @@ import com.example.team.haribo.goms.domain.member.entity.Member
 
 object MemberFixture {
 
-    fun student(id: Long = 1L, status: Status = Status.COMING) = Member(
+    fun student(
+        id: Long = 1L,
+        status: Status = Status.COMING,
+        profileImageUrl: String? = null
+    ) = Member(
         email = "student@gsm.hs.kr",
         password = "encoded_password",
         name = "홍길동",
@@ -16,10 +20,15 @@ object MemberFixture {
         department = Department.SW,
         gender = Gender.MALE,
         role = Role.ROLE_STUDENT,
-        status = status
+        status = status,
+        profileImageUrl = profileImageUrl
     ).also { it.id = id }
 
-    fun council(id: Long = 2L, status: Status = Status.COMING) = Member(
+    fun council(
+        id: Long = 2L,
+        status: Status = Status.COMING,
+        profileImageUrl: String? = null
+    ) = Member(
         email = "council@gsm.hs.kr",
         password = "encoded_password",
         name = "학생회장",
@@ -27,10 +36,25 @@ object MemberFixture {
         department = Department.IOT,
         gender = Gender.FEMALE,
         role = Role.ROLE_STUDENT_COUNCIL,
-        status = status
+        status = status,
+        profileImageUrl = profileImageUrl
     ).also { it.id = id }
 
-    fun cannotOuting(id: Long = 3L) = student(id = id, status = Status.CANNOT_OUTING)
+    fun cannotOuting(
+        id: Long = 3L,
+        profileImageUrl: String? = null
+    ) = student(
+        id = id,
+        status = Status.CANNOT_OUTING,
+        profileImageUrl = profileImageUrl
+    )
 
-    fun outing(id: Long = 4L) = student(id = id, status = Status.OUTING)
+    fun outing(
+        id: Long = 4L,
+        profileImageUrl: String? = null
+    ) = student(
+        id = id,
+        status = Status.OUTING,
+        profileImageUrl = profileImageUrl
+    )
 }
