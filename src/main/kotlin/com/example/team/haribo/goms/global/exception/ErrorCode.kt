@@ -29,7 +29,6 @@ enum class ErrorCode(
     NOT_FOUND_MEMBER(404, "해당 사용자를 찾을 수 없습니다."),
     ALREADY_REGISTERED_EMAIL(409, "이미 가입된 이메일입니다."),
     MEMBER_WITHDRAW_PASSWORD_MISMATCH(403, "회원 탈퇴 비밀번호가 일치하지 않습니다."),
-    ALREADY_PROFILE_IMAGE(409, "이미 프로필 이미지가 존재합니다."),
     NOT_EXISTS_PROFILE_IMAGE(409, "프로필 이미지가 존재하지 않습니다."),
 
     // OUTING

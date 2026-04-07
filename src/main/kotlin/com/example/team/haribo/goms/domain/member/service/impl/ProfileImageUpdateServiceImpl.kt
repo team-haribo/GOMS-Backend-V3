@@ -1,7 +1,6 @@
 package com.example.team.haribo.goms.domain.member.service.impl
 
 import com.example.team.haribo.goms.domain.member.dto.response.ProfileImageResponse
-import com.example.team.haribo.goms.domain.member.exception.NotExistsProfileImageException
 import com.example.team.haribo.goms.domain.member.service.ProfileImageUpdateService
 import com.example.team.haribo.goms.domain.s3.service.ImageDeleteService
 import com.example.team.haribo.goms.domain.s3.service.ImageUploadService
@@ -20,12 +19,14 @@ class ProfileImageUpdateServiceImpl(
     @Transactional
     override fun execute(image: MultipartFile): ProfileImageResponse {
         val member = memberUtil.currentMember()
-        val currentImageUrl = member.profileImageUrl ?: throw NotExistsProfileImageException()
+        val currentImageUrl = member.profileImageUrl
 
         val uploaded = imageUploadService.uploadProfileImage(member.id!!, image)
         member.profileImageUrl = uploaded.imageUrl
 
-        imageDeleteService.deleteByUrl(currentImageUrl)
+        if (currentImageUrl != null) {
+            imageDeleteService.deleteByUrl(currentImageUrl)
+        }
 
         return ProfileImageResponse(
             imageUrl = member.profileImageUrl

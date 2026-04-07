@@ -7,7 +7,6 @@ import com.example.team.haribo.goms.domain.member.dto.response.ProfileImageRespo
 import com.example.team.haribo.goms.domain.member.service.MemberWithdrawService
 import com.example.team.haribo.goms.domain.member.service.MyProfileQueryService
 import com.example.team.haribo.goms.domain.member.service.MyRoleQueryService
-import com.example.team.haribo.goms.domain.member.service.ProfileImageCreateService
 import com.example.team.haribo.goms.domain.member.service.ProfileImageDeleteService
 import com.example.team.haribo.goms.domain.member.service.ProfileImageUpdateService
 import io.swagger.v3.oas.annotations.Operation
@@ -24,7 +23,6 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -40,7 +38,6 @@ class MemberController(
     private val memberWithdrawService: MemberWithdrawService,
     private val myRoleQueryService: MyRoleQueryService,
     private val myProfileQueryService: MyProfileQueryService,
-    private val profileImageCreateService: ProfileImageCreateService,
     private val profileImageUpdateService: ProfileImageUpdateService,
     private val profileImageDeleteService: ProfileImageDeleteService
 ) {
@@ -84,33 +81,8 @@ class MemberController(
     }
 
     @Operation(
-        summary = "프로필 이미지 등록",
-        description = "현재 로그인한 사용자의 프로필 이미지를 등록합니다."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "201",
-                description = "등록 성공",
-                content = [Content(schema = Schema(implementation = ProfileImageResponse::class))]
-            ),
-            ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            ApiResponse(responseCode = "401", description = "인증 실패"),
-            ApiResponse(responseCode = "409", description = "이미 프로필 이미지가 존재함"),
-            ApiResponse(responseCode = "413", description = "이미지 파일 크기 초과"),
-            ApiResponse(responseCode = "415", description = "지원하지 않는 이미지 형식")
-        ]
-    )
-    @PostMapping("/profile-image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun createProfileImage(
-        @RequestPart("image") image: MultipartFile
-    ): ResponseEntity<ProfileImageResponse> {
-        return ResponseEntity.status(201).body(profileImageCreateService.execute(image))
-    }
-
-    @Operation(
-        summary = "프로필 이미지 수정",
-        description = "현재 로그인한 사용자의 프로필 이미지를 수정합니다."
+        summary = "프로필 이미지 등록 및 수정",
+        description = "현재 로그인한 사용자의 프로필 이미지를 등록하거나 수정합니다."
     )
     @ApiResponses(
         value = [
