@@ -11,6 +11,7 @@ import com.example.team.haribo.goms.domain.place.exception.NotFoundPlaceExceptio
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
 import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
 import com.example.team.haribo.goms.domain.place.service.PlaceRecommendService
+import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
 import com.example.team.haribo.goms.global.log.LogFormat
 import com.example.team.haribo.goms.global.util.MemberUtil
 import org.slf4j.LoggerFactory
@@ -22,6 +23,7 @@ import java.time.LocalDateTime
 class PlaceRecommendServiceImpl(
     private val placeRepository: PlaceRepository,
     private val recommendRepository: PlaceRecommendRepository,
+    private val reviewRepository: ReviewRepository,
     private val memberUtil: MemberUtil
 ) : PlaceRecommendService {
 
@@ -40,14 +42,14 @@ class PlaceRecommendServiceImpl(
             )
         )
 
-        val place = placeRepository.findById(placeId).orElseThrow {
+        val place = placeRepository.findByIdAndIsActiveTrue(placeId).orElseThrow {
             log.warn(
                 LogFormat.message(
                     domain = "PLACE",
                     event = "장소 추천 실패",
                     "memberId" to member.id,
                     "placeId" to placeId,
-                    "reason" to "존재하지 않는 장소"
+                    "reason" to "존재하지 않거나 비활성화된 장소"
                 )
             )
             NotFoundPlaceException()
@@ -119,14 +121,14 @@ class PlaceRecommendServiceImpl(
             )
         )
 
-        if (!placeRepository.existsById(placeId)) {
+        if (!placeRepository.existsByIdAndIsActiveTrue(placeId)) {
             log.warn(
                 LogFormat.message(
                     domain = "PLACE",
                     event = "장소 추천 취소 실패",
                     "memberId" to memberId,
                     "placeId" to placeId,
-                    "reason" to "존재하지 않는 장소"
+                    "reason" to "존재하지 않거나 비활성화된 장소"
                 )
             )
             throw NotFoundPlaceException()
@@ -183,16 +185,34 @@ class PlaceRecommendServiceImpl(
             return PlacesResponse(places = emptyList())
         }
 
-        val placeIds = recommends.mapNotNull { it.place.id }.distinct()
+        val places = recommends.map { it.place }
+            .filter { it.id != null && it.isActive }
+            .distinctBy { it.id }
+
+        if (places.isEmpty()) {
+            return PlacesResponse(places = emptyList())
+        }
+
+        val placeIds = places.mapNotNull { it.id }
 
         val recommendCountMap = recommendRepository.countRecommendedByPlaceIds(placeIds)
             .associate { it.placeId to it.recommendCount }
 
+        val reviewCountMap = placeIds.associateWith { reviewRepository.countActiveByPlaceId(it) }
+
         return PlacesResponse(
-            places = placeIds.map { placeId ->
+            places = places.map { place ->
+                val placeId = place.id!!
                 PlaceSummaryResponse(
                     placeId = placeId,
-                    reviewCount = 0,
+                    placeName = place.placeName,
+                    address = place.address,
+                    roadAddress = place.roadAddress,
+                    latitude = place.latitude,
+                    longitude = place.longitude,
+                    categoryGroupName = place.categoryGroupName,
+                    categoryName = place.categoryName,
+                    reviewCount = reviewCountMap[placeId] ?: 0L,
                     recommendCount = recommendCountMap[placeId] ?: 0L,
                     recommended = true
                 )
