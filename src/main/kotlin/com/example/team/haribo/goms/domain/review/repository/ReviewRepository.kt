@@ -6,11 +6,20 @@ import org.springframework.data.jpa.repository.Query
 
 interface ReviewRepository : JpaRepository<Review, Long> {
 
+    interface PlaceReviewCountProjection {
+        val placeId: Long
+        val reviewCount: Long
+    }
+
+    fun existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId: Long, memberId: Long): Boolean
+
+    fun deleteAllByMember_Id(memberId: Long): Long
+
     @Query(
         """
         SELECT r
         FROM Review r
-        JOIN FETCH r.member m
+        JOIN FETCH r.member
         WHERE r.place.id = :placeId
           AND r.deletedAt IS NULL
         ORDER BY r.createdAt DESC
@@ -20,7 +29,7 @@ interface ReviewRepository : JpaRepository<Review, Long> {
 
     @Query(
         """
-        SELECT COUNT(r)
+        SELECT COUNT(r.id)
         FROM Review r
         WHERE r.place.id = :placeId
           AND r.deletedAt IS NULL
@@ -28,7 +37,14 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     )
     fun countActiveByPlaceId(placeId: Long): Long
 
-    fun existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId: Long, memberId: Long): Boolean
-
-    fun deleteAllByMember_Id(memberId: Long): Long
+    @Query(
+        """
+        SELECT r.place.id AS placeId, COUNT(r.id) AS reviewCount
+        FROM Review r
+        WHERE r.deletedAt IS NULL
+          AND r.place.id IN :placeIds
+        GROUP BY r.place.id
+        """
+    )
+    fun countActiveByPlaceIds(placeIds: List<Long>): List<PlaceReviewCountProjection>
 }

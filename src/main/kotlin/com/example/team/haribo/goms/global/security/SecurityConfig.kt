@@ -119,6 +119,7 @@ class SecurityConfig {
                 it.requestMatchers("/api/v3/place/recommended/count").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/place/review/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
                 it.requestMatchers("/api/v3/place/review/count").hasAnyRole("STUDENT", "STUDENT_COUNCIL")
+                it.requestMatchers("/api/v3/place/sync").hasAnyRole("STUDENT_COUNCIL")
 
                 // REVIEW
                 it.requestMatchers("/api/v3/review/**").hasAnyRole("STUDENT", "STUDENT_COUNCIL")

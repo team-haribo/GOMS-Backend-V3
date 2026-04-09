@@ -18,7 +18,7 @@ class ReviewGetServiceImpl(
 
     @Transactional(readOnly = true)
     override fun getPlaceReviews(placeId: Long): PlaceReviewListResponse {
-        if (!placeRepository.existsById(placeId)) throw NotFoundPlaceException()
+        if (!placeRepository.existsByIdAndIsActiveTrue(placeId)) throw NotFoundPlaceException()
 
         val reviews = reviewRepository.findAllActiveByPlaceId(placeId)
 
@@ -39,7 +39,7 @@ class ReviewGetServiceImpl(
 
     @Transactional(readOnly = true)
     override fun countPlaceReviews(placeId: Long): ReviewCountResponse {
-        if (!placeRepository.existsById(placeId)) throw NotFoundPlaceException()
+        if (!placeRepository.existsByIdAndIsActiveTrue(placeId)) throw NotFoundPlaceException()
         return ReviewCountResponse(reviewCount = reviewRepository.countActiveByPlaceId(placeId))
     }
 }

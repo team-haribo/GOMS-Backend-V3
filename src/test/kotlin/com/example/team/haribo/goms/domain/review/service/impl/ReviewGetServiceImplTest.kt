@@ -19,7 +19,7 @@ class ReviewGetServiceImplTest : DescribeSpec({
     val reviewRepository = mockk<ReviewRepository>()
     val service = ReviewGetServiceImpl(placeRepository, reviewRepository)
 
-    val place = PlaceFixture.place(id = 1L)
+    val place = PlaceFixture.place(id = 1L, isActive = true)
     val placeId = place.id!!
 
     describe("ReviewGetService.getPlaceReviews()") {
@@ -30,11 +30,13 @@ class ReviewGetServiceImplTest : DescribeSpec({
                 ReviewFixture.review(id = 1L, place = place, member = member, content = "좋아요"),
                 ReviewFixture.review(id = 2L, place = place, member = member, content = "또 왔어요")
             )
-            every { placeRepository.existsById(placeId) } returns true
+
+            every { placeRepository.existsByIdAndIsActiveTrue(placeId) } returns true
             every { reviewRepository.findAllActiveByPlaceId(placeId) } returns reviews
 
             it("When: 리뷰 목록 조회 시 Then: 리뷰 목록을 반환한다") {
                 val response = service.getPlaceReviews(placeId)
+
                 response.reviews.size shouldBe 2
                 response.reviews[0].review_id shouldBe 1L
                 response.reviews[0].content shouldBe "좋아요"
@@ -45,7 +47,7 @@ class ReviewGetServiceImplTest : DescribeSpec({
         }
 
         context("Given: 존재하는 placeId + 리뷰 없음") {
-            every { placeRepository.existsById(placeId) } returns true
+            every { placeRepository.existsByIdAndIsActiveTrue(placeId) } returns true
             every { reviewRepository.findAllActiveByPlaceId(placeId) } returns emptyList()
 
             it("When: 리뷰 목록 조회 시 Then: 빈 리스트를 반환한다") {
@@ -55,7 +57,7 @@ class ReviewGetServiceImplTest : DescribeSpec({
         }
 
         context("Given: 존재하지 않는 placeId") {
-            every { placeRepository.existsById(999L) } returns false
+            every { placeRepository.existsByIdAndIsActiveTrue(999L) } returns false
 
             it("When: 리뷰 목록 조회 시 Then: NotFoundPlaceException이 발생한다") {
                 shouldThrow<NotFoundPlaceException> {
@@ -68,7 +70,7 @@ class ReviewGetServiceImplTest : DescribeSpec({
     describe("ReviewGetService.countPlaceReviews()") {
 
         context("Given: 존재하는 placeId + 리뷰 5개") {
-            every { placeRepository.existsById(placeId) } returns true
+            every { placeRepository.existsByIdAndIsActiveTrue(placeId) } returns true
             every { reviewRepository.countActiveByPlaceId(placeId) } returns 5L
 
             it("When: 리뷰 수 조회 시 Then: 5를 반환한다") {
@@ -78,7 +80,7 @@ class ReviewGetServiceImplTest : DescribeSpec({
         }
 
         context("Given: 존재하지 않는 placeId") {
-            every { placeRepository.existsById(999L) } returns false
+            every { placeRepository.existsByIdAndIsActiveTrue(999L) } returns false
 
             it("When: 리뷰 수 조회 시 Then: NotFoundPlaceException이 발생한다") {
                 shouldThrow<NotFoundPlaceException> {

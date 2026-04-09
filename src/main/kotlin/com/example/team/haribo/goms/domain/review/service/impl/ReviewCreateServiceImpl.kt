@@ -62,13 +62,13 @@ class ReviewCreateServiceImpl(
             throw ReviewContentTooLongException()
         }
 
-        val place = placeRepository.findById(placeId).orElseThrow {
+        val place = placeRepository.findByIdAndIsActiveTrue(placeId).orElseThrow {
             log.warn(
                 LogFormat.message(
                     domain = "REVIEW",
                     event = "리뷰 작성 실패",
                     "placeId" to placeId,
-                    "reason" to "존재하지 않는 장소"
+                    "reason" to "존재하지 않거나 비활성화된 장소"
                 )
             )
             NotFoundPlaceException()

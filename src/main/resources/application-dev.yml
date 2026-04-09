@@ -58,4 +58,7 @@ cloud:
     region:
       static: ${AWS_REGION:ap-northeast-2}
     s3:
-      bucket: ${AWS_S3_BUCKET}
+      bucket: ${AWS_S3_BUCKET:goms-v3-profile-image}
+
+kakao:
+  rest-api-key: ${KAKAO_REST_API_KEY}
