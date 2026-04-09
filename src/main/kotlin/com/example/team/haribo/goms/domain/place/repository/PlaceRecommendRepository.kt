@@ -28,7 +28,9 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
         """
         SELECT pr.place.id
         FROM PlaceRecommend pr
-        WHERE pr.member.id = :memberId AND pr.recommended = true
+        WHERE pr.member.id = :memberId
+          AND pr.recommended = true
+          AND pr.place.isActive = true
         """
     )
     fun findRecommendedPlaceIds(memberId: Long): List<Long>
@@ -38,6 +40,7 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
         SELECT pr.place.id
         FROM PlaceRecommend pr
         WHERE pr.recommended = true
+          AND pr.place.isActive = true
         GROUP BY pr.place.id
         ORDER BY COUNT(pr.id) DESC
         """
@@ -49,6 +52,7 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
         SELECT pr.place.id AS placeId, COUNT(pr.id) AS recommendCount
         FROM PlaceRecommend pr
         WHERE pr.recommended = true
+          AND pr.place.isActive = true
           AND pr.place.id IN :placeIds
         GROUP BY pr.place.id
         """
@@ -61,6 +65,7 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
         FROM PlaceRecommend pr
         WHERE pr.recommended = true
           AND pr.createdAt >= :since
+          AND pr.place.isActive = true
         GROUP BY pr.place.id
         ORDER BY COUNT(pr.id) DESC
         """
@@ -73,6 +78,7 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
         FROM PlaceRecommend pr
         WHERE pr.recommended = true
           AND pr.createdAt >= :since
+          AND pr.place.isActive = true
           AND pr.place.id IN :placeIds
         GROUP BY pr.place.id
         """
