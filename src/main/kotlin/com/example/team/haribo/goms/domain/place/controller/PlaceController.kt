@@ -1,6 +1,5 @@
 package com.example.team.haribo.goms.domain.place.controller
 
-import com.example.team.haribo.goms.domain.place.dto.request.PlaceUpsertRequest
 import com.example.team.haribo.goms.domain.place.dto.response.PlaceDetailResponse
 import com.example.team.haribo.goms.domain.place.dto.response.PlaceSearchListResponse
 import com.example.team.haribo.goms.domain.place.dto.response.PlaceUpsertResponse
@@ -11,7 +10,6 @@ import com.example.team.haribo.goms.domain.place.service.PlaceDetailService
 import com.example.team.haribo.goms.domain.place.service.PlaceHotPlaceService
 import com.example.team.haribo.goms.domain.place.service.PlaceRecommendService
 import com.example.team.haribo.goms.domain.place.service.PlaceSearchService
-import com.example.team.haribo.goms.domain.place.service.PlaceUpsertService
 import com.example.team.haribo.goms.domain.review.dto.response.PlaceReviewListResponse
 import com.example.team.haribo.goms.domain.review.dto.response.ReviewCountResponse
 import com.example.team.haribo.goms.domain.review.service.ReviewGetService
@@ -42,33 +40,12 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 @RequestMapping("/api/v3/place")
 class PlaceController(
-    private val upsertService: PlaceUpsertService,
     private val hotPlaceService: PlaceHotPlaceService,
     private val detailService: PlaceDetailService,
     private val searchService: PlaceSearchService,
     private val recommendService: PlaceRecommendService,
     private val reviewGetService: ReviewGetService
 ) {
-
-    @Operation(
-        summary = "장소 등록 또는 갱신",
-        description = "장소 정보를 등록하거나 이미 존재하면 갱신합니다.",
-        requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
-            required = true,
-            content = [
-                Content(
-                    schema = Schema(implementation = PlaceUpsertRequest::class)
-                )
-            ]
-        ),
-        responses = [
-            ApiResponse(responseCode = "201", description = "등록 또는 갱신 성공")
-        ]
-    )
-    @PostMapping("/upsert")
-    fun upsert(@Valid @RequestBody request: PlaceUpsertRequest): ResponseEntity<PlaceUpsertResponse> {
-        return ResponseEntity.status(201).body(upsertService.upsert(request))
-    }
 
     @Operation(
         summary = "핫플레이스 조회",
