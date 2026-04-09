@@ -1,18 +1,19 @@
 package com.example.team.haribo.goms.domain.place.client
 
 import com.example.team.haribo.goms.domain.place.dto.response.KakaoPlaceSearchResponse
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 
 @Component
 class KakaoPlaceClient(
-    @Value("\${kakao.rest-api-key}") private val restApiKey: String
+    @Qualifier("kakaoWebClient")
+    private val kakaoWebClient: WebClient,
+    @Value("\${kakao.rest-api-key}")
+    private val restApiKey: String
 ) {
-    private val webClient = WebClient.builder()
-        .baseUrl("https://dapi.kakao.com")
-        .defaultHeader("Authorization", "KakaoAK $restApiKey")
-        .build()
 
     fun searchByCategory(
         categoryGroupCode: String,
@@ -22,7 +23,7 @@ class KakaoPlaceClient(
         page: Int,
         size: Int
     ): KakaoPlaceSearchResponse {
-        return webClient.get()
+        return kakaoWebClient.get()
             .uri {
                 it.path("/v2/local/search/category.json")
                     .queryParam("category_group_code", categoryGroupCode)
@@ -33,9 +34,14 @@ class KakaoPlaceClient(
                     .queryParam("size", size)
                     .build()
             }
+            .header("Authorization", "KakaoAK $restApiKey")
             .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                response.bodyToMono(String::class.java)
+                    .map { IllegalStateException("Kakao category api failed: ${response.statusCode()} - $it") }
+            }
             .bodyToMono(KakaoPlaceSearchResponse::class.java)
-            .block()!!
+            .block() ?: throw IllegalStateException("Kakao category api response is null")
     }
 
     fun searchByKeyword(
@@ -46,7 +52,7 @@ class KakaoPlaceClient(
         page: Int,
         size: Int
     ): KakaoPlaceSearchResponse {
-        return webClient.get()
+        return kakaoWebClient.get()
             .uri {
                 it.path("/v2/local/search/keyword.json")
                     .queryParam("query", keyword)
@@ -58,8 +64,13 @@ class KakaoPlaceClient(
                     .queryParam("sort", "distance")
                     .build()
             }
+            .header("Authorization", "KakaoAK $restApiKey")
             .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                response.bodyToMono(String::class.java)
+                    .map { IllegalStateException("Kakao keyword api failed: ${response.statusCode()} - $it") }
+            }
             .bodyToMono(KakaoPlaceSearchResponse::class.java)
-            .block()!!
+            .block() ?: throw IllegalStateException("Kakao keyword api response is null")
     }
 }
