@@ -48,6 +48,7 @@ enum class ErrorCode(
     NOT_FOUND_PLACE(404, "장소를 찾을 수 없습니다."),
     ALREADY_RECOMMENDED_PLACE(409, "이미 추천한 장소입니다."),
     ALREADY_UNRECOMMENDED_PLACE(409, "이미 추천 취소된 장소입니다."),
+    INACTIVE_PLACE(409, "현재 이용할 수 없는 장소입니다."),
 
     // REVIEW
     NOT_FOUND_REVIEW(404, "후기를 찾을 수 없습니다."),
