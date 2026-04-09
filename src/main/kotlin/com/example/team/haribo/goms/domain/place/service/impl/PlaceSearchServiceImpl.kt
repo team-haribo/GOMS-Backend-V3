@@ -37,7 +37,8 @@ class PlaceSearchServiceImpl(
         val recommendCountMap = recommendRepository.countRecommendedByPlaceIds(placeIds)
             .associate { it.placeId to it.recommendCount }
 
-        val reviewCountMap = placeIds.associateWith { reviewRepository.countActiveByPlaceId(it) }
+        val reviewCountMap = reviewRepository.countActiveByPlaceIds(placeIds)
+            .associate { it.placeId to it.reviewCount }
 
         return PlaceSearchListResponse(
             places = places.map { place ->

@@ -49,6 +49,9 @@ class PlaceHotPlaceServiceImpl(
             .countRecommendedByPlaceIdsSince(hotIds, since)
             .associate { it.placeId to it.recommendCount }
 
+        val reviewCountMap = reviewRepository.countActiveByPlaceIds(hotIds)
+            .associate { it.placeId to it.reviewCount }
+
         return PlacesResponse(
             places = hotIds.mapNotNull { placeId ->
                 val place = placeMap[placeId] ?: return@mapNotNull null
@@ -61,7 +64,7 @@ class PlaceHotPlaceServiceImpl(
                     longitude = place.longitude,
                     categoryGroupName = place.categoryGroupName,
                     categoryName = place.categoryName,
-                    reviewCount = reviewRepository.countActiveByPlaceId(placeId),
+                    reviewCount = reviewCountMap[placeId] ?: 0L,
                     recommendCount = recommendCountMap[placeId] ?: 0L,
                     recommended = recommendedIds.contains(placeId)
                 )
