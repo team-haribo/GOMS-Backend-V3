@@ -134,15 +134,19 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
         context("Given: 추천 장소 있음") {
             val rec = PlaceFixture.recommend(place = place, member = member)
-            val projection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
+            val recommendProjection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
+            val reviewProjection = mockk<ReviewRepository.PlaceReviewCountProjection>()
 
-            every { projection.placeId } returns placeId
-            every { projection.recommendCount } returns 4L
+            every { recommendProjection.placeId } returns placeId
+            every { recommendProjection.recommendCount } returns 4L
+
+            every { reviewProjection.placeId } returns placeId
+            every { reviewProjection.reviewCount } returns 2L
 
             every { memberUtil.currentMemberId() } returns memberId
             every { recommendRepository.findAllByMemberIdAndRecommendedTrue(memberId) } returns listOf(rec)
-            every { recommendRepository.countRecommendedByPlaceIds(listOf(placeId)) } returns listOf(projection)
-            every { reviewRepository.countActiveByPlaceId(placeId) } returns 2L
+            every { recommendRepository.countRecommendedByPlaceIds(listOf(placeId)) } returns listOf(recommendProjection)
+            every { reviewRepository.countActiveByPlaceIds(listOf(placeId)) } returns listOf(reviewProjection)
 
             it("When: 추천 장소 목록 조회 시 Then: 목록과 count를 반환한다") {
                 val response = service.getRecommendedPlaces()

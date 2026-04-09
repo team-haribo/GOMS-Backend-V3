@@ -28,16 +28,20 @@ class PlaceSearchServiceImplTest : DescribeSpec({
 
         context("Given: 유효한 키워드 + 결과 있음") {
             val place = PlaceFixture.place(id = 1L)
-            val projection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
+            val recommendProjection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
+            val reviewProjection = mockk<ReviewRepository.PlaceReviewCountProjection>()
 
-            every { projection.placeId } returns 1L
-            every { projection.recommendCount } returns 3L
+            every { recommendProjection.placeId } returns 1L
+            every { recommendProjection.recommendCount } returns 3L
+
+            every { reviewProjection.placeId } returns 1L
+            every { reviewProjection.reviewCount } returns 2L
 
             every { memberUtil.currentMemberId() } returns memberId
             every { placeRepository.searchByKeyword("서울") } returns listOf(place)
             every { recommendRepository.findRecommendedPlaceIds(memberId) } returns listOf(1L)
-            every { recommendRepository.countRecommendedByPlaceIds(listOf(1L)) } returns listOf(projection)
-            every { reviewRepository.countActiveByPlaceId(1L) } returns 2L
+            every { recommendRepository.countRecommendedByPlaceIds(listOf(1L)) } returns listOf(recommendProjection)
+            every { reviewRepository.countActiveByPlaceIds(listOf(1L)) } returns listOf(reviewProjection)
 
             it("When: 검색 시 Then: 결과와 장소 정보를 반환한다") {
                 val response = service.search("서울")

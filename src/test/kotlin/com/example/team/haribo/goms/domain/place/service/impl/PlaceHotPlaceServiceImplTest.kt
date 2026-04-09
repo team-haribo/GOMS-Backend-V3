@@ -34,12 +34,18 @@ class PlaceHotPlaceServiceImplTest : DescribeSpec({
         if (hotIds.isNotEmpty()) {
             val places = hotIds.map { PlaceFixture.place(id = it, isActive = true) }
             every { placeRepository.findAllById(hotIds) } returns places
-            every { reviewRepository.countActiveByPlaceId(any()) } returns 0L
 
-            val projections = hotIds.map { placeId ->
+            val recommendProjections = hotIds.map { placeId ->
                 val projection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
                 every { projection.placeId } returns placeId
                 every { projection.recommendCount } returns 5L
+                projection
+            }
+
+            val reviewProjections = hotIds.map { placeId ->
+                val projection = mockk<ReviewRepository.PlaceReviewCountProjection>()
+                every { projection.placeId } returns placeId
+                every { projection.reviewCount } returns 0L
                 projection
             }
 
@@ -48,7 +54,9 @@ class PlaceHotPlaceServiceImplTest : DescribeSpec({
                     hotIds,
                     any<LocalDateTime>()
                 )
-            } returns projections
+            } returns recommendProjections
+
+            every { reviewRepository.countActiveByPlaceIds(hotIds) } returns reviewProjections
         }
     }
 
