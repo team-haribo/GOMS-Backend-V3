@@ -1,6 +1,7 @@
 package com.example.team.haribo.goms.domain.place.client
 
 import com.example.team.haribo.goms.domain.place.dto.response.KakaoPlaceSearchResponse
+import reactor.core.publisher.Mono
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatusCode
@@ -38,7 +39,8 @@ class KakaoPlaceClient(
             .retrieve()
             .onStatus(HttpStatusCode::isError) { response ->
                 response.bodyToMono(String::class.java)
-                    .map { IllegalStateException("Kakao category api failed: ${response.statusCode()} - $it") }
+                    .defaultIfEmpty("No response body")
+                    .flatMap { Mono.error(IllegalStateException("Kakao category api failed: ${response.statusCode()} - $it")) }
             }
             .bodyToMono(KakaoPlaceSearchResponse::class.java)
             .block() ?: throw IllegalStateException("Kakao category api response is null")
@@ -68,7 +70,8 @@ class KakaoPlaceClient(
             .retrieve()
             .onStatus(HttpStatusCode::isError) { response ->
                 response.bodyToMono(String::class.java)
-                    .map { IllegalStateException("Kakao keyword api failed: ${response.statusCode()} - $it") }
+                    .defaultIfEmpty("No response body")
+                    .flatMap { Mono.error(IllegalStateException("Kakao keyword api failed: ${response.statusCode()} - $it")) }
             }
             .bodyToMono(KakaoPlaceSearchResponse::class.java)
             .block() ?: throw IllegalStateException("Kakao keyword api response is null")
