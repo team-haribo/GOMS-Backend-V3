@@ -1,6 +1,9 @@
 package com.example.team.haribo.goms.domain.place.service.impl
 
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
+import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
+import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
+import com.example.team.haribo.goms.fixture.PlaceFixture
 import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.exception.GlobalException
 import com.example.team.haribo.goms.global.util.MemberUtil
@@ -15,22 +18,37 @@ import java.time.LocalDateTime
 
 class PlaceHotPlaceServiceImplTest : DescribeSpec({
 
+    val placeRepository = mockk<PlaceRepository>()
     val recommendRepository = mockk<PlaceRecommendRepository>()
+    val reviewRepository = mockk<ReviewRepository>()
     val memberUtil = mockk<MemberUtil>()
-    val service = PlaceHotPlaceServiceImpl(recommendRepository, memberUtil)
+    val service = PlaceHotPlaceServiceImpl(placeRepository, recommendRepository, reviewRepository, memberUtil)
 
     val memberId = 1L
 
-    fun setupCommon(hotIds: List<Long>, days: Long = 3L) {
+    fun setupCommon(hotIds: List<Long>) {
         every { memberUtil.currentMemberId() } returns memberId
         every { recommendRepository.findRecommendedPlaceIds(memberId) } returns emptyList()
         every { recommendRepository.findHotPlaceIdsSince(any<LocalDateTime>(), any<Pageable>()) } returns hotIds
+
         if (hotIds.isNotEmpty()) {
-            val projection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
-            every { projection.placeId } returns hotIds[0]
-            every { projection.recommendCount } returns 5L
-            every { recommendRepository.countRecommendedByPlaceIdsSince(any(), any<LocalDateTime>()) } returns
-                listOf(projection)
+            val places = hotIds.map { PlaceFixture.place(id = it, isActive = true) }
+            every { placeRepository.findAllById(hotIds) } returns places
+            every { reviewRepository.countActiveByPlaceId(any()) } returns 0L
+
+            val projections = hotIds.map { placeId ->
+                val projection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
+                every { projection.placeId } returns placeId
+                every { projection.recommendCount } returns 5L
+                projection
+            }
+
+            every {
+                recommendRepository.countRecommendedByPlaceIdsSince(
+                    hotIds,
+                    any<LocalDateTime>()
+                )
+            } returns projections
         }
     }
 
@@ -42,6 +60,7 @@ class PlaceHotPlaceServiceImplTest : DescribeSpec({
             it("When: 핫플레이스 조회 시 Then: Top3 결과를 반환한다") {
                 val response = service.getHotPlaces(null)
                 response.places.size shouldBe 3
+                response.places[0].placeId shouldBe 1L
             }
         }
 
@@ -51,6 +70,7 @@ class PlaceHotPlaceServiceImplTest : DescribeSpec({
             it("When: 핫플레이스 조회 시 Then: 정상적으로 결과를 반환한다") {
                 val response = service.getHotPlaces(1L)
                 response.places.size shouldBe 1
+                response.places[0].placeId shouldBe 1L
             }
         }
 
@@ -60,6 +80,8 @@ class PlaceHotPlaceServiceImplTest : DescribeSpec({
             it("When: 핫플레이스 조회 시 Then: 정상적으로 결과를 반환한다") {
                 val response = service.getHotPlaces(30L)
                 response.places.size shouldBe 2
+                response.places[0].placeId shouldBe 10L
+                response.places[1].placeId shouldBe 20L
             }
         }
 

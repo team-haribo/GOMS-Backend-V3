@@ -26,20 +26,23 @@ class ReviewCreateServiceImplTest : DescribeSpec({
     val memberUtil = mockk<MemberUtil>()
     val service = ReviewCreateServiceImpl(placeRepository, reviewRepository, memberUtil)
 
-    val member = MemberFixture.student()
-    val place = PlaceFixture.place(id = 1L)
-    val placeId = place.id!!
+    val member = MemberFixture.student(id = 1L)
+    val place = PlaceFixture.place(id = 1L, isActive = true)
+    val placeId = 1L
 
     describe("ReviewCreateService") {
 
         context("Given: 유효한 내용 + 첫 리뷰") {
-            every { placeRepository.findById(placeId) } returns Optional.of(place)
+            every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
             every { memberUtil.currentMember() } returns member
             every { reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!) } returns false
             every { reviewRepository.save(any()) } answers {
-                firstArg<com.example.team.haribo.goms.domain.review.entity.Review>().also {
-                    // simulate id assignment
-                }.let { ReviewFixture.review(id = 10L, place = place, member = member) }
+                ReviewFixture.review(
+                    id = 10L,
+                    place = place,
+                    member = member,
+                    content = "좋은 장소입니다."
+                )
             }
 
             it("When: 리뷰 작성 시 Then: 저장하고 review_id를 반환한다") {
@@ -74,10 +77,17 @@ class ReviewCreateServiceImplTest : DescribeSpec({
         }
 
         context("Given: 정확히 500자 내용") {
-            every { placeRepository.findById(placeId) } returns Optional.of(place)
+            every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
             every { memberUtil.currentMember() } returns member
             every { reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!) } returns false
-            every { reviewRepository.save(any()) } returns ReviewFixture.review(id = 2L)
+            every { reviewRepository.save(any()) } answers {
+                ReviewFixture.review(
+                    id = 2L,
+                    place = place,
+                    member = member,
+                    content = ReviewFixture.longContent(500)
+                )
+            }
 
             it("When: 500자 내용으로 작성 시 Then: 정상적으로 저장된다") {
                 val response = service.create(placeId, ReviewCreateRequest(ReviewFixture.longContent(500)))
@@ -86,9 +96,7 @@ class ReviewCreateServiceImplTest : DescribeSpec({
         }
 
         context("Given: 존재하지 않는 placeId") {
-            every { placeRepository.findById(999L) } returns Optional.empty()
-            every { memberUtil.currentMember() } returns member
-            every { reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(any(), any()) } returns false
+            every { placeRepository.findByIdAndIsActiveTrue(999L) } returns Optional.empty()
 
             it("When: 리뷰 작성 시 Then: NotFoundPlaceException이 발생한다") {
                 shouldThrow<NotFoundPlaceException> {
@@ -98,7 +106,7 @@ class ReviewCreateServiceImplTest : DescribeSpec({
         }
 
         context("Given: 이미 리뷰한 장소") {
-            every { placeRepository.findById(placeId) } returns Optional.of(place)
+            every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
             every { memberUtil.currentMember() } returns member
             every { reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!) } returns true
 

@@ -5,6 +5,7 @@ import com.example.team.haribo.goms.domain.place.exception.AlreadyUnrecommendedP
 import com.example.team.haribo.goms.domain.place.exception.NotFoundPlaceException
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
 import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
+import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
 import com.example.team.haribo.goms.fixture.MemberFixture
 import com.example.team.haribo.goms.fixture.PlaceFixture
 import com.example.team.haribo.goms.global.util.MemberUtil
@@ -21,11 +22,12 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
     val placeRepository = mockk<PlaceRepository>()
     val recommendRepository = mockk<PlaceRecommendRepository>()
+    val reviewRepository = mockk<ReviewRepository>()
     val memberUtil = mockk<MemberUtil>()
-    val service = PlaceRecommendServiceImpl(placeRepository, recommendRepository, memberUtil)
+    val service = PlaceRecommendServiceImpl(placeRepository, recommendRepository, reviewRepository, memberUtil)
 
     val member = MemberFixture.student()
-    val place = PlaceFixture.place(id = 1L)
+    val place = PlaceFixture.place(id = 1L, isActive = true)
     val placeId = place.id!!
     val memberId = member.id!!
 
@@ -33,7 +35,7 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
         context("Given: 추천 레코드 없음 (신규)") {
             every { memberUtil.currentMember() } returns member
-            every { placeRepository.findById(placeId) } returns Optional.of(place)
+            every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
             every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns Optional.empty()
             every { recommendRepository.save(any()) } returnsArgument 0
 
@@ -44,12 +46,12 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
             }
         }
 
-        context("Given: 기존 미추천(recommended=false) 레코드 있음") {
+        context("Given: 기존 미추천 레코드 있음") {
             val existingUnrecommended = PlaceFixture.recommend(place = place, member = member, recommended = false)
+
             every { memberUtil.currentMember() } returns member
-            every { placeRepository.findById(placeId) } returns Optional.of(place)
-            every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns
-                Optional.of(existingUnrecommended)
+            every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
+            every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns Optional.of(existingUnrecommended)
             every { recommendRepository.save(any()) } returnsArgument 0
 
             it("When: 추천 시 Then: recommended=true로 업데이트한다") {
@@ -61,10 +63,10 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
         context("Given: 이미 추천 상태") {
             val alreadyRecommended = PlaceFixture.recommend(place = place, member = member, recommended = true)
+
             every { memberUtil.currentMember() } returns member
-            every { placeRepository.findById(placeId) } returns Optional.of(place)
-            every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns
-                Optional.of(alreadyRecommended)
+            every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
+            every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns Optional.of(alreadyRecommended)
 
             it("When: 추천 시 Then: AlreadyRecommendedPlaceException이 발생한다") {
                 shouldThrow<AlreadyRecommendedPlaceException> {
@@ -75,7 +77,7 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
         context("Given: 존재하지 않는 placeId") {
             every { memberUtil.currentMember() } returns member
-            every { placeRepository.findById(999L) } returns Optional.empty()
+            every { placeRepository.findByIdAndIsActiveTrue(999L) } returns Optional.empty()
 
             it("When: 추천 시 Then: NotFoundPlaceException이 발생한다") {
                 shouldThrow<NotFoundPlaceException> {
@@ -89,10 +91,10 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
         context("Given: 추천 상태 레코드 있음") {
             val recommended = PlaceFixture.recommend(place = place, member = member, recommended = true)
+
             every { memberUtil.currentMemberId() } returns memberId
-            every { placeRepository.existsById(placeId) } returns true
-            every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns
-                Optional.of(recommended)
+            every { placeRepository.existsByIdAndIsActiveTrue(placeId) } returns true
+            every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns Optional.of(recommended)
             every { recommendRepository.save(any()) } returnsArgument 0
 
             it("When: 추천 취소 시 Then: recommended=false로 변경한다") {
@@ -104,10 +106,10 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
         context("Given: 이미 미추천 상태") {
             val unrecommended = PlaceFixture.recommend(place = place, member = member, recommended = false)
+
             every { memberUtil.currentMemberId() } returns memberId
-            every { placeRepository.existsById(placeId) } returns true
-            every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns
-                Optional.of(unrecommended)
+            every { placeRepository.existsByIdAndIsActiveTrue(placeId) } returns true
+            every { recommendRepository.findByPlaceIdAndMemberId(placeId, memberId) } returns Optional.of(unrecommended)
 
             it("When: 추천 취소 시 Then: AlreadyUnrecommendedPlaceException이 발생한다") {
                 shouldThrow<AlreadyUnrecommendedPlaceException> {
@@ -118,7 +120,7 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
         context("Given: 존재하지 않는 placeId") {
             every { memberUtil.currentMemberId() } returns memberId
-            every { placeRepository.existsById(999L) } returns false
+            every { placeRepository.existsByIdAndIsActiveTrue(999L) } returns false
 
             it("When: 추천 취소 시 Then: NotFoundPlaceException이 발생한다") {
                 shouldThrow<NotFoundPlaceException> {
@@ -133,17 +135,28 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
         context("Given: 추천 장소 있음") {
             val rec = PlaceFixture.recommend(place = place, member = member)
             val projection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
+
             every { projection.placeId } returns placeId
             every { projection.recommendCount } returns 4L
 
             every { memberUtil.currentMemberId() } returns memberId
             every { recommendRepository.findAllByMemberIdAndRecommendedTrue(memberId) } returns listOf(rec)
             every { recommendRepository.countRecommendedByPlaceIds(listOf(placeId)) } returns listOf(projection)
+            every { reviewRepository.countActiveByPlaceId(placeId) } returns 2L
 
             it("When: 추천 장소 목록 조회 시 Then: 목록과 count를 반환한다") {
                 val response = service.getRecommendedPlaces()
+
                 response.places.size shouldBe 1
                 response.places[0].placeId shouldBe placeId
+                response.places[0].placeName shouldBe place.placeName
+                response.places[0].address shouldBe place.address
+                response.places[0].roadAddress shouldBe place.roadAddress
+                response.places[0].latitude shouldBe place.latitude
+                response.places[0].longitude shouldBe place.longitude
+                response.places[0].categoryGroupName shouldBe place.categoryGroupName
+                response.places[0].categoryName shouldBe place.categoryName
+                response.places[0].reviewCount shouldBe 2L
                 response.places[0].recommendCount shouldBe 4L
                 response.places[0].recommended shouldBe true
             }
