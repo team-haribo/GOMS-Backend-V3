@@ -19,7 +19,7 @@ class KakaoWebClientConfig {
     @Qualifier("kakaoWebClient")
     fun kakaoWebClient(): WebClient {
         val httpClient = HttpClient.create()
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
             .responseTimeout(Duration.ofSeconds(60))
             .doOnConnected { connection ->
                 connection.addHandlerLast(ReadTimeoutHandler(60, TimeUnit.SECONDS))
