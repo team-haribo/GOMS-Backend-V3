@@ -3,7 +3,6 @@ package com.example.team.haribo.goms.domain.place.config
 import io.netty.channel.ChannelOption
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -16,14 +15,15 @@ import java.util.concurrent.TimeUnit
 class KakaoWebClientConfig {
 
     @Bean
-    @Qualifier("kakaoWebClient")
     fun kakaoWebClient(): WebClient {
         val httpClient = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
             .responseTimeout(Duration.ofSeconds(60))
+            .secure()
             .doOnConnected { connection ->
-                connection.addHandlerLast(ReadTimeoutHandler(60, TimeUnit.SECONDS))
-                connection.addHandlerLast(WriteTimeoutHandler(60, TimeUnit.SECONDS))
+                connection
+                    .addHandlerLast(ReadTimeoutHandler(60, TimeUnit.SECONDS))
+                    .addHandlerLast(WriteTimeoutHandler(60, TimeUnit.SECONDS))
             }
 
         return WebClient.builder()
