@@ -100,8 +100,6 @@ class StudentCouncilMemberController(
     fun filterMembers(
         @RequestParam("name", required = false) name: String?,
         @RequestParam("grade", required = false)
-        @Min(value = 1, message = "grade 는 1 이상이어야 합니다.")
-        @Max(value = 3, message = "grade 는 3 이하여야 합니다.")
         grade: Int?,
         @RequestParam("department", required = false) department: Department?,
         @RequestParam("gender", required = false) gender: Gender?,
