@@ -31,7 +31,7 @@ class PlaceSyncServiceImpl(
     private val schoolLatitude = 35.1427689679488
     private val schoolLongitude = 126.800771954215
     private val finalRadius = 1000
-    private val searchRadius = 250
+    private val searchRadius = 350
     private val searchPointOffsetMeter = 250.0
     private val pageSize = 15
     private val maxPage = 3

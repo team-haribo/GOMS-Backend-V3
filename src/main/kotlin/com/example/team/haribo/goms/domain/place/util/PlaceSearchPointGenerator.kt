@@ -14,8 +14,8 @@ class PlaceSearchPointGenerator {
     ): List<SearchPoint> {
         val points = mutableListOf<SearchPoint>()
 
-        for (latitudeStep in -2..2) {
-            for (longitudeStep in -2..2) {
+        for (latitudeStep in -3..3) {
+            for (longitudeStep in -3..3) {
                 val movedLatitude = moveLatitude(centerLatitude, latitudeStep * offsetMeter)
                 val movedLongitude = moveLongitude(centerLatitude, centerLongitude, longitudeStep * offsetMeter)
 
