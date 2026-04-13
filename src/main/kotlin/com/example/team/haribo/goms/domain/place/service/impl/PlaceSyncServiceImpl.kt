@@ -1,10 +1,10 @@
 package com.example.team.haribo.goms.domain.place.service.impl
 
+import com.example.team.haribo.goms.domain.common.enums.PlaceSyncCategory
 import com.example.team.haribo.goms.domain.place.client.KakaoPlaceClient
 import com.example.team.haribo.goms.domain.place.dto.response.KakaoPlaceDocument
 import com.example.team.haribo.goms.domain.place.dto.response.PlaceSyncResult
 import com.example.team.haribo.goms.domain.place.entity.Place
-import com.example.team.haribo.goms.domain.common.enums.PlaceSyncCategory
 import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
 import com.example.team.haribo.goms.domain.place.service.PlaceSyncService
 import com.example.team.haribo.goms.domain.place.util.PlaceDistanceCalculator
@@ -31,9 +31,10 @@ class PlaceSyncServiceImpl(
     private val schoolLatitude = 35.1427689679488
     private val schoolLongitude = 126.800771954215
     private val finalRadius = 1000
-    private val searchRadius = 400
-    private val searchPointOffsetMeter = 300.0
+    private val searchRadius = 500
+    private val searchPointOffsetMeter = 500.0
     private val pageSize = 15
+    private val maxPage = 3
 
     @Transactional
     override fun sync(): PlaceSyncResult {
@@ -126,7 +127,7 @@ class PlaceSyncServiceImpl(
             searchPoints.forEach { point ->
                 var page = 1
 
-                while (true) {
+                while (page <= maxPage) {
                     val response = kakaoPlaceClient.searchByCategory(
                         categoryGroupCode = category.categoryGroupCode,
                         x = point.longitude.toString(),
@@ -140,6 +141,7 @@ class PlaceSyncServiceImpl(
 
                     response.documents
                         .filter { placeSyncFilter.isAllowed(it) }
+                        .filter { !result.containsKey(it.id) }
                         .filter { isWithinSchoolRadius(it) }
                         .forEach { result[it.id] = it }
 
