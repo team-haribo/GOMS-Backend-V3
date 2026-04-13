@@ -23,6 +23,7 @@ class StudentCouncilResolvedReportListServiceImpl(
             reports = reports.map {
                 val review = it.review
                 val reviewer = review.member
+                val place = review.place
 
                 ReportResponse(
                     reportId = it.id!!,
@@ -32,6 +33,9 @@ class StudentCouncilResolvedReportListServiceImpl(
                     reviewerGrade = reviewer.grade,
                     reviewerDepartment = reviewer.department,
                     reviewerProfileImageUrl = reviewer.profileImageUrl,
+                    reportContent = it.content,
+                    reviewContent = review.content,
+                    placeName = place.placeName,
                     reportCreatedAt = it.createdAt!!,
                     reportStatus = it.status,
                     deletedAt = review.deletedAt,
