@@ -12,22 +12,22 @@ class PlaceSearchPointGenerator {
         offsetMeter: Double,
         searchRadius: Int
     ): List<SearchPoint> {
-        val northLatitude = moveLatitude(centerLatitude, offsetMeter)
-        val southLatitude = moveLatitude(centerLatitude, -offsetMeter)
-        val eastLongitude = moveLongitude(centerLatitude, centerLongitude, offsetMeter)
-        val westLongitude = moveLongitude(centerLatitude, centerLongitude, -offsetMeter)
+        val points = mutableListOf<SearchPoint>()
 
-        return listOf(
-            SearchPoint(centerLongitude, centerLatitude, searchRadius),
-            SearchPoint(centerLongitude, northLatitude, searchRadius),
-            SearchPoint(centerLongitude, southLatitude, searchRadius),
-            SearchPoint(eastLongitude, centerLatitude, searchRadius),
-            SearchPoint(westLongitude, centerLatitude, searchRadius),
-            SearchPoint(eastLongitude, northLatitude, searchRadius),
-            SearchPoint(westLongitude, northLatitude, searchRadius),
-            SearchPoint(eastLongitude, southLatitude, searchRadius),
-            SearchPoint(westLongitude, southLatitude, searchRadius)
-        )
+        for (latitudeStep in -3..3) {
+            for (longitudeStep in -3..3) {
+                val movedLatitude = moveLatitude(centerLatitude, latitudeStep * offsetMeter)
+                val movedLongitude = moveLongitude(centerLatitude, centerLongitude, longitudeStep * offsetMeter)
+
+                points += SearchPoint(
+                    longitude = movedLongitude,
+                    latitude = movedLatitude,
+                    radius = searchRadius
+                )
+            }
+        }
+
+        return points
     }
 
     private fun moveLatitude(latitude: Double, meter: Double): Double {
