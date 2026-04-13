@@ -33,6 +33,7 @@ class KakaoPlaceClient(
                     .queryParam("radius", radius)
                     .queryParam("page", page)
                     .queryParam("size", size)
+                    .queryParam("sort", "distance")
                     .build()
             }
             .header("Authorization", "KakaoAK $restApiKey")
