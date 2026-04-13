@@ -4,5 +4,7 @@ data class PlaceSyncResult(
     val createdCount: Int,
     val updatedCount: Int,
     val deactivatedCount: Int,
-    val totalFetchedCount: Int
+    val totalFetchedCount: Int,
+    val searchPointCount: Int,
+    val rawCollectedCount: Int
 )
