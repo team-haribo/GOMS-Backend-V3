@@ -16,8 +16,8 @@ class ReportMyListServiceImpl(
 
     @Transactional(readOnly = true)
     override fun getMyReports(): ReportListResponse {
-        val memberId = memberUtil.currentMemberId()
-        val reports = reviewReportRepository.findAllByMemberIdWithReviewAndReviewer(memberId)
+        val current = memberUtil.currentMember()
+        val reports = reviewReportRepository.findAllByMemberIdWithReviewAndReviewer(current.id!!)
 
         return ReportListResponse(
             reports = reports.map {
@@ -32,10 +32,13 @@ class ReportMyListServiceImpl(
                     reviewerGrade = reviewer.grade,
                     reviewerDepartment = reviewer.department,
                     reviewerProfileImageUrl = reviewer.profileImageUrl,
+                    reportContent = it.content,
+                    reviewContent = review.content,
+                    placeName = review.place.placeName,
                     reportCreatedAt = it.createdAt!!,
                     reportStatus = it.status,
                     deletedAt = review.deletedAt,
-                    deletedBy = review.deletedBy
+                    deletedBy = review.deletedBy,
                 )
             }
         )

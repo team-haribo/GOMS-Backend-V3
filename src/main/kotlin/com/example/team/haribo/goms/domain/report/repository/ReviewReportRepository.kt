@@ -20,6 +20,7 @@ interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
         FROM ReviewReport rr
         JOIN FETCH rr.review r
         JOIN FETCH r.member m
+        JOIN FETCH r.place p
         WHERE rr.memberId = :memberId
         ORDER BY rr.createdAt DESC
         """
