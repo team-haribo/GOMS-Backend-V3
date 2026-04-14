@@ -15,6 +15,7 @@ data class ReportDetailResponse(
     val reviewerProfileImageUrl: String?,
     val reviewContent: String,
     val reportContent: String,
+    val placeName: String,
     val reportCreatedAt: LocalDateTime,
     val reportStatus: ReportStatus,
     val deletedAt: LocalDateTime?,

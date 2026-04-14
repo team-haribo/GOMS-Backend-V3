@@ -29,6 +29,7 @@ class ReportDetailServiceImpl(
 
         val review = report.review
         val reviewer = review.member
+        val place = review.place
 
         return ReportDetailResponse(
             reportId = report.id!!,
@@ -41,6 +42,7 @@ class ReportDetailServiceImpl(
             reviewerProfileImageUrl = reviewer.profileImageUrl,
             reviewContent = review.content,
             reportContent = report.content,
+            placeName = place.placeName,
             reportCreatedAt = report.createdAt!!,
             reportStatus = report.status,
             deletedAt = review.deletedAt,

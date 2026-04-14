@@ -20,6 +20,7 @@ interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
         FROM ReviewReport rr
         JOIN FETCH rr.review r
         JOIN FETCH r.member m
+        JOIN FETCH r.place p
         WHERE rr.memberId = :memberId
         ORDER BY rr.createdAt DESC
         """
@@ -32,6 +33,7 @@ interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
         FROM ReviewReport rr
         JOIN FETCH rr.review r
         JOIN FETCH r.member m
+        JOIN FETCH r.place p
         WHERE rr.id = :reportId
         """
     )
@@ -43,6 +45,7 @@ interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
         FROM ReviewReport rr
         JOIN FETCH rr.review r
         JOIN FETCH r.member m
+        JOIN FETCH r.place p
         WHERE rr.status = :status
         ORDER BY rr.createdAt DESC
         """
@@ -55,6 +58,7 @@ interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
         FROM ReviewReport rr
         JOIN FETCH rr.review r
         JOIN FETCH r.member m
+        JOIN FETCH r.place p
         WHERE rr.status IN :statuses
         ORDER BY rr.createdAt DESC
         """
