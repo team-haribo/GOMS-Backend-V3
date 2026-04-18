@@ -26,6 +26,7 @@ class ReviewGetServiceImpl(
             reviews = reviews.map {
                 ReviewResponse(
                     review_id = it.id!!,
+                    memberId = it.member.id!!,
                     name = it.member.name,
                     grade = it.member.grade,
                     department = it.member.department,
