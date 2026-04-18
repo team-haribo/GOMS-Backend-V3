@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 
 data class ReviewResponse(
     val review_id: Long,
+    val memberId: Long,
     val name: String,
     val grade: Int,
     val department: Department,
