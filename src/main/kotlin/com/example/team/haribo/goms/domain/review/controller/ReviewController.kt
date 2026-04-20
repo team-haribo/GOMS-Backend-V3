@@ -1,9 +1,13 @@
 package com.example.team.haribo.goms.domain.review.controller
 
 import com.example.team.haribo.goms.domain.review.dto.request.ReviewCreateRequest
+import com.example.team.haribo.goms.domain.review.dto.response.MyReviewCountResponse
+import com.example.team.haribo.goms.domain.review.dto.response.MyReviewListResponse
 import com.example.team.haribo.goms.domain.review.dto.response.ReviewCreateResponse
 import com.example.team.haribo.goms.domain.review.service.ReviewCreateService
 import com.example.team.haribo.goms.domain.review.service.ReviewDeleteService
+import com.example.team.haribo.goms.domain.review.service.ReviewMyCountService
+import com.example.team.haribo.goms.domain.review.service.ReviewMyListService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -16,6 +20,7 @@ import jakarta.validation.constraints.Positive
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -29,7 +34,9 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v3/review")
 class ReviewController(
     private val reviewCreateService: ReviewCreateService,
-    private val reviewDeleteService: ReviewDeleteService
+    private val reviewDeleteService: ReviewDeleteService,
+    private val reviewMyListService: ReviewMyListService,
+    private val reviewMyCountService: ReviewMyCountService
 ) {
 
     @Operation(
@@ -63,6 +70,30 @@ class ReviewController(
         @Valid @RequestBody request: ReviewCreateRequest
     ): ResponseEntity<ReviewCreateResponse> {
         return ResponseEntity.status(201).body(reviewCreateService.create(placeId, request))
+    }
+
+    @Operation(
+        summary = "내가 작성한 리뷰 목록 조회",
+        description = "현재 로그인한 사용자가 작성한 리뷰 목록을 조회합니다.",
+        responses = [
+            ApiResponse(responseCode = "200", description = "조회 성공")
+        ]
+    )
+    @GetMapping("/me")
+    fun getMyReviews(): ResponseEntity<MyReviewListResponse> {
+        return ResponseEntity.ok(reviewMyListService.getMyReviews())
+    }
+
+    @Operation(
+        summary = "내가 작성한 리뷰 개수 조회",
+        description = "현재 로그인한 사용자가 작성한 리뷰 개수를 조회합니다.",
+        responses = [
+            ApiResponse(responseCode = "200", description = "조회 성공")
+        ]
+    )
+    @GetMapping("/count")
+    fun getMyReviewCount(): ResponseEntity<MyReviewCountResponse> {
+        return ResponseEntity.ok(reviewMyCountService.getMyReviewCount())
     }
 
     @Operation(

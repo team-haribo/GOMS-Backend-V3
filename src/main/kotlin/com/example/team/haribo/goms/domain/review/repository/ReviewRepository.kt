@@ -15,6 +15,8 @@ interface ReviewRepository : JpaRepository<Review, Long> {
 
     fun deleteAllByMember_Id(memberId: Long): Long
 
+    fun countAllByMemberIdAndDeletedAtIsNull(memberId: Long): Long
+
     @Query(
         """
         SELECT r
@@ -26,6 +28,18 @@ interface ReviewRepository : JpaRepository<Review, Long> {
         """
     )
     fun findAllActiveByPlaceId(placeId: Long): List<Review>
+
+    @Query(
+        """
+        SELECT r
+        FROM Review r
+        JOIN FETCH r.place
+        WHERE r.member.id = :memberId
+          AND r.deletedAt IS NULL
+        ORDER BY r.createdAt DESC
+        """
+    )
+    fun findAllActiveByMemberId(memberId: Long): List<Review>
 
     @Query(
         """
