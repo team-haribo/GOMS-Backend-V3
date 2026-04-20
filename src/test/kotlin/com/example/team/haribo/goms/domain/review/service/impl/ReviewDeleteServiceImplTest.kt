@@ -1,5 +1,6 @@
 package com.example.team.haribo.goms.domain.review.service.impl
 
+import com.example.team.haribo.goms.domain.report.repository.ReviewReportRepository
 import com.example.team.haribo.goms.domain.review.exception.NotFoundReviewException
 import com.example.team.haribo.goms.domain.review.exception.ReviewForbiddenException
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
@@ -17,8 +18,9 @@ import java.util.Optional
 class ReviewDeleteServiceImplTest : DescribeSpec({
 
     val reviewRepository = mockk<ReviewRepository>()
+    val reviewReportRepository = mockk<ReviewReportRepository>()
     val memberUtil = mockk<MemberUtil>()
-    val service = ReviewDeleteServiceImpl(reviewRepository, memberUtil)
+    val service = ReviewDeleteServiceImpl(reviewRepository, reviewReportRepository, memberUtil)
 
     val owner = MemberFixture.student(id = 1L)
     val other = MemberFixture.student(id = 99L)
@@ -29,10 +31,13 @@ class ReviewDeleteServiceImplTest : DescribeSpec({
             val review = ReviewFixture.review(id = 1L, member = owner)
             every { memberUtil.currentMemberId() } returns owner.id!!
             every { reviewRepository.findById(1L) } returns Optional.of(review)
+            every { reviewReportRepository.deleteAllByReview_Id(1L) } returns 0L
             justRun { reviewRepository.delete(review) }
 
-            it("When: 삭제 요청 시 Then: 리뷰가 삭제된다") {
+            it("When: 삭제 요청 시 Then: 리뷰 신고가 먼저 삭제되고 리뷰가 삭제된다") {
                 service.delete(1L)
+
+                verify(exactly = 1) { reviewReportRepository.deleteAllByReview_Id(1L) }
                 verify(exactly = 1) { reviewRepository.delete(review) }
             }
         }
