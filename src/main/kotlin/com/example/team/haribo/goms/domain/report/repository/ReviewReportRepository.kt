@@ -14,6 +14,8 @@ interface ReviewReportRepository : JpaRepository<ReviewReport, Long> {
 
     fun deleteAllByReview_Member_Id(memberId: Long): Long
 
+    fun deleteAllByReview_Id(reviewId: Long): Long
+
     @Query(
         """
         SELECT rr

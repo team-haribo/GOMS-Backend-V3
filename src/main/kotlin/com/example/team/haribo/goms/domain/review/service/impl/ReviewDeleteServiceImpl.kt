@@ -1,5 +1,6 @@
 package com.example.team.haribo.goms.domain.review.service.impl
 
+import com.example.team.haribo.goms.domain.report.repository.ReviewReportRepository
 import com.example.team.haribo.goms.domain.review.exception.NotFoundReviewException
 import com.example.team.haribo.goms.domain.review.exception.ReviewForbiddenException
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ReviewDeleteServiceImpl(
     private val reviewRepository: ReviewRepository,
+    private val reviewReportRepository: ReviewReportRepository,
     private val memberUtil: MemberUtil
 ) : ReviewDeleteService {
 
@@ -57,6 +59,7 @@ class ReviewDeleteServiceImpl(
             throw ReviewForbiddenException()
         }
 
+        reviewReportRepository.deleteAllByReview_Id(reviewId)
         reviewRepository.delete(review)
 
         log.info(
