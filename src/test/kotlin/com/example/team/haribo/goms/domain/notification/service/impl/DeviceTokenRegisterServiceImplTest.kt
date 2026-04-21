@@ -8,6 +8,7 @@ import com.example.team.haribo.goms.fixture.MemberFixture
 import com.example.team.haribo.goms.global.util.MemberUtil
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
@@ -21,9 +22,13 @@ class DeviceTokenRegisterServiceImplTest : DescribeSpec({
 
     val member = MemberFixture.student(id = 1L)
 
+    beforeTest {
+        clearMocks(deviceTokenRepository, memberUtil)
+    }
+
     describe("DeviceTokenRegisterService") {
 
-        context("Given: 기존 member/deviceId 토큰이 없음") {
+        it("기존 member/deviceId 토큰이 없으면 새 토큰을 저장한다") {
             val request = DeviceTokenRegisterRequest(
                 fcmToken = "token-1",
                 platform = Platform.ANDROID,
@@ -35,13 +40,14 @@ class DeviceTokenRegisterServiceImplTest : DescribeSpec({
             every { deviceTokenRepository.findByMember_IdAndDeviceId(1L, "device-1") } returns null
             every { deviceTokenRepository.save(any()) } answers { firstArg() }
 
-            it("When: 토큰 등록 시 Then: 새 토큰이 저장된다") {
-                service.register(request)
-                verify(exactly = 1) { deviceTokenRepository.save(any()) }
-            }
+            service.register(request)
+
+            verify(exactly = 1) { deviceTokenRepository.save(any()) }
+            verify(exactly = 0) { deviceTokenRepository.delete(any()) }
+            verify(exactly = 0) { deviceTokenRepository.flush() }
         }
 
-        context("Given: 동일 member/deviceId 토큰이 이미 존재함") {
+        it("동일 member/deviceId 토큰이 이미 존재하면 기존 토큰을 갱신한다") {
             val request = DeviceTokenRegisterRequest(
                 fcmToken = "new-token",
                 platform = Platform.IOS,
@@ -58,15 +64,17 @@ class DeviceTokenRegisterServiceImplTest : DescribeSpec({
             every { deviceTokenRepository.findByFcmToken("new-token") } returns null
             every { deviceTokenRepository.findByMember_IdAndDeviceId(1L, "device-1") } returns existing
 
-            it("When: 토큰 등록 시 Then: 기존 토큰이 갱신된다") {
-                service.register(request)
+            service.register(request)
 
-                existing.fcmToken shouldBe "new-token"
-                existing.platform shouldBe Platform.IOS
-            }
+            existing.fcmToken shouldBe "new-token"
+            existing.platform shouldBe Platform.IOS
+
+            verify(exactly = 0) { deviceTokenRepository.save(any()) }
+            verify(exactly = 0) { deviceTokenRepository.delete(any()) }
+            verify(exactly = 0) { deviceTokenRepository.flush() }
         }
 
-        context("Given: 다른 사용자 또는 다른 deviceId가 같은 fcmToken을 사용 중") {
+        it("다른 사용자 또는 다른 deviceId가 같은 fcmToken을 사용 중이면 중복 토큰을 정리하고 새 토큰을 저장한다") {
             val request = DeviceTokenRegisterRequest(
                 fcmToken = "duplicated-token",
                 platform = Platform.ANDROID,
@@ -82,17 +90,15 @@ class DeviceTokenRegisterServiceImplTest : DescribeSpec({
             every { memberUtil.currentMember() } returns member
             every { deviceTokenRepository.findByFcmToken("duplicated-token") } returns otherToken
             justRun { deviceTokenRepository.delete(otherToken) }
-            every { deviceTokenRepository.flush() } returns Unit
+            justRun { deviceTokenRepository.flush() }
             every { deviceTokenRepository.findByMember_IdAndDeviceId(1L, "device-1") } returns null
             every { deviceTokenRepository.save(any()) } answers { firstArg() }
 
-            it("When: 토큰 등록 시 Then: 중복 토큰을 정리하고 새 토큰을 저장한다") {
-                service.register(request)
+            service.register(request)
 
-                verify(exactly = 1) { deviceTokenRepository.delete(otherToken) }
-                verify(exactly = 1) { deviceTokenRepository.flush() }
-                verify(exactly = 1) { deviceTokenRepository.save(any()) }
-            }
+            verify(exactly = 1) { deviceTokenRepository.delete(otherToken) }
+            verify(exactly = 1) { deviceTokenRepository.flush() }
+            verify(exactly = 1) { deviceTokenRepository.save(any()) }
         }
     }
 })
