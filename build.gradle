@@ -8,7 +8,7 @@ plugins {
 
 group = 'com.example.team.haribo.goms'
 version = '0.0.1-SNAPSHOT'
-description = 'GOMS-Server_V3'
+description = 'GOMS-Server-V3'
 
 java {
     toolchain {
@@ -29,6 +29,8 @@ repositories {
 dependencies {
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -36,23 +38,50 @@ dependencies {
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    // JWT
+    implementation "io.jsonwebtoken:jjwt-api:0.12.6"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:0.12.6"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.12.6"
+
     // Kotlin
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
-    implementation 'tools.jackson.module:jackson-module-kotlin'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // DB
     runtimeOnly 'com.mysql:mysql-connector-j'
-    //runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // Mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // Firebase
+    implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+    // AWS S3
+    implementation 'software.amazon.awssdk:s3:2.25.26'
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
+
+    // Netty
+    implementation 'io.netty:netty-tcnative-boringssl-static'
+
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.kotest:kotest-runner-junit5:6.1.3'
+    testImplementation 'io.kotest:kotest-assertions-core:6.1.3'
+    testImplementation 'io.kotest:kotest-property:6.1.3'
+    testImplementation 'io.mockk:mockk:1.14.9'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

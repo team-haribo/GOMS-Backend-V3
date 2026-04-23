@@ -38,3 +38,11 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### OS generated files #
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Firebase
+secrets/
