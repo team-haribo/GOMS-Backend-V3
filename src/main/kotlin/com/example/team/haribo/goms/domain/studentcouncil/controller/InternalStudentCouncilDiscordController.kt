@@ -21,7 +21,7 @@ class InternalStudentCouncilDiscordController(
 
     @PostMapping("/apply")
     fun apply(
-        @RequestHeader("X-Internal-Secret", required = false) internalSecret: String?,
+        @RequestHeader("X-Internal-Secret") internalSecret: String,
         @Valid @RequestBody request: DiscordStudentCouncilApplyRequest
     ): ResponseEntity<DiscordStudentCouncilApplyResponse> {
         return ResponseEntity.ok(
