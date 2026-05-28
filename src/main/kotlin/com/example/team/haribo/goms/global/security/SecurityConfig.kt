@@ -133,6 +133,8 @@ class SecurityConfig {
 
                 // STUDENT-COUNCIL
                 it.requestMatchers("/api/v3/student-council/**").hasAnyRole("STUDENT_COUNCIL")
+
+                it.requestMatchers("/api/v3/internal/**").permitAll()
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

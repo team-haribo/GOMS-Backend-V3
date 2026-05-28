@@ -40,7 +40,10 @@ class Member(
     var status: Status = Status.COMING,
 
     @Column(name = "profile_image_url")
-    var profileImageUrl: String? = null
+    var profileImageUrl: String? = null,
+
+    @Column(name = "is_fixed_student_council", nullable = false, columnDefinition = "BOOLEAN NOT NULL DEFAULT FALSE")
+    var isFixedStudentCouncil: Boolean = false
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
