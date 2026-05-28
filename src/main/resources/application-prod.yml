@@ -62,3 +62,7 @@ cloud:
 
 kakao:
   rest-api-key: ${KAKAO_REST_API_KEY}
+
+internal:
+  discord:
+    secret: ${GOMS_INTERNAL_API_SECRET}
