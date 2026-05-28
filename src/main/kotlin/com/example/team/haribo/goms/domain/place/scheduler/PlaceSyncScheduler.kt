@@ -25,11 +25,9 @@ class PlaceSyncScheduler(
         )
 
         try {
-            lateinit var result: Any
-
-            val durationMs = measureTimeMillis {
-                result = placeSyncService.sync()
-            }
+            val startTime = System.currentTimeMillis()
+            val result = placeSyncService.sync()
+            val durationMs = System.currentTimeMillis() - startTime
 
             log.info(
                 LogFormat.message(
