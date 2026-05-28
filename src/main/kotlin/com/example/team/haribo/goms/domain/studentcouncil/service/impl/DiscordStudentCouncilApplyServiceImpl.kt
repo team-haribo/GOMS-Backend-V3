@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -85,20 +86,36 @@ class DiscordStudentCouncilApplyServiceImpl(
         }
 
         val durationMs = System.currentTimeMillis() - startTime
-        val appliedAt = LocalDateTime.now().format(formatter)
+        val appliedAt = LocalDateTime
+            .now(ZoneId.of("Asia/Seoul"))
+            .format(formatter)
         val success = failedUsers.isEmpty()
 
-        log.info(
-            LogFormat.message(
-                domain = "STUDENT_COUNCIL",
-                event = "디스코드 외출제 관리 인원 동기화 완료",
-                "success" to success,
-                "syncedCount" to syncedUsers.size,
-                "failedCount" to failedUsers.size,
-                "appliedAt" to appliedAt,
-                "durationMs" to durationMs
+        if (success) {
+            log.info(
+                LogFormat.message(
+                    domain = "STUDENT_COUNCIL",
+                    event = "디스코드 외출제 관리 인원 동기화 완료",
+                    "success" to true,
+                    "syncedCount" to syncedUsers.size,
+                    "appliedAt" to appliedAt,
+                    "durationMs" to durationMs
+                )
             )
-        )
+        } else {
+            log.warn(
+                LogFormat.message(
+                    domain = "STUDENT_COUNCIL",
+                    event = "디스코드 외출제 관리 인원 동기화 일부 실패",
+                    "success" to false,
+                    "syncedCount" to syncedUsers.size,
+                    "failedCount" to failedUsers.size,
+                    "failedUsers" to failedUsers,
+                    "appliedAt" to appliedAt,
+                    "durationMs" to durationMs
+                )
+            )
+        }
 
         return DiscordStudentCouncilApplyResponse(
             success = success,
