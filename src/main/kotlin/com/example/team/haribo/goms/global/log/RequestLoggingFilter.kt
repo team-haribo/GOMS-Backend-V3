@@ -68,7 +68,7 @@ class RequestLoggingFilter : OncePerRequestFilter() {
         response: HttpServletResponse,
         durationMs: Long
     ): Boolean {
-        if (response.status >= 400) return true
+        if (response.status >= 500) return true
         if (request.method != "GET") return true
         return durationMs >= 1000
     }
