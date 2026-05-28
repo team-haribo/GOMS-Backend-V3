@@ -6,6 +6,7 @@ import com.example.team.haribo.goms.domain.common.enums.Role
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.member.entity.Member
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.util.Optional
@@ -79,4 +80,15 @@ interface MemberRepository : JpaRepository<Member, Long> {
     ): List<Member>
 
     fun findAllByStatus(status: Status): List<Member>
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(
+        """
+        UPDATE Member m
+        SET m.role = com.example.team.haribo.goms.domain.common.enums.Role.ROLE_STUDENT
+        WHERE m.role = com.example.team.haribo.goms.domain.common.enums.Role.ROLE_STUDENT_COUNCIL
+          AND m.isFixedStudentCouncil = false
+        """
+    )
+    fun resetTemporaryStudentCouncilRole(): Int
 }
