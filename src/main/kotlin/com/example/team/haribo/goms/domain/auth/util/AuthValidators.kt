@@ -8,7 +8,7 @@ object AuthValidators {
     private val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
 
     private val passwordRegex =
-        Regex("^(?=.*[a-zA-Z])[A-Za-z0-9!@#\$%^&?~]{6,15}$")
+        Regex("^(?=.*[a-zA-Z])[A-Za-z0-9!@#\$%^&?~*]{6,15}$")
 
     fun validateEmail(email: String) {
         if (!emailRegex.matches(email)) throw InvalidEmailFormatException()
