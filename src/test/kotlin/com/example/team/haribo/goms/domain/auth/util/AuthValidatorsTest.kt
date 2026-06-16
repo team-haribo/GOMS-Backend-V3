@@ -44,7 +44,8 @@ class AuthValidatorsTest : DescribeSpec({
                 "Pass12",
                 "abcDEF123",
                 "a12345",
-                "Password1!"
+                "Password1!",
+                "Password1*"
             ).forEach { password ->
                 it("When: '$password' 검증 시 Then: 예외 없이 통과한다") {
                     shouldNotThrow<Exception> { AuthValidators.validatePassword(password) }
