@@ -27,19 +27,33 @@ class LateAutoCreateJob(
         val now = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
         val activeOutings = outingRepository.findAllActiveWithOutingMember()
-        val lates = activeOutings
-            .filterNot { lateRepository.existsByOutingId(it.id!!) }
-            .map {
-                it.comingAt = now
-                it.member.status = Status.COMING
+        val outingIds = activeOutings.map { it.id!! }
+        val existingLateOutingIds = if (outingIds.isEmpty()) {
+            emptySet()
+        } else {
+            lateRepository.findAllOutingIdsIn(outingIds).toSet()
+        }
+        val targetOutings = activeOutings
+            .filterNot { existingLateOutingIds.contains(it.id!!) }
+        val memberIds = targetOutings.map { it.member.id!! }.distinct()
+        val lateCountByMemberId = if (memberIds.isEmpty()) {
+            emptyMap()
+        } else {
+            lateRepository.countByMemberIds(memberIds)
+                .associate { it.memberId to it.lateCount }
+        }
 
-                Late(
-                    member = it.member,
-                    outing = it,
-                    comingAt = now,
-                    lateCount = lateRepository.countByMemberId(it.member.id!!) + 1
-                )
-            }
+        val lates = targetOutings.map {
+            it.comingAt = now
+            it.member.status = Status.COMING
+
+            Late(
+                member = it.member,
+                outing = it,
+                comingAt = now,
+                lateCount = (lateCountByMemberId[it.member.id!!] ?: 0L) + 1
+            )
+        }
 
         lateRepository.saveAll(lates)
 

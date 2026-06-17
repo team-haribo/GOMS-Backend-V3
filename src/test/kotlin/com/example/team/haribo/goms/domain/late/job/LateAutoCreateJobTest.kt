@@ -2,6 +2,7 @@ package com.example.team.haribo.goms.domain.late.job
 
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.late.entity.Late
+import com.example.team.haribo.goms.domain.late.repository.MemberLateCount
 import com.example.team.haribo.goms.domain.late.repository.LateRepository
 import com.example.team.haribo.goms.domain.outing.repository.OutingRepository
 import com.example.team.haribo.goms.fixture.MemberFixture
@@ -25,10 +26,13 @@ class LateAutoCreateJobTest : DescribeSpec({
             val outingRepository = mockk<OutingRepository>()
             val lateRepository = mockk<LateRepository>()
             val job = LateAutoCreateJob(outingRepository, lateRepository)
+            val memberLateCount = mockk<MemberLateCount>()
 
             every { outingRepository.findAllActiveWithOutingMember() } returns listOf(outing)
-            every { lateRepository.existsByOutingId(outing.id!!) } returns false
-            every { lateRepository.countByMemberId(member.id!!) } returns 2L
+            every { lateRepository.findAllOutingIdsIn(listOf(outing.id!!)) } returns emptyList()
+            every { lateRepository.countByMemberIds(listOf(member.id!!)) } returns listOf(memberLateCount)
+            every { memberLateCount.memberId } returns member.id!!
+            every { memberLateCount.lateCount } returns 2L
             every { lateRepository.saveAll(capture(lateSlot)) } answers { firstArg<Iterable<Late>>().toList() }
 
             it("When: 자동 지각 생성 시 Then: Late를 저장하고 외출 상태를 COMING으로 변경한다") {
@@ -52,7 +56,7 @@ class LateAutoCreateJobTest : DescribeSpec({
             val job = LateAutoCreateJob(outingRepository, lateRepository)
 
             every { outingRepository.findAllActiveWithOutingMember() } returns listOf(outing)
-            every { lateRepository.existsByOutingId(outing.id!!) } returns true
+            every { lateRepository.findAllOutingIdsIn(listOf(outing.id!!)) } returns listOf(outing.id!!)
             every { lateRepository.saveAll(emptyList<Late>()) } returns emptyList()
 
             it("When: 자동 지각 생성 시 Then: 중복 저장하지 않고 상태를 변경하지 않는다") {
@@ -61,6 +65,7 @@ class LateAutoCreateJobTest : DescribeSpec({
                 member.status shouldBe Status.OUTING
                 outing.comingAt shouldBe null
                 verify(exactly = 0) { lateRepository.countByMemberId(any()) }
+                verify(exactly = 0) { lateRepository.countByMemberIds(any()) }
             }
         }
     }

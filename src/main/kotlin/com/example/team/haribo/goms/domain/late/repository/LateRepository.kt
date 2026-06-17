@@ -39,7 +39,29 @@ interface LateRepository : JpaRepository<Late, Long> {
 
     fun countByMemberId(memberId: Long): Long
 
-    fun existsByOutingId(outingId: Long): Boolean
+    @Query(
+        """
+        SELECT l.outing.id
+        FROM Late l
+        WHERE l.outing.id IN :outingIds
+        """
+    )
+    fun findAllOutingIdsIn(outingIds: List<Long>): List<Long>
+
+    @Query(
+        """
+        SELECT l.member.id AS memberId, COUNT(l) AS lateCount
+        FROM Late l
+        WHERE l.member.id IN :memberIds
+        GROUP BY l.member.id
+        """
+    )
+    fun countByMemberIds(memberIds: List<Long>): List<MemberLateCount>
 
     fun deleteAllByMemberId(memberId: Long): Long
+}
+
+interface MemberLateCount {
+    val memberId: Long
+    val lateCount: Long
 }
