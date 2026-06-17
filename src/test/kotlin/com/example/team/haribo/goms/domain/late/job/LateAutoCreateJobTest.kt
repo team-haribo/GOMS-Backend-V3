@@ -35,7 +35,7 @@ class LateAutoCreateJobTest : DescribeSpec({
             every { memberLateCount.lateCount } returns 2L
             every { lateRepository.saveAll(capture(lateSlot)) } answers { firstArg<Iterable<Late>>().toList() }
 
-            it("When: 자동 지각 생성 시 Then: Late를 저장하고 외출 상태를 COMING으로 변경한다") {
+            it("When: 자동 지각 생성 시 Then: Late를 저장하고 외출을 복귀 처리한 뒤 외출금지 상태로 변경한다") {
                 job.createLatesForOutingMembers()
 
                 val late = lateSlot.captured.single()
@@ -44,7 +44,7 @@ class LateAutoCreateJobTest : DescribeSpec({
                 late.lateCount shouldBe 3L
                 late.comingAt shouldNotBe null
                 outing.comingAt shouldNotBe null
-                member.status shouldBe Status.COMING
+                member.status shouldBe Status.CANNOT_OUTING
             }
         }
 

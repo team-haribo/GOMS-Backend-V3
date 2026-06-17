@@ -45,7 +45,7 @@ class LateAutoCreateJob(
 
         val lates = targetOutings.map {
             it.comingAt = now
-            it.member.status = Status.COMING
+            it.member.status = Status.CANNOT_OUTING
 
             Late(
                 member = it.member,
