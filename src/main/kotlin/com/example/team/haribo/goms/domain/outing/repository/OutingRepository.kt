@@ -26,6 +26,17 @@ interface OutingRepository : JpaRepository<Outing, Long> {
         select o from Outing o
         join fetch o.member m
         where o.comingAt is null
+          and m.status = com.example.team.haribo.goms.domain.common.enums.Status.OUTING
+        order by o.outingAt asc
+        """
+    )
+    fun findAllActiveWithOutingMember(): List<Outing>
+
+    @Query(
+        """
+        select o from Outing o
+        join fetch o.member m
+        where o.comingAt is null
           and lower(m.name) like lower(concat('%', :name, '%'))
         order by o.outingAt desc
         """
