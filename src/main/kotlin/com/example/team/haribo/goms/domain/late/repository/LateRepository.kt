@@ -39,5 +39,7 @@ interface LateRepository : JpaRepository<Late, Long> {
 
     fun countByMemberId(memberId: Long): Long
 
+    fun existsByOutingId(outingId: Long): Boolean
+
     fun deleteAllByMemberId(memberId: Long): Long
 }
