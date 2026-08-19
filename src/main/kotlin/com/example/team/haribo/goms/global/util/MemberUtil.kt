@@ -33,6 +33,15 @@ class MemberUtil(
         return memberRepository.findById(memberId).orElseThrow { NotFoundMemberException() }
     }
 
+    /**
+     * 상태 전이(외출/복귀 등)처럼 동시 요청에 대한 원자성이 필요한 로직에서 사용한다.
+     * 트랜잭션 커밋 전까지 해당 회원 row를 잠가 race condition을 막는다.
+     */
+    fun currentMemberForUpdate(): Member {
+        val memberId = currentMemberId()
+        return memberRepository.findByIdForUpdate(memberId) ?: throw NotFoundMemberException()
+    }
+
     private fun findMemberIdByEmail(email: String): Long {
         val member = memberRepository.findByEmail(email).orElseThrow { NotFoundMemberException() }
         return member.id!!

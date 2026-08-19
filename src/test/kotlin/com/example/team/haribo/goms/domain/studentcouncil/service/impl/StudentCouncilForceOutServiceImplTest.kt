@@ -14,7 +14,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.util.Optional
 
 class StudentCouncilForceOutServiceImplTest : DescribeSpec({
 
@@ -26,7 +25,7 @@ class StudentCouncilForceOutServiceImplTest : DescribeSpec({
 
         context("Given: COMING 상태 멤버") {
             val member = MemberFixture.student(id = 1L, status = Status.COMING)
-            every { memberRepository.findById(1L) } returns Optional.of(member)
+            every { memberRepository.findByIdForUpdate(1L) } returns member
             every { outingRepository.save(any()) } answers {
                 firstArg<com.example.team.haribo.goms.domain.outing.entity.Outing>().also { it.id = 10L }
             }
@@ -41,7 +40,7 @@ class StudentCouncilForceOutServiceImplTest : DescribeSpec({
         }
 
         context("Given: 존재하지 않는 memberId") {
-            every { memberRepository.findById(999L) } returns Optional.empty()
+            every { memberRepository.findByIdForUpdate(999L) } returns null
 
             it("When: 강제 외출 시 Then: NotFoundMemberException이 발생한다") {
                 shouldThrow<NotFoundMemberException> {
@@ -51,7 +50,7 @@ class StudentCouncilForceOutServiceImplTest : DescribeSpec({
         }
 
         context("Given: CANNOT_OUTING 상태 멤버") {
-            every { memberRepository.findById(3L) } returns Optional.of(MemberFixture.cannotOuting(id = 3L))
+            every { memberRepository.findByIdForUpdate(3L) } returns MemberFixture.cannotOuting(id = 3L)
 
             it("When: 강제 외출 시 Then: CannotOutingException이 발생한다") {
                 shouldThrow<CannotOutingException> {
@@ -61,7 +60,7 @@ class StudentCouncilForceOutServiceImplTest : DescribeSpec({
         }
 
         context("Given: 이미 OUTING 상태 멤버") {
-            every { memberRepository.findById(4L) } returns Optional.of(MemberFixture.outing(id = 4L))
+            every { memberRepository.findByIdForUpdate(4L) } returns MemberFixture.outing(id = 4L)
 
             it("When: 강제 외출 시 Then: AlreadyOutingException이 발생한다") {
                 shouldThrow<AlreadyOutingException> {
