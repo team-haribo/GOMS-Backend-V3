@@ -27,7 +27,7 @@ class QrComingServiceImpl(
     override fun coming(request: QrToggleRequest): QrComingResponse {
         QrExpValidator.validate(request.exp)
 
-        val member = memberUtil.currentMember()
+        val member = memberUtil.currentMemberForUpdate()
         val memberId = member.id!!
         val beforeStatus = member.status
 

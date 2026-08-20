@@ -27,7 +27,7 @@ class QrComingServiceImplTest : DescribeSpec({
         context("Given: OUTING 상태 멤버 + 유효 QR + 활성 Outing 존재") {
             val member = MemberFixture.outing()
             val activeOuting = OutingFixture.active(member)
-            every { memberUtil.currentMember() } returns member
+            every { memberUtil.currentMemberForUpdate() } returns member
             every { outingRepository.findTopByMemberIdAndComingAtIsNullOrderByIdDesc(member.id!!) } returns activeOuting
 
             it("When: 귀교 QR 스캔 시 Then: comingAt이 설정되고 상태가 COMING으로 변경된다") {
@@ -42,7 +42,7 @@ class QrComingServiceImplTest : DescribeSpec({
 
         context("Given: 활성 Outing 없음") {
             val member = MemberFixture.student()
-            every { memberUtil.currentMember() } returns member
+            every { memberUtil.currentMemberForUpdate() } returns member
             every { outingRepository.findTopByMemberIdAndComingAtIsNullOrderByIdDesc(any()) } returns null
 
             it("When: 귀교 QR 스캔 시 Then: NotOutingException이 발생한다") {

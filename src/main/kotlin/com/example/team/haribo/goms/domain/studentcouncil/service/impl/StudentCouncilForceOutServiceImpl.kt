@@ -34,7 +34,7 @@ class StudentCouncilForceOutServiceImpl(
             )
         )
 
-        val member = memberRepository.findById(memberId).orElseThrow {
+        val member = memberRepository.findByIdForUpdate(memberId) ?: run {
             log.warn(
                 LogFormat.message(
                     domain = "STUDENT_COUNCIL",
@@ -43,7 +43,7 @@ class StudentCouncilForceOutServiceImpl(
                     "reason" to "존재하지 않는 사용자"
                 )
             )
-            NotFoundMemberException()
+            throw NotFoundMemberException()
         }
 
         if (member.status == Status.CANNOT_OUTING) {

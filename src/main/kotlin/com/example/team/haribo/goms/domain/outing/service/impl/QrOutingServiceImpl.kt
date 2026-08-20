@@ -29,7 +29,7 @@ class QrOutingServiceImpl(
     override fun outing(request: QrToggleRequest): QrOutingResponse {
         QrExpValidator.validate(request.exp)
 
-        val member = memberUtil.currentMember()
+        val member = memberUtil.currentMemberForUpdate()
         val beforeStatus = member.status
 
         log.info(
