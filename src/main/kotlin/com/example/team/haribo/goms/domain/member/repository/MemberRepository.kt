@@ -5,7 +5,9 @@ import com.example.team.haribo.goms.domain.common.enums.Gender
 import com.example.team.haribo.goms.domain.common.enums.Role
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.member.entity.Member
+import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -16,6 +18,15 @@ interface MemberRepository : JpaRepository<Member, Long> {
     fun findByEmail(email: String): Optional<Member>
 
     fun existsByEmail(email: String): Boolean
+
+    /**
+     * 외출/복귀 상태 전이(QR 외출·복귀, 학생회 강제 외출·복귀)처럼
+     * "조회 -> 상태 검증 -> 변경" 흐름이 동시에 들어올 수 있는 케이스 전용 조회.
+     * 커밋 전까지 동일 회원에 대한 다른 트랜잭션의 갱신을 막아 중복 Outing 생성을 방지한다.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT m FROM Member m WHERE m.id = :id")
+    fun findByIdForUpdate(@Param("id") id: Long): Member?
 
     @Query(
         """

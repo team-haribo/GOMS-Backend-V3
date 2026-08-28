@@ -14,7 +14,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import java.util.Optional
 
 class StudentCouncilForceInServiceImplTest : DescribeSpec({
 
@@ -27,7 +26,7 @@ class StudentCouncilForceInServiceImplTest : DescribeSpec({
         context("Given: OUTING 상태 멤버 + 활성 Outing 있음") {
             val member = MemberFixture.outing(id = 1L)
             val activeOuting = OutingFixture.active(member)
-            every { memberRepository.findById(1L) } returns Optional.of(member)
+            every { memberRepository.findByIdForUpdate(1L) } returns member
             every { outingRepository.findTopByMemberIdAndComingAtIsNullOrderByIdDesc(1L) } returns activeOuting
 
             it("When: 강제 귀교 시 Then: comingAt이 설정되고 상태가 COMING으로 변경된다") {
@@ -41,7 +40,7 @@ class StudentCouncilForceInServiceImplTest : DescribeSpec({
         }
 
         context("Given: 존재하지 않는 memberId") {
-            every { memberRepository.findById(999L) } returns Optional.empty()
+            every { memberRepository.findByIdForUpdate(999L) } returns null
 
             it("When: 강제 귀교 시 Then: NotFoundMemberException이 발생한다") {
                 shouldThrow<NotFoundMemberException> {
@@ -52,7 +51,7 @@ class StudentCouncilForceInServiceImplTest : DescribeSpec({
 
         context("Given: 활성 Outing 없음") {
             val member = MemberFixture.student(id = 2L)
-            every { memberRepository.findById(2L) } returns Optional.of(member)
+            every { memberRepository.findByIdForUpdate(2L) } returns member
             every { outingRepository.findTopByMemberIdAndComingAtIsNullOrderByIdDesc(2L) } returns null
 
             it("When: 강제 귀교 시 Then: NotOutingException이 발생한다") {

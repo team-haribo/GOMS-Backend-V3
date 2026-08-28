@@ -4,9 +4,8 @@ import com.example.team.haribo.goms.domain.common.enums.PlaceSyncCategory
 import com.example.team.haribo.goms.domain.place.client.KakaoPlaceClient
 import com.example.team.haribo.goms.domain.place.dto.response.KakaoPlaceDocument
 import com.example.team.haribo.goms.domain.place.dto.response.PlaceSyncResult
-import com.example.team.haribo.goms.domain.place.entity.Place
-import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
 import com.example.team.haribo.goms.domain.place.service.PlaceSyncService
+import com.example.team.haribo.goms.domain.place.service.PlaceSyncWriter
 import com.example.team.haribo.goms.domain.place.util.PlaceDistanceCalculator
 import com.example.team.haribo.goms.domain.place.util.PlaceSearchPointGenerator
 import com.example.team.haribo.goms.domain.place.util.PlaceSyncFilter
@@ -14,13 +13,12 @@ import com.example.team.haribo.goms.domain.place.util.SearchPoint
 import com.example.team.haribo.goms.global.log.LogFormat
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
 class PlaceSyncServiceImpl(
     private val kakaoPlaceClient: KakaoPlaceClient,
-    private val placeRepository: PlaceRepository,
+    private val placeSyncWriter: PlaceSyncWriter,
     private val placeSyncFilter: PlaceSyncFilter,
     private val placeSearchPointGenerator: PlaceSearchPointGenerator,
     private val placeDistanceCalculator: PlaceDistanceCalculator
@@ -36,7 +34,12 @@ class PlaceSyncServiceImpl(
     private val pageSize = 15
     private val maxPage = 3
 
-    @Transactional
+    /**
+     * 카카오 API 호출(최대 수백~천 회에 달하는 외부 I/O)과 DB 반영을 한 트랜잭션 안에서 처리하면
+     * 외부 API 응답을 기다리는 동안 DB 커넥션을 계속 점유하게 된다.
+     * 그래서 이 메서드 자체는 트랜잭션을 걸지 않고, 외부 호출(fetchAllDocuments)을 먼저 끝낸 뒤
+     * DB 반영만 PlaceSyncWriter의 짧은 트랜잭션 안에서 처리하도록 분리했다.
+     */
     override fun sync(): PlaceSyncResult {
         val syncStartedAt = LocalDateTime.now()
         val searchPoints = placeSearchPointGenerator.generate(
@@ -48,53 +51,7 @@ class PlaceSyncServiceImpl(
 
         val fetchResult = fetchAllDocuments(searchPoints)
 
-        var createdCount = 0
-        var updatedCount = 0
-
-        fetchResult.documents.forEach { document ->
-            val existing = placeRepository.findByExternalPlaceId(document.id).orElse(null)
-
-            if (existing == null) {
-                placeRepository.save(
-                    Place(
-                        externalPlaceId = document.id,
-                        placeName = document.place_name,
-                        address = document.address_name,
-                        roadAddress = document.road_address_name,
-                        latitude = document.y.toDouble(),
-                        longitude = document.x.toDouble(),
-                        categoryGroupCode = document.category_group_code,
-                        categoryGroupName = document.category_group_name,
-                        categoryName = document.category_name,
-                        phone = document.phone,
-                        placeUrl = document.place_url,
-                        isActive = true,
-                        lastSyncedAt = syncStartedAt,
-                        createdAt = syncStartedAt,
-                        updatedAt = syncStartedAt
-                    )
-                )
-                createdCount++
-            } else {
-                existing.sync(
-                    placeName = document.place_name,
-                    address = document.address_name,
-                    roadAddress = document.road_address_name,
-                    latitude = document.y.toDouble(),
-                    longitude = document.x.toDouble(),
-                    categoryGroupCode = document.category_group_code,
-                    categoryGroupName = document.category_group_name,
-                    categoryName = document.category_name,
-                    phone = document.phone,
-                    placeUrl = document.place_url,
-                    syncedAt = syncStartedAt
-                )
-                updatedCount++
-            }
-        }
-
-        val placesToDeactivate = placeRepository.findAllByLastSyncedAtBeforeAndIsActiveTrue(syncStartedAt)
-        placesToDeactivate.forEach { it.deactivate(syncStartedAt) }
+        val writeResult = placeSyncWriter.write(fetchResult.documents, syncStartedAt)
 
         log.info(
             LogFormat.message(
@@ -103,16 +60,16 @@ class PlaceSyncServiceImpl(
                 "searchPointCount" to searchPoints.size,
                 "rawCollectedCount" to fetchResult.rawCollectedCount,
                 "totalFetchedCount" to fetchResult.documents.size,
-                "createdCount" to createdCount,
-                "updatedCount" to updatedCount,
-                "deactivatedCount" to placesToDeactivate.size
+                "createdCount" to writeResult.createdCount,
+                "updatedCount" to writeResult.updatedCount,
+                "deactivatedCount" to writeResult.deactivatedCount
             )
         )
 
         return PlaceSyncResult(
-            createdCount = createdCount,
-            updatedCount = updatedCount,
-            deactivatedCount = placesToDeactivate.size,
+            createdCount = writeResult.createdCount,
+            updatedCount = writeResult.updatedCount,
+            deactivatedCount = writeResult.deactivatedCount,
             totalFetchedCount = fetchResult.documents.size,
             searchPointCount = searchPoints.size,
             rawCollectedCount = fetchResult.rawCollectedCount

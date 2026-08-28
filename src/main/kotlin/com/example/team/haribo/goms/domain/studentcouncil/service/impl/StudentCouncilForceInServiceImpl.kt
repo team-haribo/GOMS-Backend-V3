@@ -32,7 +32,7 @@ class StudentCouncilForceInServiceImpl(
             )
         )
 
-        val member = memberRepository.findById(memberId).orElseThrow {
+        val member = memberRepository.findByIdForUpdate(memberId) ?: run {
             log.warn(
                 LogFormat.message(
                     domain = "STUDENT_COUNCIL",
@@ -41,7 +41,7 @@ class StudentCouncilForceInServiceImpl(
                     "reason" to "존재하지 않는 사용자"
                 )
             )
-            NotFoundMemberException()
+            throw NotFoundMemberException()
         }
 
         val active = outingRepository.findTopByMemberIdAndComingAtIsNullOrderByIdDesc(memberId)

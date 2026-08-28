@@ -27,7 +27,7 @@ class QrOutingServiceImplTest : DescribeSpec({
 
         context("Given: COMING 상태 멤버 + 유효한 QR") {
             val member = MemberFixture.student(status = Status.COMING)
-            every { memberUtil.currentMember() } returns member
+            every { memberUtil.currentMemberForUpdate() } returns member
             every { outingRepository.save(any()) } answers {
                 firstArg<com.example.team.haribo.goms.domain.outing.entity.Outing>().also { it.id = 10L }
             }
@@ -42,7 +42,7 @@ class QrOutingServiceImplTest : DescribeSpec({
         }
 
         context("Given: CANNOT_OUTING 상태 멤버") {
-            every { memberUtil.currentMember() } returns MemberFixture.cannotOuting()
+            every { memberUtil.currentMemberForUpdate() } returns MemberFixture.cannotOuting()
 
             it("When: 외출 QR 스캔 시 Then: CannotOutingException이 발생한다") {
                 shouldThrow<CannotOutingException> {
@@ -52,7 +52,7 @@ class QrOutingServiceImplTest : DescribeSpec({
         }
 
         context("Given: 이미 OUTING 상태 멤버") {
-            every { memberUtil.currentMember() } returns MemberFixture.outing()
+            every { memberUtil.currentMemberForUpdate() } returns MemberFixture.outing()
 
             it("When: 외출 QR 스캔 시 Then: AlreadyOutingException이 발생한다") {
                 shouldThrow<AlreadyOutingException> {
