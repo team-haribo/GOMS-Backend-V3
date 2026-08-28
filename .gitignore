@@ -46,3 +46,8 @@ desktop.ini
 
 # Firebase
 secrets/
+
+# Environment
+.env
+.env.*
+!.env.example
