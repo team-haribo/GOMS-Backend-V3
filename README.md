@@ -28,7 +28,7 @@ GOMS는 광주소프트웨어마이스터고등학교 학생들을 위한 외출
 
 *   **Language**: Kotlin
 *   **Framework**: Spring Boot, Spring Security, Spring Data JPA
-*   **Database**: MySQL
+*   **Database**: MariaDB
 
 ## 기여하기
 
