@@ -42,25 +42,31 @@ class ActuatorEndpointTest @Autowired constructor(
     private val httpClient = HttpClient.newHttpClient()
 
     @Test
-    fun `actuator endpoints require authentication`() {
-        assertEquals(401, get("/actuator/health").statusCode())
-        assertEquals(401, get("/actuator/info").statusCode())
-        assertEquals(401, get("/actuator/prometheus").statusCode())
-    }
-
-    @Test
-    fun `authenticated requests can access the exposed actuator endpoints`() {
-        val accessToken = jwtProvider.createAccessToken(1L, "ROLE_STUDENT")
-
-        val health = get("/actuator/health", accessToken)
-        val info = get("/actuator/info", accessToken)
-        val prometheus = get("/actuator/prometheus", accessToken)
+    fun `actuator endpoints are accessible without authentication`() {
+        val health = get("/actuator/health")
+        val info = get("/actuator/info")
+        val prometheus = get("/actuator/prometheus")
 
         assertEquals(200, health.statusCode())
         assertEquals(200, info.statusCode())
         assertEquals(200, prometheus.statusCode())
         assertTrue(prometheus.body().contains("# HELP"))
         assertTrue(prometheus.body().contains("application=\"goms-server-v3\""))
+    }
+
+    @Test
+    fun `authenticated requests can access the exposed actuator endpoints`() {
+        val accessToken = jwtProvider.createAccessToken(1L, "ROLE_STUDENT")
+
+        assertEquals(200, get("/actuator/health", accessToken).statusCode())
+        assertEquals(200, get("/actuator/info", accessToken).statusCode())
+        assertEquals(200, get("/actuator/prometheus", accessToken).statusCode())
+    }
+
+    @Test
+    fun `protected endpoints still require authentication`() {
+        assertEquals(401, get("/api/v3/member/withdraw").statusCode())
+        assertEquals(401, get("/actuator/beans").statusCode())
     }
 
     private fun get(path: String, accessToken: String? = null): HttpResponse<String> {

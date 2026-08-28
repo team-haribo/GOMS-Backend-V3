@@ -36,7 +36,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
 
 networks:
   default:
