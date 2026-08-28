@@ -82,6 +82,11 @@ class SecurityConfig {
                 it.requestMatchers("/swagger-ui.html").permitAll()
                 it.requestMatchers("/swagger-ui/**").permitAll()
 
+                // ACTUATOR
+                it.requestMatchers("/actuator/health").permitAll()
+                it.requestMatchers("/actuator/info").permitAll()
+                it.requestMatchers("/actuator/prometheus").permitAll()
+
                 // AUTH
                 it.requestMatchers("/api/v3/auth/email-verifications/send").permitAll()
                 it.requestMatchers("/api/v3/auth/email-verifications/confirm").permitAll()
