@@ -139,5 +139,17 @@ class InternalStudentCouncilDiscordControllerTest : DescribeSpec({
                     .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."))
             }
         }
+        context("Secret 헤더 누락") {
+            it("필수 헤더 X-Internal-Secret이 없으면 500을 반환한다") {
+                mockMvc.perform(
+                    post(url)
+                        // .header("X-Internal-Secret", ...) 를 일부러 뺌
+                        .contentType(MediaType.APPLICATION_JSON)
+
+                        .content(objectMapper.writeValueAsString(DiscordStudentCouncilApplyRequest(listOf("d1"))))
+                )
+                    .andExpect(status().isInternalServerError)
+            }
+        }
     }
 })
