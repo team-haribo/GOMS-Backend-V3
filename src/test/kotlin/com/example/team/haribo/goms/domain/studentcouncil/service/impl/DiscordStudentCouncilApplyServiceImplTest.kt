@@ -64,7 +64,8 @@ class DiscordStudentCouncilApplyServiceImplTest : DescribeSpec({
 
         context("isFixedStudentCouncil 회원") {
             val fixedMember = MemberFixture.student(id = 2L).also {
-                it.isFixedStudentCouncil = true // 기존 role(ROLE_STUDENT)을 유지하는지 보기 위함
+                it.isFixedStudentCouncil = true
+                it.role = Role.ROLE_STUDENT_COUNCIL// 기존 role(ROLE_STUDENT)을 유지하는지 보기 위함
             }
             every { memberRepository.resetTemporaryStudentCouncilRole() } returns 0
             every { discordAccountLinkRepository.findAllByDiscordUserIdIn(any()) } returns
@@ -75,7 +76,7 @@ class DiscordStudentCouncilApplyServiceImplTest : DescribeSpec({
 
                 response.success shouldBe true
                 response.syncedUsers shouldContainExactly listOf(fixedMember.name)
-                fixedMember.role shouldBe Role.ROLE_STUDENT // 변경 안 됨
+                fixedMember.role shouldBe Role.ROLE_STUDENT_COUNCIL // 변경 안 됨
             }
         }
 
