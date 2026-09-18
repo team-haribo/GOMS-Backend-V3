@@ -107,6 +107,9 @@ class PlaceSearchServiceImplTest : DescribeSpec({
                 val response = service.search("테스트")
 
                 response.places[0].reviewCount shouldBe 0L
+                response.places[0].address shouldBe "서울시 중구 세종대로 110"
+                response.places[0].latitude shouldBe 37.5665
+                response.places[0].categoryName shouldBe "한식"
                 response.places[0].recommendCount shouldBe 0L
                 response.places[0].recommended shouldBe false
             }
