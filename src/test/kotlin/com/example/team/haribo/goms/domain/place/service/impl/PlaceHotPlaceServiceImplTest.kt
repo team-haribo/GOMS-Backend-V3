@@ -2,6 +2,7 @@ package com.example.team.haribo.goms.domain.place.service.impl
 
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
 import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
+import com.example.team.haribo.goms.domain.place.util.PlaceSummaryMapper
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
 import com.example.team.haribo.goms.fixture.PlaceFixture
 import com.example.team.haribo.goms.global.exception.ErrorCode
@@ -22,7 +23,14 @@ class PlaceHotPlaceServiceImplTest : DescribeSpec({
     val recommendRepository = mockk<PlaceRecommendRepository>()
     val reviewRepository = mockk<ReviewRepository>()
     val memberUtil = mockk<MemberUtil>()
-    val service = PlaceHotPlaceServiceImpl(placeRepository, recommendRepository, reviewRepository, memberUtil)
+    val placeSummaryMapper = PlaceSummaryMapper()
+    val service = PlaceHotPlaceServiceImpl(
+        placeRepository,
+        recommendRepository,
+        reviewRepository,
+        memberUtil,
+        placeSummaryMapper
+    )
 
     val memberId = 1L
 
@@ -117,6 +125,86 @@ class PlaceHotPlaceServiceImplTest : DescribeSpec({
             it("When: 핫플레이스 조회 시 Then: 빈 리스트를 반환한다") {
                 val response = service.getHotPlaces(3L)
                 response.places.shouldBeEmpty()
+            }
+        }
+
+        context("Given: HotPlace의 집계 Query 결과가 없음") {
+            it("When: 핫플레이스 조회 시 Then: 기본값 0L이 반환된다"){
+                val hotIds = listOf(1L)
+                val place = PlaceFixture.place(id = 1L, isActive = true)
+
+                every { memberUtil.currentMemberId() } returns memberId
+                every { recommendRepository.findRecommendedPlaceIds(memberId) } returns emptyList()
+                every { recommendRepository.findHotPlaceIdsSince(any<LocalDateTime>(), any<Pageable>()) } returns hotIds
+                every { placeRepository.findAllById(hotIds) } returns listOf(place)
+                every { recommendRepository.countRecommendedByPlaceIdsSince(hotIds, any<LocalDateTime>()) } returns emptyList()
+                every { reviewRepository.countActiveByPlaceIds(hotIds) } returns emptyList()
+
+                val response = service.getHotPlaces(1L)
+
+                response.places[0].recommendCount shouldBe 0L
+                response.places[0].reviewCount shouldBe 0L
+                response.places[0].recommended shouldBe false
+            }
+        }
+
+        context("Given: HotPlace ID 순서([3L, 1L, 2L])와 findAllById 리턴 순서([1L, 2L, 3L])가 다름") {
+            it("When: 핫플레이스 조회 시 Then: 응답 places 순서는 hotIds 순서([3L, 1L, 2L])를 따른다") {
+                val hotIds = listOf(3L, 1L, 2L)
+                val place1 = PlaceFixture.place(id = 1L, isActive = true)
+                val place2 = PlaceFixture.place(id = 2L, isActive = true)
+                val place3 = PlaceFixture.place(id = 3L, isActive = true)
+
+                every { memberUtil.currentMemberId() } returns memberId
+                every { recommendRepository.findRecommendedPlaceIds(memberId) } returns emptyList()
+                every { recommendRepository.countRecommendedByPlaceIdsSince(hotIds, any<LocalDateTime>()) } returns emptyList()
+                every { recommendRepository.findHotPlaceIdsSince(any<LocalDateTime>(), any<Pageable>()) } returns hotIds
+                every { placeRepository.findAllById(hotIds) } returns listOf(place1, place2, place3)
+                every { reviewRepository.countActiveByPlaceIds(hotIds) } returns emptyList()
+
+                val response = service.getHotPlaces(1L)
+
+                response.places.map { it.placeId } shouldBe listOf(3L, 1L, 2L)
+            }
+        }
+
+        context("Given: HotPlace 중 비활성 Place가 포함됨") {
+            it("When: 핫플레이스 조회 시 Then: 비활성 Place는 응답에서 제외된다") {
+                val hotIds = listOf(1L, 2L)
+                val place1 = PlaceFixture.place(id = 1L, isActive = false)
+                val place2 = PlaceFixture.place(id = 2L, isActive = true)
+
+                every { memberUtil.currentMemberId() } returns memberId
+                every { recommendRepository.findRecommendedPlaceIds(memberId) } returns emptyList()
+                every { recommendRepository.findHotPlaceIdsSince(any<LocalDateTime>(), any<Pageable>()) } returns hotIds
+                every { placeRepository.findAllById(hotIds) } returns listOf(place1, place2)
+                every { recommendRepository.countRecommendedByPlaceIdsSince(hotIds, any<LocalDateTime>()) } returns emptyList()
+                every { reviewRepository.countActiveByPlaceIds(hotIds) } returns emptyList()
+
+                val response = service.getHotPlaces(1L)
+
+                response.places.map { it.placeId } shouldBe listOf(2L)
+            }
+        }
+
+        context("Given: HotPlace 중 회원이 추천한 Place가 포함됨") {
+            it("When: 핫플레이스 조회 시 Then: 추천한 Place는 recommended=true로 반환된다") {
+                val hotIds = listOf(1L, 2L)
+                val place1 = PlaceFixture.place(id = 1L, isActive = true)
+                val place2 = PlaceFixture.place(id = 2L, isActive = true)
+
+                every { memberUtil.currentMemberId() } returns memberId
+                every { recommendRepository.findRecommendedPlaceIds(memberId) } returns listOf(1L)
+                every { recommendRepository.findHotPlaceIdsSince(any(), any()) } returns hotIds
+                every { placeRepository.findAllById(hotIds) } returns listOf(place1, place2)
+                every { recommendRepository.countRecommendedByPlaceIdsSince(hotIds, any<LocalDateTime>()) } returns emptyList()
+                every { reviewRepository.countActiveByPlaceIds(hotIds) } returns emptyList()
+
+                val response = service.getHotPlaces(1L)
+
+                response.places.find { it.placeId == 1L }?.recommended shouldBe true
+                response.places.find { it.placeId == 2L }?.recommended shouldBe false
+
             }
         }
     }
