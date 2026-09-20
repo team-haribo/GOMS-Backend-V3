@@ -5,6 +5,7 @@ import com.example.team.haribo.goms.domain.place.dto.response.PlaceSearchRespons
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
 import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
 import com.example.team.haribo.goms.domain.place.service.PlaceSearchService
+import com.example.team.haribo.goms.domain.place.util.PlaceSummaryMapper
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
 import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.exception.GlobalException
@@ -17,7 +18,8 @@ class PlaceSearchServiceImpl(
     private val placeRepository: PlaceRepository,
     private val recommendRepository: PlaceRecommendRepository,
     private val reviewRepository: ReviewRepository,
-    private val memberUtil: MemberUtil
+    private val memberUtil: MemberUtil,
+    private val placeSummaryMapper: PlaceSummaryMapper,
 ) : PlaceSearchService {
 
     @Transactional(readOnly = true)
@@ -43,18 +45,11 @@ class PlaceSearchServiceImpl(
         return PlaceSearchListResponse(
             places = places.map { place ->
                 val placeId = place.id!!
-                PlaceSearchResponse(
-                    placeId = placeId,
-                    placeName = place.placeName,
-                    address = place.address,
-                    roadAddress = place.roadAddress,
-                    latitude = place.latitude,
-                    longitude = place.longitude,
-                    categoryGroupName = place.categoryGroupName,
-                    categoryName = place.categoryName,
+                placeSummaryMapper.toSearchResponse(
+                    place = place,
                     reviewCount = reviewCountMap[placeId] ?: 0L,
                     recommendCount = recommendCountMap[placeId] ?: 0L,
-                    recommended = recommendedIds.contains(placeId)
+                    recommended = recommendedIds.contains(placeId),
                 )
             }
         )
