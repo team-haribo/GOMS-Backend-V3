@@ -2,6 +2,7 @@ package com.example.team.haribo.goms.domain.place.service.impl
 
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
 import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
+import com.example.team.haribo.goms.domain.place.util.PlaceSummaryMapper
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
 import com.example.team.haribo.goms.fixture.PlaceFixture
 import com.example.team.haribo.goms.global.exception.ErrorCode
@@ -20,7 +21,14 @@ class PlaceSearchServiceImplTest : DescribeSpec({
     val recommendRepository = mockk<PlaceRecommendRepository>()
     val reviewRepository = mockk<ReviewRepository>()
     val memberUtil = mockk<MemberUtil>()
-    val service = PlaceSearchServiceImpl(placeRepository, recommendRepository, reviewRepository, memberUtil)
+    val placeSummaryMapper = PlaceSummaryMapper()
+    val service = PlaceSearchServiceImpl(
+        placeRepository,
+        recommendRepository,
+        reviewRepository,
+        memberUtil,
+        placeSummaryMapper,
+    )
 
     val memberId = 1L
 
@@ -84,6 +92,26 @@ class PlaceSearchServiceImplTest : DescribeSpec({
             it("When: 검색 시 Then: 빈 리스트를 반환한다") {
                 val response = service.search("존재하지않는장소")
                 response.places.shouldBeEmpty()
+            }
+        }
+
+        context("Given: 검색 결과 place의 집계 Query 결과가 없음") {
+            it("When: 검색 시 Then: 기본값 0L이 반환된다") {
+                val place = PlaceFixture.place(id = 1L)
+                every { placeRepository.searchByKeyword(any()) } returns listOf(place)
+                every { recommendRepository.findRecommendedPlaceIds(any()) } returns emptyList()
+                every { recommendRepository.countRecommendedByPlaceIds(any()) } returns emptyList()
+                every { reviewRepository.countActiveByPlaceIds(any()) } returns emptyList()
+                every { memberUtil.currentMemberId() } returns memberId
+
+                val response = service.search("테스트")
+
+                response.places[0].reviewCount shouldBe 0L
+                response.places[0].address shouldBe "서울시 중구 세종대로 110"
+                response.places[0].latitude shouldBe 37.5665
+                response.places[0].categoryName shouldBe "한식"
+                response.places[0].recommendCount shouldBe 0L
+                response.places[0].recommended shouldBe false
             }
         }
     }

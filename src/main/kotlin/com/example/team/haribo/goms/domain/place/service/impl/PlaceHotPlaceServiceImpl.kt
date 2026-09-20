@@ -1,10 +1,10 @@
 package com.example.team.haribo.goms.domain.place.service.impl
 
-import com.example.team.haribo.goms.domain.place.dto.response.PlaceSummaryResponse
 import com.example.team.haribo.goms.domain.place.dto.response.PlacesResponse
 import com.example.team.haribo.goms.domain.place.repository.PlaceRecommendRepository
 import com.example.team.haribo.goms.domain.place.repository.PlaceRepository
 import com.example.team.haribo.goms.domain.place.service.PlaceHotPlaceService
+import com.example.team.haribo.goms.domain.place.util.PlaceSummaryMapper
 import com.example.team.haribo.goms.domain.review.repository.ReviewRepository
 import com.example.team.haribo.goms.global.exception.ErrorCode
 import com.example.team.haribo.goms.global.exception.GlobalException
@@ -19,7 +19,8 @@ class PlaceHotPlaceServiceImpl(
     private val placeRepository: PlaceRepository,
     private val recommendRepository: PlaceRecommendRepository,
     private val reviewRepository: ReviewRepository,
-    private val memberUtil: MemberUtil
+    private val memberUtil: MemberUtil,
+    private val placeSummaryMapper: PlaceSummaryMapper
 ) : PlaceHotPlaceService {
 
     @Transactional(readOnly = true)
@@ -55,18 +56,11 @@ class PlaceHotPlaceServiceImpl(
         return PlacesResponse(
             places = hotIds.mapNotNull { placeId ->
                 val place = placeMap[placeId] ?: return@mapNotNull null
-                PlaceSummaryResponse(
-                    placeId = placeId,
-                    placeName = place.placeName,
-                    address = place.address,
-                    roadAddress = place.roadAddress,
-                    latitude = place.latitude,
-                    longitude = place.longitude,
-                    categoryGroupName = place.categoryGroupName,
-                    categoryName = place.categoryName,
-                    reviewCount = reviewCountMap[placeId] ?: 0L,
+                placeSummaryMapper.toSummary(
+                    place = place,
                     recommendCount = recommendCountMap[placeId] ?: 0L,
-                    recommended = recommendedIds.contains(placeId)
+                    recommended = recommendedIds.contains(placeId),
+                    reviewCount = reviewCountMap[placeId] ?: 0L,
                 )
             }
         )
