@@ -1,0 +1,3 @@
+# Codex CLI에서 현재 stable로 확인된 hooks 기능만 활성화한다.
+[features]
+hooks = true
