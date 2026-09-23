@@ -1,0 +1,72 @@
+name: Reviewer Assign
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+
+concurrency:
+  group: reviewer-assign-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  assign:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Request reviewer
+        uses: actions/github-script@v8
+        env:
+          REVIEWER_POOL: "exijn,minwoo-3"
+          TARGET_REVIEWERS: "1"
+        with:
+          script: |
+            try {
+              const pr = context.payload.pull_request;
+              const author = pr.user.login;
+              const target = Number(process.env.TARGET_REVIEWERS);
+              const pool = process.env.REVIEWER_POOL.split(',').map(s => s.trim()).filter(Boolean);
+              const { owner, repo } = context.repo;
+
+              if (pool.length === 0) {
+                core.warning('Reviewer pool is empty.');
+                return;
+              }
+
+              const reviews = await github.paginate(github.rest.pulls.listReviews, {
+                owner, repo, pull_number: pr.number,
+              });
+              const { data: requested } = await github.rest.pulls.listRequestedReviewers({
+                owner, repo, pull_number: pr.number,
+              });
+
+              const engaged = new Set([
+                ...requested.users.map(u => u.login),
+                ...reviews.filter(r => r.user && r.user.type !== 'Bot').map(r => r.user.login),
+              ]);
+              engaged.delete(author);
+
+              if (engaged.size >= target) {
+                core.info(`Already has ${engaged.size} reviewer(s). Skip.`);
+                return;
+              }
+
+              const candidates = pool.filter(u => u !== author && !engaged.has(u) && !u.endsWith('[bot]'));
+              if (candidates.length === 0) {
+                core.warning(`No candidate reviewer (author: ${author}).`);
+                return;
+              }
+
+              const picked = candidates
+                .sort(() => Math.random() - 0.5)
+                .slice(0, target - engaged.size);
+              await github.rest.pulls.requestReviewers({
+                owner, repo, pull_number: pr.number, reviewers: picked,
+              });
+              core.info(`Requested reviewers: ${picked.join(', ')}`);
+            } catch (e) {
+              core.warning(`Reviewer assignment failed: ${e.status ?? ''} ${e.message}`);
+            }
