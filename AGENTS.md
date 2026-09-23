@@ -155,6 +155,18 @@ Controller는 요청 변환·검증·인증 경계·응답 상태 코드만 담�
 - PR 생성 후 `title`, `baseRefName`, `headRefName`, `labels`, `closingIssuesReferences`, `isDraft`, `assignees`를 다시 조회한다. 의도와 다르면 허용된 범위에서 수정하고 재검증한다.
 - metadata 검증을 위해 실제 테스트 Issue나 PR을 새로 만들지 않는다.
 
+### PR 본문 작성
+
+- `.github/pull_request_template.md`의 heading 순서와 이름을 유지하고, 기존 checklist 문구와 순서를 임의로 바꾸거나 삭제하지 않는다.
+- `관련 이슈` section에서는 해결하는 Issue에 `Closes #<issue-number>`, 단순 연관에는 `Related to #<issue-number>`를 사용한다. Issue 번호를 추측하지 않고 parent/tracking Issue를 `Closes`로 연결하지 않는다.
+- PR 하나가 실제로 여러 Issue를 해결하면 `Closes #<issue-number>`를 여러 줄로 작성할 수 있다.
+- `작업내용`은 리뷰에 필요한 핵심 변경만 짧은 문장이나 bullet로 작성하고, 모든 파일이나 구현 세부사항을 나열하지 않는다.
+- `참고사항`에는 운영 영향, 호환성, 특별한 검증 결과, 중요한 제약·제외 범위처럼 실제로 필요한 내용만 작성한다. 내용이 없으면 억지로 채우지 않는다.
+- `Summary`, `Motivation`, `Background`, `Architecture`, `Implementation Details`, `Testing`, `Risks`, `Future Work`, `Files Changed` 등 template에 없는 heading을 기본으로 추가하지 않는다. 추가 checklist도 실제 검증에 필요할 때만 사용한다.
+- PR 작성 전에 최근 merged PR 3~5개의 문장 길이와 bullet 사용을 확인하되, 현재 template과 이 문서가 우선한다.
+- checklist와 본문에는 실제로 확인한 항목과 실행한 검증만 기록한다. 실행하지 않은 테스트나 확인하지 않은 CI 결과를 체크하거나 작성하지 않는다.
+- `Closes`와 `Related to` 표기는 develop merge 시 Issue 자동 종료를 처리하는 Workflow(#102)가 읽을 수 있는 형식과 일치시킨다.
+
 ### 책임 범위
 
 - Issue·PR metadata 확인은 reviewer 자동 지정 Workflow(#93), PR Template 구조(#99), 코드 주석·KDoc 규칙(#100)을 대신하지 않는다.

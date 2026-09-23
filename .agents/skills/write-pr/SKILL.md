@@ -15,14 +15,14 @@ PR template, git diff/log, gh pr list/view/create, gh label list, Gradle 검증�
 
 ## 조사 단계
 
-1. .github/pull_request_template.md와 최근 상세 PR을 읽는다.
+1. .github/pull_request_template.md와 최근 merged PR 3~5개를 읽고 본문 길이와 bullet 사용을 확인한다.
 2. 일반 개발 PR의 base가 develop인지 확인한다. main은 배포 PR에만 사용한다.
 3. `AGENTS.md`의 GitHub Metadata 규칙에 따라 관련 Issue의 존재·assignee·label, PR title convention, 실제 label을 확인한다.
 4. 변경 파일과 검증 결과를 사실대로 정리한다.
 
 ## 실행 단계
 
-간결한 한국어 제목과 기존 템플릿 구조를 유지한 본문을 작성한다. 작업내용, 참고사항, 체크리스트, 검증, 주요 구성, 제외 사항을 포함한다. 실제 수행한 항목만 체크한다. PR 생성 전 `AGENTS.md` 기준에 따라 develop base, 관련 Issue, 기존 label을 확정한다.
+간결한 한국어 제목과 기존 템플릿 구조를 유지한 본문을 작성한다. `관련 이슈`에는 해결 시 `Closes #<issue-number>`, 단순 연관 시 `Related to #<issue-number>`를 사용한다. `작업내용`은 핵심 변경만 짧게, `참고사항`은 실제로 필요한 내용만 작성한다. 기존 heading·checklist를 유지하고 template에 없는 heading은 기본으로 추가하지 않는다. 실제 수행한 항목만 체크하며, PR 생성 전 `AGENTS.md` 기준에 따라 develop base·관련 Issue·기존 label을 확정한다.
 
 ## 검증 단계
 
