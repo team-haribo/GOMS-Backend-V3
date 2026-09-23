@@ -107,10 +107,4 @@ allOpen {
 
 tasks.named('test') {
     useJUnitPlatform()
-    testLogging {
-        events 'failed'
-        exceptionFormat 'full'
-        showCauses true
-        showStackTraces true
-    }
 }

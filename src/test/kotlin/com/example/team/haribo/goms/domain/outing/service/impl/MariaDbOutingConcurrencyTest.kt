@@ -22,7 +22,7 @@ import org.testcontainers.mariadb.MariaDBContainer
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(properties = ["spring.profiles.active="])
+@TestPropertySource(properties = ["spring.profiles.active=", "spring.jpa.hibernate.ddl-auto=create-drop"])
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @Testcontainers(disabledWithoutDocker = true)
 @Import(
