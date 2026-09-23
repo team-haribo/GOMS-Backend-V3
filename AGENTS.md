@@ -128,7 +128,7 @@ Controller는 요청 변환·검증·인증 경계·응답 상태 코드만 담�
 - 테스트를 통과시키기 위해 assertion을 약화하거나 테스트를 삭제하지 않는다.
 - 실행 명령은 ./gradlew test, ./gradlew compileKotlin test, ./gradlew build --no-daemon이다. Windows에서는 gradlew.bat을 사용한다.
 
-## 15. Git, Commit, PR
+## 15. GitHub Metadata, Commit, PR
 
 - 일반 개발 PR의 base는 develop, 배포 PR만 main이다.
 - 실제 브랜치 접두사는 feat/, fix/, refactor/, test/, chore/, hotfix/, ci/ 등을 따른다. 이번 작업은 chore/ai-harness다.
@@ -137,6 +137,27 @@ Controller는 요청 변환·검증·인증 경계·응답 상태 코드만 담�
 - .github/pull_request_template.md를 유지하고 실제로 수행한 검증만 체크한다.
 - 실제 존재하는 Label만 사용하고, 애매하면 라벨을 붙이지 않는다.
 - 사용자 요청이 없으면 commit, push, PR 생성, merge를 수행하지 않는다. 이번 작업은 사용자가 명시했으므로 commit/push/PR 생성까지 수행하되 merge·auto merge·deploy는 하지 않는다.
+
+### Issue 생성 전후
+
+- 생성 전에 동일하거나 유사한 Issue, 최근 제목 convention, 현재 repository의 label 목록, 기존 assignee를 `gh`로 확인한다.
+- Issue에는 repository에 실제로 존재하는 label만 적용한다. 새 label을 자동 생성하지 않고, 의미가 가까운 label을 보통 1~2개만 선택한다.
+- 사용자가 assignee를 지정하면 그대로 따른다. 이미 다른 assignee가 있으면 임의로 변경하거나 추가하지 않는다.
+- assignee가 없고 사용자가 자신이 작업한다고 명시한 경우에만 현재 인증 사용자를 지정할 수 있다. 단순 backlog Issue에는 임의로 assignee를 지정하지 않으며, 애매하면 사용자에게 확인한다.
+- Issue 생성 후 `title`, `assignees`, `labels`, `state`를 다시 조회해 의도한 metadata와 일치하는지 확인한다.
+
+### PR 생성 전후
+
+- 생성 전에 관련 Issue의 존재·assignee·label, PR title convention, base branch, PR label을 확인한다.
+- 일반 개발 PR의 base는 `develop`으로 고정하고, `main`은 배포·release 등 repository convention이 명확한 경우에만 사용한다.
+- PR은 해결하는 Issue를 명시하고, 단순 참고 Issue와 구분한다. 관련 Issue가 없거나 연결 방식이 애매하면 임의로 번호를 만들지 않는다.
+- PR에도 실제로 존재하는 label만 적용하며 새 label을 만들지 않는다. 필요한 label은 보통 1~2개로 제한한다.
+- PR 생성 후 `title`, `baseRefName`, `headRefName`, `labels`, `closingIssuesReferences`, `isDraft`, `assignees`를 다시 조회한다. 의도와 다르면 허용된 범위에서 수정하고 재검증한다.
+- metadata 검증을 위해 실제 테스트 Issue나 PR을 새로 만들지 않는다.
+
+### 책임 범위
+
+- Issue·PR metadata 확인은 reviewer 자동 지정 Workflow(#93), PR Template 구조(#99), 코드 주석·KDoc 규칙(#100)을 대신하지 않는다.
 
 ## 16. 문서와 언어
 
