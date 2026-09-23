@@ -3,6 +3,7 @@ package com.example.team.haribo.goms.domain.late.job
 import com.example.team.haribo.goms.domain.common.enums.Status
 import com.example.team.haribo.goms.domain.late.entity.Late
 import com.example.team.haribo.goms.domain.late.repository.LateRepository
+import com.example.team.haribo.goms.domain.member.repository.MemberRepository
 import com.example.team.haribo.goms.domain.outing.repository.OutingRepository
 import com.example.team.haribo.goms.global.log.LogFormat
 import org.slf4j.LoggerFactory
@@ -15,7 +16,8 @@ import java.time.ZoneId
 @Component
 class LateAutoCreateJob(
     private val outingRepository: OutingRepository,
-    private val lateRepository: LateRepository
+    private val lateRepository: LateRepository,
+    private val memberRepository: MemberRepository
 ) {
 
     private val log = LoggerFactory.getLogger(LateAutoCreateJob::class.java)
@@ -26,7 +28,19 @@ class LateAutoCreateJob(
         val start = System.currentTimeMillis()
         val now = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
-        val activeOutings = outingRepository.findAllActiveWithOutingMember()
+        // Select IDs only: entities loaded before a lock wait would retain stale state in this persistence context.
+        val candidateMemberIds = outingRepository.findAllActiveMemberIds().distinct().sorted()
+        val lockedMemberIds = if (candidateMemberIds.isEmpty()) {
+            emptyList()
+        } else {
+            // Match interactive state transitions: lock Members first, in a stable order, then lock current Outings.
+            memberRepository.findAllByIdForUpdate(candidateMemberIds).mapNotNull { it.id }.sorted()
+        }
+        val activeOutings = if (lockedMemberIds.isEmpty()) {
+            emptyList()
+        } else {
+            outingRepository.findAllActiveByMemberIdInForUpdate(lockedMemberIds)
+        }
         val outingIds = activeOutings.map { it.id!! }
         val existingLateOutingIds = if (outingIds.isEmpty()) {
             emptySet()

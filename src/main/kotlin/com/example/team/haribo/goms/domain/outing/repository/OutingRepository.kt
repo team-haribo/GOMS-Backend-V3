@@ -1,7 +1,9 @@
 package com.example.team.haribo.goms.domain.outing.repository
 
 import com.example.team.haribo.goms.domain.outing.entity.Outing
+import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
@@ -31,6 +33,30 @@ interface OutingRepository : JpaRepository<Outing, Long> {
         """
     )
     fun findAllActiveWithOutingMember(): List<Outing>
+
+    /** Candidate member IDs are read without materializing possibly stale Outing/Member entities. */
+    @Query(
+        """
+        select o.member.id from Outing o
+        where o.comingAt is null
+          and o.member.status = com.example.team.haribo.goms.domain.common.enums.Status.OUTING
+        """
+    )
+    fun findAllActiveMemberIds(): List<Long>
+
+    /** Current-read query used after Member rows have been locked in ascending ID order. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query(
+        """
+        select o from Outing o
+        join fetch o.member m
+        where o.comingAt is null
+          and m.status = com.example.team.haribo.goms.domain.common.enums.Status.OUTING
+          and m.id in :memberIds
+        order by m.id asc, o.id asc
+        """
+    )
+    fun findAllActiveByMemberIdInForUpdate(@Param("memberIds") memberIds: List<Long>): List<Outing>
 
     @Query(
         """
