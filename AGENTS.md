@@ -21,7 +21,7 @@ GOMS는 기숙사 학생의 외출·복귀와 지각을 관리하고 장소, 후
 
 ## 3. 패키지 구조
 
-기본 패키지는 com.example.team.haribo.goms다.
+기본 패키지는 com.teamharibo.goms다.
 
 - domain/{도메인}/controller: HTTP 진입점
 - domain/{도메인}/dto/request, response: 요청·응답 Kotlin data class

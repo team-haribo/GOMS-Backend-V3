@@ -1,6 +1,0 @@
-package com.example.team.haribo.goms.domain.place.exception
-
-import com.example.team.haribo.goms.global.exception.ErrorCode
-import com.example.team.haribo.goms.global.exception.GlobalException
-
-class AlreadyUnrecommendedPlaceException : GlobalException(ErrorCode.ALREADY_UNRECOMMENDED_PLACE)
