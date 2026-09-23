@@ -1,0 +1,35 @@
+package com.teamharibo.goms.domain.late.service.impl
+
+import com.teamharibo.goms.domain.late.dto.response.LateRankListResponse
+import com.teamharibo.goms.domain.late.repository.LateRepository
+import com.teamharibo.goms.domain.late.service.LateRankService
+import com.teamharibo.goms.domain.studentcouncil.dto.response.LateStudentResponse
+import org.springframework.data.domain.PageRequest
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+@Service
+@Transactional(readOnly = true)
+class LateRankServiceImpl(
+    private val lateRepository: LateRepository
+) : LateRankService {
+
+    override fun getTop5(): LateRankListResponse {
+        val top5 = lateRepository.findLateRank(PageRequest.of(0, 5))
+
+        return LateRankListResponse(
+            students = top5.map {
+                LateStudentResponse(
+                    memberId = it.member.id!!,
+                    name = it.member.name,
+                    grade = it.member.grade,
+                    department = it.member.department,
+                    role = it.member.role,
+                    status = it.member.status,
+                    profileImageUrl = it.member.profileImageUrl,
+                    comingAt = it.comingAt
+                )
+            }
+        )
+    }
+}

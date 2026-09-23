@@ -6,9 +6,9 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.jpa' version '2.2.21'
 }
 
-group = 'com.example.team.haribo.goms'
+group = 'com.teamharibo.goms'
 version = '0.0.1-SNAPSHOT'
-description = 'GOMS-Server-V3'
+description = 'GOMS-Backend-V3'
 
 java {
     toolchain {
