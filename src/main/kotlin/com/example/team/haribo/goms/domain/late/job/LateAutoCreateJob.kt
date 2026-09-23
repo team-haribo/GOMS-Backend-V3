@@ -28,12 +28,12 @@ class LateAutoCreateJob(
         val start = System.currentTimeMillis()
         val now = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
-        // Select IDs only: entities loaded before a lock wait would retain stale state in this persistence context.
+        // 먼저 ID만 조회해, 락 획득 전에 오래된 Entity가 영속성 컨텍스트에 들어가지 않도록 합니다.
         val candidateMemberIds = outingRepository.findAllActiveMemberIds().distinct().sorted()
         val lockedMemberIds = if (candidateMemberIds.isEmpty()) {
             emptyList()
         } else {
-            // Match interactive state transitions: lock Members first, in a stable order, then lock current Outings.
+            // 대화형 상태 변경과 같은 잠금 순서를 사용합니다. Member를 ID 오름차순으로 먼저 잠근 뒤 현재 Outing을 잠급니다.
             memberRepository.findAllByIdForUpdate(candidateMemberIds).mapNotNull { it.id }.sorted()
         }
         val activeOutings = if (lockedMemberIds.isEmpty()) {

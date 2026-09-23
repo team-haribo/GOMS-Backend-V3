@@ -34,7 +34,7 @@ interface OutingRepository : JpaRepository<Outing, Long> {
     )
     fun findAllActiveWithOutingMember(): List<Outing>
 
-    /** Candidate member IDs are read without materializing possibly stale Outing/Member entities. */
+    /** 오래된 Outing/Member Entity를 영속성 컨텍스트에 올리지 않고 처리할 대상 Member ID만 조회합니다. */
     @Query(
         """
         select o.member.id from Outing o
@@ -44,7 +44,7 @@ interface OutingRepository : JpaRepository<Outing, Long> {
     )
     fun findAllActiveMemberIds(): List<Long>
 
-    /** Current-read query used after Member rows have been locked in ascending ID order. */
+    /** Member 행을 ID 오름차순으로 잠근 뒤 최신 상태의 Outing을 조회합니다. */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(
         """
