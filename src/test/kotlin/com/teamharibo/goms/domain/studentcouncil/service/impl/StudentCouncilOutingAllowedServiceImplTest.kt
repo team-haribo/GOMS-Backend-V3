@@ -12,7 +12,6 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import java.util.Optional
 
 class StudentCouncilOutingAllowedServiceImplTest : DescribeSpec({
 
@@ -23,7 +22,7 @@ class StudentCouncilOutingAllowedServiceImplTest : DescribeSpec({
 
         context("Given: COMING 상태 멤버 → CANNOT_OUTING으로 변경") {
             val member = MemberFixture.student(id = 1L, status = Status.COMING)
-            every { memberRepository.findById(1L) } returns Optional.of(member)
+            every { memberRepository.findByIdForUpdate(1L) } returns member
 
             it("When: 상태 변경 시 Then: CANNOT_OUTING으로 업데이트된다") {
                 service.update(1L, Status.CANNOT_OUTING)
@@ -33,7 +32,7 @@ class StudentCouncilOutingAllowedServiceImplTest : DescribeSpec({
 
         context("Given: CANNOT_OUTING 상태 멤버 → COMING으로 변경") {
             val member = MemberFixture.cannotOuting(id = 2L)
-            every { memberRepository.findById(2L) } returns Optional.of(member)
+            every { memberRepository.findByIdForUpdate(2L) } returns member
 
             it("When: 상태 변경 시 Then: COMING으로 업데이트된다") {
                 service.update(2L, Status.COMING)
@@ -42,7 +41,7 @@ class StudentCouncilOutingAllowedServiceImplTest : DescribeSpec({
         }
 
         context("Given: 존재하지 않는 memberId") {
-            every { memberRepository.findById(999L) } returns Optional.empty()
+            every { memberRepository.findByIdForUpdate(999L) } returns null
 
             it("When: COMING으로 변경 시 Then: NotFoundMemberException이 발생한다") {
                 shouldThrow<NotFoundMemberException> {
@@ -61,7 +60,7 @@ class StudentCouncilOutingAllowedServiceImplTest : DescribeSpec({
 
         context("Given: 현재 OUTING 상태인 멤버") {
             val outingMember = MemberFixture.outing(id = 4L)
-            every { memberRepository.findById(4L) } returns Optional.of(outingMember)
+            every { memberRepository.findByIdForUpdate(4L) } returns outingMember
 
             it("When: 상태 변경 시 Then: StatusConflictException이 발생한다") {
                 shouldThrow<StatusConflictException> {
@@ -72,7 +71,7 @@ class StudentCouncilOutingAllowedServiceImplTest : DescribeSpec({
 
         context("Given: 동일 상태로 변경 시도") {
             val comingMember = MemberFixture.student(id = 5L, status = Status.COMING)
-            every { memberRepository.findById(5L) } returns Optional.of(comingMember)
+            every { memberRepository.findByIdForUpdate(5L) } returns comingMember
 
             it("When: 이미 COMING인 멤버를 COMING으로 변경 시 Then: StatusConflictException이 발생한다") {
                 shouldThrow<StatusConflictException> {

@@ -28,6 +28,10 @@ interface MemberRepository : JpaRepository<Member, Long> {
     @Query("SELECT m FROM Member m WHERE m.id = :id")
     fun findByIdForUpdate(@Param("id") id: Long): Member?
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT m FROM Member m WHERE m.id IN :ids ORDER BY m.id ASC")
+    fun findAllByIdForUpdate(@Param("ids") ids: List<Long>): List<Member>
+
     @Query(
         """
         SELECT m

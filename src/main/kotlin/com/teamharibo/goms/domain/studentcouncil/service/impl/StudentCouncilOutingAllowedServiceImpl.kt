@@ -42,7 +42,7 @@ class StudentCouncilOutingAllowedServiceImpl(
             throw GlobalException(ErrorCode.INVALID_REQUEST)
         }
 
-        val member = memberRepository.findById(memberId).orElseThrow {
+        val member = memberRepository.findByIdForUpdate(memberId) ?: run {
             log.warn(
                 LogFormat.message(
                     domain = "STUDENT_COUNCIL",
@@ -51,7 +51,7 @@ class StudentCouncilOutingAllowedServiceImpl(
                     "reason" to "존재하지 않는 사용자"
                 )
             )
-            NotFoundMemberException()
+            throw NotFoundMemberException()
         }
 
         if (member.status == Status.OUTING) {

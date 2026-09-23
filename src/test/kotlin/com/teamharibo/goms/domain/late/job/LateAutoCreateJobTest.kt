@@ -4,6 +4,7 @@ import com.teamharibo.goms.domain.common.enums.Status
 import com.teamharibo.goms.domain.late.entity.Late
 import com.teamharibo.goms.domain.late.repository.MemberLateCount
 import com.teamharibo.goms.domain.late.repository.LateRepository
+import com.teamharibo.goms.domain.member.repository.MemberRepository
 import com.teamharibo.goms.domain.outing.repository.OutingRepository
 import com.teamharibo.goms.fixture.MemberFixture
 import com.teamharibo.goms.fixture.OutingFixture
@@ -25,10 +26,13 @@ class LateAutoCreateJobTest : DescribeSpec({
             val lateSlot = slot<Iterable<Late>>()
             val outingRepository = mockk<OutingRepository>()
             val lateRepository = mockk<LateRepository>()
-            val job = LateAutoCreateJob(outingRepository, lateRepository)
+            val memberRepository = mockk<MemberRepository>()
+            val job = LateAutoCreateJob(outingRepository, lateRepository, memberRepository)
             val memberLateCount = mockk<MemberLateCount>()
 
-            every { outingRepository.findAllActiveWithOutingMember() } returns listOf(outing)
+            every { outingRepository.findAllActiveMemberIds() } returns listOf(member.id!!)
+            every { memberRepository.findAllByIdForUpdate(listOf(member.id!!)) } returns listOf(member)
+            every { outingRepository.findAllActiveByMemberIdInForUpdate(listOf(member.id!!)) } returns listOf(outing)
             every { lateRepository.findAllOutingIdsIn(listOf(outing.id!!)) } returns emptyList()
             every { lateRepository.countByMemberIds(listOf(member.id!!)) } returns listOf(memberLateCount)
             every { memberLateCount.memberId } returns member.id!!
@@ -53,9 +57,12 @@ class LateAutoCreateJobTest : DescribeSpec({
             val outing = OutingFixture.active(member)
             val outingRepository = mockk<OutingRepository>()
             val lateRepository = mockk<LateRepository>()
-            val job = LateAutoCreateJob(outingRepository, lateRepository)
+            val memberRepository = mockk<MemberRepository>()
+            val job = LateAutoCreateJob(outingRepository, lateRepository, memberRepository)
 
-            every { outingRepository.findAllActiveWithOutingMember() } returns listOf(outing)
+            every { outingRepository.findAllActiveMemberIds() } returns listOf(member.id!!)
+            every { memberRepository.findAllByIdForUpdate(listOf(member.id!!)) } returns listOf(member)
+            every { outingRepository.findAllActiveByMemberIdInForUpdate(listOf(member.id!!)) } returns listOf(outing)
             every { lateRepository.findAllOutingIdsIn(listOf(outing.id!!)) } returns listOf(outing.id!!)
             every { lateRepository.saveAll(emptyList<Late>()) } returns emptyList()
 
