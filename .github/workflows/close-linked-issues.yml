@@ -28,5 +28,5 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const { closeLinkedIssues } = require('./.github/scripts/close-linked-issues.js');
+            const { closeLinkedIssues } = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/close-linked-issues.js`);
             await closeLinkedIssues({ github, context, core });
