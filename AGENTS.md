@@ -175,6 +175,15 @@ Controller는 요청 변환·검증·인증 경계·응답 상태 코드만 담�
 
 프로젝트 문서와 AI 지침은 한국어로 작성한다. 코드 식별자와 로그의 domain/field처럼 기존 계약상 영문인 값은 유지한다. Washer 전용 SDK, ExpectedException, response wrapper 규칙을 GOMS 규칙으로 사용하지 않는다.
 
+### 코드 주석과 KDoc
+
+- 코드 자체로 표현되는 동작을 반복하는 새 일반 주석을 기본적으로 추가하지 않는다. 메서드·변수 설명, 단계별 구현, 변경 이력, AI 작업 설명, 기계적인 Given/When/Then 주석을 지양한다. 예를 들어 `// 회원을 조회한다.`처럼 바로 아래 코드가 의미를 드러내면 작성하지 않는다.
+- 주석은 동시성·lock 순서·transaction 경계, 보안·외부 spec 제약, workaround, 비직관적인 side effect, 쉽게 깨지는 invariant처럼 코드만으로 이유를 알기 어려운 경우에만 짧게 작성한다. 구현 흐름보다 유지해야 하는 이유를 설명한다.
+- KDoc은 모든 public class/function에 의무화하지 않는다. 호출 계약, 허용 상태, 중요한 예외·부작용, 동시성·transaction 제약, 외부 연동 계약처럼 호출자가 코드만 보고 오해할 수 있는 경우에만 짧게 추가한다.
+- 단순 CRUD, private helper, DTO property, Entity field, 단순 repository·controller forwarding, mapper, getter/setter에는 이름을 반복하는 기계적인 KDoc을 추가하지 않는다. 이름만으로 알 수 있는 `@param`·`@return`도 남발하지 않는다.
+- 기존 주석은 관련 코드 변경으로 틀리게 된 경우에만 갱신하고, unrelated 주석 삭제·정리는 하지 않는다. TODO는 실제 후속 작업과 이유가 있을 때만 기존 Issue/TODO convention에 맞춰 작성한다.
+- 이 기준은 앞으로 작성하는 코드의 판단 기준이며, 기존 코드의 선별적인 KDoc 보강은 Issue #101 범위에서 별도로 진행한다.
+
 ## 17. 변경 후 검증
 
 하네스 변경 후 JSON/TOML/YAML front matter/Shell 문법, 문서 간 핵심 규칙, .agents/skills와 .claude/skills 목록, 금지 키워드, 참조 경로를 확인한다. 이어서 git diff --check, ./gradlew compileKotlin test, ./gradlew build --no-daemon을 실행한다. 실패하면 하네스 변경 때문인지 기존 애플리케이션 실패인지 구분해 보고한다.
