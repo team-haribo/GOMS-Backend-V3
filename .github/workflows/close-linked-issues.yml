@@ -1,0 +1,32 @@
+name: Close Issues on Develop Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  close-linked-issues:
+    if: github.event.pull_request.base.ref == 'develop' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout issue closing script
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 1
+          sparse-checkout: |
+            .github/scripts/close-linked-issues.js
+          sparse-checkout-cone-mode: false
+
+      - name: Close linked issues
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { closeLinkedIssues } = require('./.github/scripts/close-linked-issues.js');
+            await closeLinkedIssues({ github, context, core });
