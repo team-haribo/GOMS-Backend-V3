@@ -8,7 +8,7 @@ import java.util.Optional
 
 interface PlaceRepository : JpaRepository<Place, Long> {
 
-    fun findByExternalPlaceId(externalPlaceId: String): Optional<Place>
+    fun findAllByExternalPlaceIdIn(externalPlaceIds: List<String>): List<Place>
 
     fun existsByIdAndIsActiveTrue(id: Long): Boolean
 

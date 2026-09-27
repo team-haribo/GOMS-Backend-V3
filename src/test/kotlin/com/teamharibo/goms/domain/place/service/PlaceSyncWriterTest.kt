@@ -5,11 +5,11 @@ import com.teamharibo.goms.domain.place.entity.Place
 import com.teamharibo.goms.domain.place.repository.PlaceRepository
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDateTime
-import java.util.Optional
 
 class PlaceSyncWriterTest : DescribeSpec({
 
@@ -34,8 +34,12 @@ class PlaceSyncWriterTest : DescribeSpec({
 
     describe("PlaceSyncWriter") {
 
+        beforeTest {
+            clearMocks(placeRepository, answers = false)
+        }
+
         context("Given: 처음 수집된 장소") {
-            every { placeRepository.findByExternalPlaceId(document.id) } returns Optional.empty()
+            every { placeRepository.findAllByExternalPlaceIdIn(listOf(document.id)) } returns emptyList()
             every { placeRepository.save(any()) } answers { firstArg() }
             every { placeRepository.findAllByLastSyncedAtBeforeAndIsActiveTrue(any()) } returns emptyList()
 
@@ -45,6 +49,45 @@ class PlaceSyncWriterTest : DescribeSpec({
                 result.createdCount shouldBe 1
                 result.updatedCount shouldBe 0
                 result.deactivatedCount shouldBe 0
+                verify(exactly = 1) { placeRepository.save(any()) }
+                verify(exactly = 1) { placeRepository.findAllByExternalPlaceIdIn(listOf(document.id)) }
+            }
+        }
+
+        context("Given: 신규 장소와 기존 장소가 함께 수집됨") {
+            val existing = Place(
+                id = 1L,
+                externalPlaceId = "kakao-place-2",
+                placeName = "기존 장소명",
+                address = "기존 주소",
+                roadAddress = null,
+                latitude = 35.0,
+                longitude = 126.0,
+                categoryGroupCode = "FD6",
+                categoryGroupName = "음식점",
+                categoryName = "기존 카테고리",
+                phone = null,
+                placeUrl = null,
+                isActive = true,
+                lastSyncedAt = LocalDateTime.now().minusDays(1),
+                createdAt = LocalDateTime.now().minusDays(10),
+                updatedAt = LocalDateTime.now().minusDays(1)
+            )
+            val existingDocument = document.copy(id = existing.externalPlaceId)
+            val documents = listOf(document, existingDocument)
+
+            every { placeRepository.findAllByExternalPlaceIdIn(documents.map { it.id }) } returns listOf(existing)
+            every { placeRepository.save(any()) } answers { firstArg() }
+            every { placeRepository.findAllByLastSyncedAtBeforeAndIsActiveTrue(any()) } returns emptyList()
+
+            it("When: write 호출 시 Then: bulk 조회 결과로 신규와 기존 장소를 구분한다") {
+                val result = writer.write(documents, syncStartedAt)
+
+                result.createdCount shouldBe 1
+                result.updatedCount shouldBe 1
+                result.deactivatedCount shouldBe 0
+                existing.placeName shouldBe existingDocument.place_name
+                verify(exactly = 1) { placeRepository.findAllByExternalPlaceIdIn(documents.map { it.id }) }
                 verify(exactly = 1) { placeRepository.save(any()) }
             }
         }
@@ -88,7 +131,7 @@ class PlaceSyncWriterTest : DescribeSpec({
                 updatedAt = LocalDateTime.now().minusDays(30)
             )
 
-            every { placeRepository.findByExternalPlaceId(document.id) } returns Optional.of(existing)
+            every { placeRepository.findAllByExternalPlaceIdIn(listOf(document.id)) } returns listOf(existing)
             every { placeRepository.findAllByLastSyncedAtBeforeAndIsActiveTrue(any()) } returns listOf(stale)
 
             it("When: write 호출 시 Then: 기존 장소는 갱신되고 stale 장소는 비활성화된다") {
@@ -101,6 +144,21 @@ class PlaceSyncWriterTest : DescribeSpec({
                 existing.placeName shouldBe "테스트 식당"
                 existing.address shouldBe "광주 광산구 테스트로 1"
                 stale.isActive shouldBe false
+                verify(exactly = 1) { placeRepository.findAllByExternalPlaceIdIn(listOf(document.id)) }
+            }
+        }
+
+        context("Given: 빈 동기화 문서 목록") {
+            every { placeRepository.findAllByLastSyncedAtBeforeAndIsActiveTrue(any()) } returns emptyList()
+
+            it("When: write 호출 시 Then: 기존 장소 bulk 조회 없이 stale 조회만 수행한다") {
+                val result = writer.write(emptyList(), syncStartedAt)
+
+                result.createdCount shouldBe 0
+                result.updatedCount shouldBe 0
+                result.deactivatedCount shouldBe 0
+                verify(exactly = 0) { placeRepository.findAllByExternalPlaceIdIn(any()) }
+                verify(exactly = 1) { placeRepository.findAllByLastSyncedAtBeforeAndIsActiveTrue(any()) }
             }
         }
     }
