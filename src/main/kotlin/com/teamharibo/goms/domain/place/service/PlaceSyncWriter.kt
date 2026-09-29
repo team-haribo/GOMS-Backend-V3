@@ -32,7 +32,7 @@ class PlaceSyncWriter(
             }
             .associateBy { it.externalPlaceId }
 
-        documents.forEach { document ->
+        documents.distinctBy { it.id }.forEach { document ->
             val existing = existingPlacesByExternalPlaceId[document.id]
 
             if (existing == null) {

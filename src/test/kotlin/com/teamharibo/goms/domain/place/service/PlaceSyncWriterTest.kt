@@ -92,6 +92,27 @@ class PlaceSyncWriterTest : DescribeSpec({
             }
         }
 
+        context("Given: 동일한 장소 ID가 중복된 문서 목록") {
+            val duplicatedDocuments = listOf(
+                document,
+                document.copy(place_name = "중복된 장소명")
+            )
+
+            every { placeRepository.findAllByExternalPlaceIdIn(listOf(document.id)) } returns emptyList()
+            every { placeRepository.save(any()) } answers { firstArg() }
+            every { placeRepository.findAllByLastSyncedAtBeforeAndIsActiveTrue(any()) } returns emptyList()
+
+            it("When: write 호출 시 Then: 동일한 장소를 한 번만 저장한다") {
+                val result = writer.write(duplicatedDocuments, syncStartedAt)
+
+                result.createdCount shouldBe 1
+                result.updatedCount shouldBe 0
+                result.deactivatedCount shouldBe 0
+                verify(exactly = 1) { placeRepository.save(any()) }
+                verify(exactly = 1) { placeRepository.findAllByExternalPlaceIdIn(listOf(document.id)) }
+            }
+        }
+
         context("Given: 이미 존재하는 장소 + 정리 대상(stale) 장소") {
             val existing = Place(
                 id = 1L,
