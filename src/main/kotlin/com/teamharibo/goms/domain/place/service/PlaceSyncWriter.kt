@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+private const val EXTERNAL_PLACE_ID_QUERY_CHUNK_SIZE = 500
+
 /**
  * PlaceSyncServiceImpl.sync()에서 카카오 API 호출(외부 I/O) 단계와 DB 반영 단계를 분리하기 위한 컴포넌트.
  * 최대 수백~천 회에 달하는 외부 API 호출은 트랜잭션 밖에서 끝내고, DB 반영만 이 클래스의
@@ -21,9 +23,17 @@ class PlaceSyncWriter(
     fun write(documents: List<KakaoPlaceDocument>, syncStartedAt: LocalDateTime): PlaceSyncWriteResult {
         var createdCount = 0
         var updatedCount = 0
+        val existingPlacesByExternalPlaceId = documents
+            .map { it.id }
+            .distinct()
+            .chunked(EXTERNAL_PLACE_ID_QUERY_CHUNK_SIZE)
+            .flatMap { externalPlaceIds ->
+                placeRepository.findAllByExternalPlaceIdIn(externalPlaceIds)
+            }
+            .associateBy { it.externalPlaceId }
 
-        documents.forEach { document ->
-            val existing = placeRepository.findByExternalPlaceId(document.id).orElse(null)
+        documents.distinctBy { it.id }.forEach { document ->
+            val existing = existingPlacesByExternalPlaceId[document.id]
 
             if (existing == null) {
                 placeRepository.save(
