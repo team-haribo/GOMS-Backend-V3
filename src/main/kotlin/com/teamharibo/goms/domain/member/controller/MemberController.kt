@@ -2,11 +2,9 @@ package com.teamharibo.goms.domain.member.controller
 
 import com.teamharibo.goms.domain.member.dto.request.MemberWithdrawRequest
 import com.teamharibo.goms.domain.member.dto.response.MyProfileResponse
-import com.teamharibo.goms.domain.member.dto.response.MyRoleResponse
 import com.teamharibo.goms.domain.member.dto.response.ProfileImageResponse
 import com.teamharibo.goms.domain.member.service.MemberWithdrawService
 import com.teamharibo.goms.domain.member.service.MyProfileQueryService
-import com.teamharibo.goms.domain.member.service.MyRoleQueryService
 import com.teamharibo.goms.domain.member.service.ProfileImageDeleteService
 import com.teamharibo.goms.domain.member.service.ProfileImageUpdateService
 import io.swagger.v3.oas.annotations.Operation
@@ -36,30 +34,10 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/api/v3/member")
 class MemberController(
     private val memberWithdrawService: MemberWithdrawService,
-    private val myRoleQueryService: MyRoleQueryService,
     private val myProfileQueryService: MyProfileQueryService,
     private val profileImageUpdateService: ProfileImageUpdateService,
     private val profileImageDeleteService: ProfileImageDeleteService
 ) {
-
-    @Operation(
-        summary = "내 권한 조회",
-        description = "현재 로그인한 사용자의 권한(Role)을 조회합니다."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "조회 성공",
-                content = [Content(schema = Schema(implementation = MyRoleResponse::class))]
-            ),
-            ApiResponse(responseCode = "401", description = "인증 실패")
-        ]
-    )
-    @GetMapping("/myrole")
-    fun getMyRole(): ResponseEntity<MyRoleResponse> {
-        return ResponseEntity.ok(myRoleQueryService.execute())
-    }
 
     @Operation(
         summary = "내 프로필 조회",
