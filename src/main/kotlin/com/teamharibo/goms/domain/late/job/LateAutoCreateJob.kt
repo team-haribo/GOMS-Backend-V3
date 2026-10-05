@@ -22,6 +22,11 @@ class LateAutoCreateJob(
 
     private val log = LoggerFactory.getLogger(LateAutoCreateJob::class.java)
 
+    /**
+     * 매주 월·수 19:30(Asia/Seoul)에 아직 복귀하지 않은 외출을 지각으로 처리한다.
+     * 해당 외출은 실행 시각으로 복귀 처리되고 회원은 CANNOT_OUTING 상태가 된다.
+     * 이미 Late가 있는 외출은 건너뛰므로 다시 실행해도 지각이 중복 생성되지 않는다.
+     */
     @Transactional
     @Scheduled(cron = "0 30 19 * * MON,WED", zone = "Asia/Seoul")
     fun createLatesForOutingMembers() {
