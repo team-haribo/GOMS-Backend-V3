@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface DiscordAccountLinkRepository : JpaRepository<DiscordAccountLink, Long> {
 
+    fun deleteAllByMember_Id(memberId: Long): Long
+
     @EntityGraph(attributePaths = ["member"])
     fun findAllByDiscordUserIdIn(discordUserIds: Collection<String>): List<DiscordAccountLink>
 }

@@ -1,10 +1,12 @@
 package com.teamharibo.goms.domain.member.service.impl
 
 import com.teamharibo.goms.domain.auth.repository.redis.RefreshTokenRedisRepository
+import com.teamharibo.goms.domain.discord.repository.DiscordAccountLinkRepository
 import com.teamharibo.goms.domain.late.repository.LateRepository
 import com.teamharibo.goms.domain.member.dto.request.MemberWithdrawRequest
 import com.teamharibo.goms.domain.member.exception.MemberWithdrawPasswordMismatchException
 import com.teamharibo.goms.domain.member.repository.MemberRepository
+import com.teamharibo.goms.domain.notification.repository.DeviceTokenRepository
 import com.teamharibo.goms.domain.outing.repository.OutingRepository
 import com.teamharibo.goms.domain.place.repository.PlaceRecommendRepository
 import com.teamharibo.goms.domain.report.repository.ReviewReportRepository
@@ -18,6 +20,7 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 class MemberWithdrawServiceImplTest : DescribeSpec({
 
@@ -28,6 +31,8 @@ class MemberWithdrawServiceImplTest : DescribeSpec({
     val reviewRepository = mockk<ReviewRepository>()
     val placeRecommendRepository = mockk<PlaceRecommendRepository>()
     val outingRepository = mockk<OutingRepository>()
+    val deviceTokenRepository = mockk<DeviceTokenRepository>()
+    val discordAccountLinkRepository = mockk<DiscordAccountLinkRepository>()
     val refreshTokenRedisRepository = mockk<RefreshTokenRedisRepository>()
     val memberRepository = mockk<MemberRepository>()
 
@@ -39,6 +44,8 @@ class MemberWithdrawServiceImplTest : DescribeSpec({
         reviewRepository,
         placeRecommendRepository,
         outingRepository,
+        deviceTokenRepository,
+        discordAccountLinkRepository,
         refreshTokenRedisRepository,
         memberRepository
     )
@@ -56,11 +63,19 @@ class MemberWithdrawServiceImplTest : DescribeSpec({
             every { reviewRepository.deleteAllByMember_Id(member.id!!) } returns 1L
             every { placeRecommendRepository.deleteAllByMember_Id(member.id!!) } returns 1L
             every { outingRepository.deleteAllByMember_Id(member.id!!) } returns 1L
+            every { deviceTokenRepository.deleteAllByMember_Id(member.id!!) } returns 1L
+            every { discordAccountLinkRepository.deleteAllByMember_Id(member.id!!) } returns 1L
             justRun { refreshTokenRedisRepository.deleteByMemberId(member.id!!) }
             justRun { memberRepository.delete(member) }
 
             it("When: 회원 탈퇴 시 Then: 연관 데이터와 함께 회원이 삭제된다") {
-                service.withdraw(MemberWithdrawRequest(password = "1234"))
+                TransactionSynchronizationManager.initSynchronization()
+                try {
+                    service.withdraw(MemberWithdrawRequest(password = "1234"))
+                    TransactionSynchronizationManager.getSynchronizations().forEach { it.afterCommit() }
+                } finally {
+                    TransactionSynchronizationManager.clearSynchronization()
+                }
 
                 verify(exactly = 1) { reviewReportRepository.deleteAllByMemberId(member.id!!) }
                 verify(exactly = 1) { reviewReportRepository.deleteAllByReview_Member_Id(member.id!!) }
@@ -68,6 +83,8 @@ class MemberWithdrawServiceImplTest : DescribeSpec({
                 verify(exactly = 1) { reviewRepository.deleteAllByMember_Id(member.id!!) }
                 verify(exactly = 1) { placeRecommendRepository.deleteAllByMember_Id(member.id!!) }
                 verify(exactly = 1) { outingRepository.deleteAllByMember_Id(member.id!!) }
+                verify(exactly = 1) { deviceTokenRepository.deleteAllByMember_Id(member.id!!) }
+                verify(exactly = 1) { discordAccountLinkRepository.deleteAllByMember_Id(member.id!!) }
                 verify(exactly = 1) { refreshTokenRedisRepository.deleteByMemberId(member.id!!) }
                 verify(exactly = 1) { memberRepository.delete(member) }
             }
