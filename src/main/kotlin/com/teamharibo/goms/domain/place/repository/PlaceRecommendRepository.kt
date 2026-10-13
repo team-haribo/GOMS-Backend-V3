@@ -21,8 +21,6 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
 
     fun countByMemberIdAndRecommendedTrue(memberId: Long): Long
 
-    fun findAllByMemberIdAndRecommendedTrue(memberId: Long): List<PlaceRecommend>
-
     fun deleteAllByMember_Id(memberId: Long): Long
 
     @Query(
