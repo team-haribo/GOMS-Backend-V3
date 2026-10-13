@@ -133,7 +133,6 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
     describe("PlaceRecommendService.getRecommendedPlaces()") {
 
         context("Given: 추천 장소 있음") {
-            val rec = PlaceFixture.recommend(place = place, member = member)
             val recommendProjection = mockk<PlaceRecommendRepository.PlaceRecommendCountProjection>()
             val reviewProjection = mockk<ReviewRepository.PlaceReviewCountProjection>()
 
@@ -144,7 +143,7 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
             every { reviewProjection.reviewCount } returns 2L
 
             every { memberUtil.currentMemberId() } returns memberId
-            every { recommendRepository.findAllByMemberIdAndRecommendedTrue(memberId) } returns listOf(rec)
+            every { recommendRepository.findActiveRecommendedPlaces(memberId) } returns listOf(place)
             every { recommendRepository.countRecommendedByPlaceIds(listOf(placeId)) } returns listOf(recommendProjection)
             every { reviewRepository.countActiveByPlaceIds(listOf(placeId)) } returns listOf(reviewProjection)
 
@@ -168,7 +167,7 @@ class PlaceRecommendServiceImplTest : DescribeSpec({
 
         context("Given: 추천 장소 없음") {
             every { memberUtil.currentMemberId() } returns memberId
-            every { recommendRepository.findAllByMemberIdAndRecommendedTrue(memberId) } returns emptyList()
+            every { recommendRepository.findActiveRecommendedPlaces(memberId) } returns emptyList()
 
             it("When: 추천 장소 목록 조회 시 Then: 빈 리스트를 반환한다") {
                 val response = service.getRecommendedPlaces()

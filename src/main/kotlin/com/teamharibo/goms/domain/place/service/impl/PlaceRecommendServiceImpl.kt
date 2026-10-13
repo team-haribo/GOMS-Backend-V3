@@ -179,15 +179,7 @@ class PlaceRecommendServiceImpl(
     @Transactional(readOnly = true)
     override fun getRecommendedPlaces(): PlacesResponse {
         val memberId = memberUtil.currentMemberId()
-        val recommends = recommendRepository.findAllByMemberIdAndRecommendedTrue(memberId)
-
-        if (recommends.isEmpty()) {
-            return PlacesResponse(places = emptyList())
-        }
-
-        val places = recommends.map { it.place }
-            .filter { it.id != null && it.isActive }
-            .distinctBy { it.id }
+        val places = recommendRepository.findActiveRecommendedPlaces(memberId)
 
         if (places.isEmpty()) {
             return PlacesResponse(places = emptyList())
