@@ -1,5 +1,6 @@
 package com.teamharibo.goms.domain.place.repository
 
+import com.teamharibo.goms.domain.place.entity.Place
 import com.teamharibo.goms.domain.place.entity.PlaceRecommend
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -34,6 +35,18 @@ interface PlaceRecommendRepository : JpaRepository<PlaceRecommend, Long> {
         """
     )
     fun findRecommendedPlaceIds(memberId: Long): List<Long>
+
+    @Query(
+        """
+        SELECT p
+        FROM PlaceRecommend pr
+        JOIN pr.place p
+        WHERE pr.member.id = :memberId
+          AND pr.recommended = true
+          AND p.isActive = true
+        """
+    )
+    fun findActiveRecommendedPlaces(memberId: Long): List<Place>
 
     @Query(
         """
