@@ -1,0 +1,15 @@
+package com.teamharibo.goms.domain.review.dto.response
+
+import com.teamharibo.goms.domain.common.enums.Department
+import java.time.LocalDateTime
+
+data class ReviewResponse(
+    val review_id: Long,
+    val memberId: Long,
+    val name: String,
+    val grade: Int,
+    val department: Department,
+    val profileImageUrl: String?,
+    val content: String,
+    val reviewed_at: LocalDateTime
+)

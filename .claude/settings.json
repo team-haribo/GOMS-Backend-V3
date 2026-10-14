@@ -1,0 +1,54 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status --*)",
+      "Bash(git diff --*)",
+      "Bash(git log --*)",
+      "Bash(git branch --*)",
+      "Bash(git fetch origin --prune)",
+      "Bash(git show --*)",
+      "Bash(./gradlew.bat tasks*)",
+      "Bash(./gradlew.bat compileKotlin*)",
+      "Bash(./gradlew.bat test*)",
+      "Bash(./gradlew.bat build*)",
+      "Bash(bash -n *)",
+      "Bash(gh auth status)",
+      "Bash(gh pr list*)",
+      "Bash(gh pr view*)",
+      "Bash(gh label list*)"
+    ],
+    "deny": [
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fdx*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(gh pr merge*)",
+      "Bash(gh release*)",
+      "Bash(docker system prune*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/preToolUse.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/postToolUse.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

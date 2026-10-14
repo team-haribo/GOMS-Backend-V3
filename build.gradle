@@ -6,9 +6,9 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.jpa' version '2.2.21'
 }
 
-group = 'com.example.team.haribo.goms'
+group = 'com.teamharibo.goms'
 version = '0.0.1-SNAPSHOT'
-description = 'GOMS-Server-V3'
+description = 'GOMS-Backend-V3'
 
 java {
     toolchain {
@@ -78,6 +78,8 @@ dependencies {
 
     // Test
     testImplementation 'com.h2database:h2'
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter:2.0.5'
+    testImplementation 'org.testcontainers:testcontainers-mariadb:2.0.5'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.security:spring-security-test'

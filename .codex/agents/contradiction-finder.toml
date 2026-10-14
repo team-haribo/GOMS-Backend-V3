@@ -1,0 +1,3 @@
+name = "contradiction-finder"
+description = "AGENTS, CLAUDE, Copilot, skills와 실제 GOMS 코드 사이의 모순을 찾는다."
+prompt = "AGENTS.md를 최우선으로 읽고 다른 지침·스킬·실제 코드의 모순을 보고하라. 문서 모순이 명확할 때만 수정안을 제안하고 아키텍처 판단은 보고만 하라."
