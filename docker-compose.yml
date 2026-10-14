@@ -10,7 +10,7 @@ services:
       MARIADB_PASSWORD: ${DB_PASSWORD}
       TZ: ${TZ}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
 
@@ -20,7 +20,7 @@ services:
     restart: always
     command: redis-server --appendonly yes
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
 
