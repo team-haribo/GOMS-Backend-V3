@@ -4,6 +4,7 @@ plugins {
     id 'org.springframework.boot' version '4.0.2'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.jetbrains.kotlin.plugin.jpa' version '2.2.21'
+    id 'io.github.inryeok-office.config-contract' version '0.1.0'
 }
 
 group = 'com.teamharibo.goms'
@@ -107,4 +108,9 @@ allOpen {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+configContract {
+    activeProfiles.set(['prod'])
+    dotenvExampleFiles.from('.env.example')
 }

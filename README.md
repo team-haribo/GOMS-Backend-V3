@@ -30,6 +30,10 @@ GOMS는 광주소프트웨어마이스터고등학교 학생들을 위한 외출
 *   **Framework**: Spring Boot, Spring Security, Spring Data JPA
 *   **Database**: MariaDB
 
+## 설정 계약 검사
+
+Spring Config Contract 파일럿의 실행 방법과 검증 결과는 [설정 계약 검사 문서](docs/config-contract.md)를 참고합니다.
+
 ## 기여하기
 
 기여에 관심이 있으시다면, [기여자 행동 강령 규약](CODE_OF_CONDUCT.adoc)을 먼저 읽어주시고, 이슈를 생성하거나 PR을 보내주세요.
