@@ -66,7 +66,17 @@ class SignoutServiceImpl(
             throw GlobalException(ErrorCode.INVALID_REFRESH_TOKEN)
         }
 
-        refreshTokenRedisRepository.deleteByMemberId(memberId)
+        if (!refreshTokenRedisRepository.deleteIfMatch(memberId, token)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "AUTH",
+                    event = "로그아웃 실패",
+                    "memberId" to memberId,
+                    "reason" to "다른 요청이 리프레시 토큰을 먼저 변경함"
+                )
+            )
+            throw GlobalException(ErrorCode.INVALID_REFRESH_TOKEN)
+        }
 
         log.info(
             LogFormat.message(
