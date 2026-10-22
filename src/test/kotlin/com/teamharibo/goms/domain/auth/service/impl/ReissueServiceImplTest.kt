@@ -13,7 +13,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDateTime
@@ -52,13 +51,39 @@ class ReissueServiceImplTest : DescribeSpec({
             every { jwtProvider.createRefreshToken(memberId) } returns "new-refresh"
             every { jwtProvider.getAccessExpirationDate() } returns LocalDateTime.now().plusHours(2)
             every { jwtProvider.getRefreshExpirationDate() } returns LocalDateTime.now().plusDays(7)
-            justRun { refreshTokenRepository.save(memberId, "new-refresh", any()) }
+            every {
+                refreshTokenRepository.rotate(memberId, AuthFixture.VALID_REFRESH_TOKEN, "new-refresh", any())
+            } returns true
 
             it("When: 재발급 시 Then: 새 토큰을 반환하고 저장된 토큰을 갱신한다") {
                 val response = service.reissue(bearerHeader)
                 response.accessToken shouldBe "new-access"
                 response.refreshToken shouldBe "new-refresh"
-                verify(exactly = 1) { refreshTokenRepository.save(memberId, "new-refresh", any()) }
+                verify(exactly = 1) {
+                    refreshTokenRepository.rotate(memberId, AuthFixture.VALID_REFRESH_TOKEN, "new-refresh", any())
+                }
+            }
+        }
+
+        context("Given: 검증 이후 다른 요청이 리프레시 토큰을 먼저 변경함") {
+            val claims = validClaims()
+            val member = validMember()
+
+            every { jwtProvider.parseClaims(AuthFixture.VALID_REFRESH_TOKEN) } returns claims
+            every { refreshTokenRepository.findByMemberId(memberId) } returns AuthFixture.VALID_REFRESH_TOKEN
+            every { memberRepository.findById(memberId) } returns Optional.of(member)
+            every { jwtProvider.createAccessToken(memberId, "ROLE_STUDENT") } returns "new-access"
+            every { jwtProvider.createRefreshToken(memberId) } returns "new-refresh"
+            every { jwtProvider.getAccessExpirationDate() } returns LocalDateTime.now().plusHours(2)
+            every { jwtProvider.getRefreshExpirationDate() } returns LocalDateTime.now().plusDays(7)
+            every {
+                refreshTokenRepository.rotate(memberId, AuthFixture.VALID_REFRESH_TOKEN, "new-refresh", any())
+            } returns false
+
+            it("When: 재발급 시 Then: INVALID_REFRESH_TOKEN 예외가 발생한다") {
+                shouldThrow<GlobalException> {
+                    service.reissue(bearerHeader)
+                }.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
             }
         }
 

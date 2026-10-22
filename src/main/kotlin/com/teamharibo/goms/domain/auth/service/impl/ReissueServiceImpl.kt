@@ -94,7 +94,17 @@ class ReissueServiceImpl(
         val refreshTtlSeconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), refreshExpiresAt)
             .coerceAtLeast(1)
 
-        refreshTokenRedisRepository.save(memberId, newRefreshToken, refreshTtlSeconds)
+        if (!refreshTokenRedisRepository.rotate(memberId, token, newRefreshToken, refreshTtlSeconds)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "AUTH",
+                    event = "토큰 재발급 실패",
+                    "memberId" to memberId,
+                    "reason" to "다른 요청이 리프레시 토큰을 먼저 변경함"
+                )
+            )
+            throw GlobalException(ErrorCode.INVALID_REFRESH_TOKEN)
+        }
 
         log.info(
             LogFormat.message(
