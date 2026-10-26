@@ -9,6 +9,8 @@ import com.teamharibo.goms.global.exception.ErrorCode
 import com.teamharibo.goms.global.exception.GlobalException
 import com.teamharibo.goms.global.jwt.JwtProvider
 import io.jsonwebtoken.Claims
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.MalformedJwtException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -119,6 +121,47 @@ class ReissueServiceImplTest : DescribeSpec({
                 shouldThrow<GlobalException> {
                     service.reissue(bearerHeader)
                 }.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
+            }
+        }
+
+        context("Given: 만료되어 파싱할 수 없는 리프레시 토큰") {
+            every { jwtProvider.parseClaims("expired-refresh-token") } throws
+                ExpiredJwtException(null, null, "expired")
+
+            it("When: 재발급 시 Then: 401 EXPIRED_TOKEN 예외가 발생한다") {
+                val exception = shouldThrow<GlobalException> {
+                    service.reissue("Bearer expired-refresh-token")
+                }
+
+                exception.errorCode shouldBe ErrorCode.EXPIRED_TOKEN
+                exception.errorCode.status shouldBe 401
+            }
+        }
+
+        context("Given: 서명 또는 형식이 잘못된 리프레시 토큰") {
+            every { jwtProvider.parseClaims("malformed-refresh-token") } throws
+                MalformedJwtException("malformed")
+
+            it("When: 재발급 시 Then: 401 INVALID_REFRESH_TOKEN 예외가 발생한다") {
+                val exception = shouldThrow<GlobalException> {
+                    service.reissue("Bearer malformed-refresh-token")
+                }
+
+                exception.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
+                exception.errorCode.status shouldBe 401
+            }
+        }
+
+        context("Given: 비어 있는 리프레시 토큰") {
+            every { jwtProvider.parseClaims("") } throws IllegalArgumentException("empty")
+
+            it("When: 재발급 시 Then: 401 INVALID_REFRESH_TOKEN 예외가 발생한다") {
+                val exception = shouldThrow<GlobalException> {
+                    service.reissue("Bearer ")
+                }
+
+                exception.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
+                exception.errorCode.status shouldBe 401
             }
         }
     }
