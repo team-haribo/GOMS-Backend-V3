@@ -12,6 +12,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.servlet.NoHandlerFoundException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -66,6 +68,17 @@ class GlobalExceptionHandler {
         return invalidRequestResponse()
     }
 
+    @ExceptionHandler(
+        NoResourceFoundException::class,
+        NoHandlerFoundException::class
+    )
+    fun handleNotFoundException(
+        e: Exception,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
+        return clientErrorResponse(e, ErrorCode.NOT_FOUND_RESOURCE, request)
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleException(
         e: Exception,
@@ -88,6 +101,30 @@ class GlobalExceptionHandler {
             message = ErrorCode.INTERNAL_SERVER_ERROR.message
         )
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response)
+    }
+
+    private fun clientErrorResponse(
+        e: Exception,
+        errorCode: ErrorCode,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
+        request.setAttribute(RequestLogConstants.FAILURE_REASON, errorCode.name)
+        request.setAttribute(RequestLogConstants.EXCEPTION_TYPE, e::class.simpleName)
+
+        log.warn(
+            LogFormat.message(
+                domain = "EXCEPTION",
+                event = "클라이언트 요청 오류",
+                "status" to errorCode.status,
+                "type" to e::class.simpleName
+            )
+        )
+
+        val response = ErrorResponse(
+            status = errorCode.status,
+            message = errorCode.message
+        )
+        return ResponseEntity.status(errorCode.status).body(response)
     }
 
     private fun invalidRequestResponse(): ResponseEntity<ErrorResponse> {
