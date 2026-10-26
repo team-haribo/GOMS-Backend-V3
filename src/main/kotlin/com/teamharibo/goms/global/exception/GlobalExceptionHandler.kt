@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.HttpMediaTypeNotSupportedException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -77,6 +79,22 @@ class GlobalExceptionHandler {
         request: HttpServletRequest
     ): ResponseEntity<ErrorResponse> {
         return clientErrorResponse(e, ErrorCode.NOT_FOUND_RESOURCE, request)
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    fun handleMethodNotSupportedException(
+        e: HttpRequestMethodNotSupportedException,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
+        return clientErrorResponse(e, ErrorCode.METHOD_NOT_ALLOWED, request)
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
+    fun handleMediaTypeNotSupportedException(
+        e: HttpMediaTypeNotSupportedException,
+        request: HttpServletRequest
+    ): ResponseEntity<ErrorResponse> {
+        return clientErrorResponse(e, ErrorCode.UNSUPPORTED_MEDIA_TYPE, request)
     }
 
     @ExceptionHandler(Exception::class)
