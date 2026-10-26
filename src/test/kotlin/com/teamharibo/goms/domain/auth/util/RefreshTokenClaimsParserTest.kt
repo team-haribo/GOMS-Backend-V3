@@ -38,7 +38,7 @@ class RefreshTokenClaimsParserTest : DescribeSpec({
         }
 
         context("Given: 만료된 리프레시 토큰") {
-            it("When: 파싱 시 Then: 401 EXPIRED_TOKEN 예외가 발생한다") {
+            it("When: 파싱 시 Then: 401 INVALID_REFRESH_TOKEN 예외가 발생한다") {
                 val jwtProvider = provider(refreshExpSeconds = -60)
                 val token = jwtProvider.createRefreshToken(1L)
 
@@ -46,7 +46,7 @@ class RefreshTokenClaimsParserTest : DescribeSpec({
                     RefreshTokenClaimsParser.parse(jwtProvider, token, log, failureEvent)
                 }
 
-                exception.errorCode shouldBe ErrorCode.EXPIRED_TOKEN
+                exception.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
                 exception.errorCode.status shouldBe 401
             }
         }

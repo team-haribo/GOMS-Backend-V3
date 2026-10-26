@@ -128,12 +128,12 @@ class ReissueServiceImplTest : DescribeSpec({
             every { jwtProvider.parseClaims("expired-refresh-token") } throws
                 ExpiredJwtException(null, null, "expired")
 
-            it("When: 재발급 시 Then: 401 EXPIRED_TOKEN 예외가 발생한다") {
+            it("When: 재발급 시 Then: 401 INVALID_REFRESH_TOKEN 예외가 발생한다") {
                 val exception = shouldThrow<GlobalException> {
                     service.reissue("Bearer expired-refresh-token")
                 }
 
-                exception.errorCode shouldBe ErrorCode.EXPIRED_TOKEN
+                exception.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
                 exception.errorCode.status shouldBe 401
             }
         }

@@ -37,7 +37,7 @@ class SignoutServiceImplTest : DescribeSpec({
     describe("SignoutService") {
 
         context("Given: 만료되어 파싱할 수 없는 리프레시 토큰") {
-            it("When: 로그아웃 시 Then: 401 EXPIRED_TOKEN 예외가 발생하고 토큰을 삭제하지 않는다") {
+            it("When: 로그아웃 시 Then: 401 INVALID_REFRESH_TOKEN 예외가 발생하고 토큰을 삭제하지 않는다") {
                 every { jwtProvider.parseClaims("expired-refresh-token") } throws
                     ExpiredJwtException(null, null, "expired")
 
@@ -45,7 +45,7 @@ class SignoutServiceImplTest : DescribeSpec({
                     service.signout("Bearer expired-refresh-token")
                 }
 
-                exception.errorCode shouldBe ErrorCode.EXPIRED_TOKEN
+                exception.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
                 exception.errorCode.status shouldBe 401
                 verify(exactly = 0) { refreshTokenRepository.findByMemberId(any()) }
                 verify(exactly = 0) { refreshTokenRepository.deleteByMemberId(any()) }

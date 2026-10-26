@@ -22,7 +22,7 @@ object RefreshTokenClaimsParser {
                     "reason" to "만료된 리프레시 토큰"
                 )
             )
-            throw GlobalException(ErrorCode.EXPIRED_TOKEN)
+            throw GlobalException(ErrorCode.INVALID_REFRESH_TOKEN)
         } catch (e: JwtException) {
             log.warn(
                 LogFormat.message(
