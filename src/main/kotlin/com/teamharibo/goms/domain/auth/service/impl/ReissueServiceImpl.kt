@@ -3,6 +3,7 @@ package com.teamharibo.goms.domain.auth.service.impl
 import com.teamharibo.goms.domain.auth.dto.response.TokenResponse
 import com.teamharibo.goms.domain.auth.repository.redis.RefreshTokenRedisRepository
 import com.teamharibo.goms.domain.auth.service.ReissueService
+import com.teamharibo.goms.domain.auth.util.RefreshTokenClaimsParser
 import com.teamharibo.goms.domain.member.repository.MemberRepository
 import com.teamharibo.goms.global.exception.ErrorCode
 import com.teamharibo.goms.global.exception.GlobalException
@@ -33,7 +34,7 @@ class ReissueServiceImpl(
         )
 
         val token = refreshTokenHeader.removePrefix("Bearer ").trim()
-        val claims = jwtProvider.parseClaims(token)
+        val claims = RefreshTokenClaimsParser.parse(jwtProvider, token, log, "토큰 재발급 실패")
 
         if (claims["type"] != "REFRESH") {
             log.warn(
