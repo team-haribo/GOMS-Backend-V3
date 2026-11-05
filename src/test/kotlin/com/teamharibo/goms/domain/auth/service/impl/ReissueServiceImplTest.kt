@@ -9,11 +9,12 @@ import com.teamharibo.goms.global.exception.ErrorCode
 import com.teamharibo.goms.global.exception.GlobalException
 import com.teamharibo.goms.global.jwt.JwtProvider
 import io.jsonwebtoken.Claims
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.MalformedJwtException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDateTime
@@ -52,13 +53,39 @@ class ReissueServiceImplTest : DescribeSpec({
             every { jwtProvider.createRefreshToken(memberId) } returns "new-refresh"
             every { jwtProvider.getAccessExpirationDate() } returns LocalDateTime.now().plusHours(2)
             every { jwtProvider.getRefreshExpirationDate() } returns LocalDateTime.now().plusDays(7)
-            justRun { refreshTokenRepository.save(memberId, "new-refresh", any()) }
+            every {
+                refreshTokenRepository.rotate(memberId, AuthFixture.VALID_REFRESH_TOKEN, "new-refresh", any())
+            } returns true
 
             it("When: 재발급 시 Then: 새 토큰을 반환하고 저장된 토큰을 갱신한다") {
                 val response = service.reissue(bearerHeader)
                 response.accessToken shouldBe "new-access"
                 response.refreshToken shouldBe "new-refresh"
-                verify(exactly = 1) { refreshTokenRepository.save(memberId, "new-refresh", any()) }
+                verify(exactly = 1) {
+                    refreshTokenRepository.rotate(memberId, AuthFixture.VALID_REFRESH_TOKEN, "new-refresh", any())
+                }
+            }
+        }
+
+        context("Given: 검증 이후 다른 요청이 리프레시 토큰을 먼저 변경함") {
+            val claims = validClaims()
+            val member = validMember()
+
+            every { jwtProvider.parseClaims(AuthFixture.VALID_REFRESH_TOKEN) } returns claims
+            every { refreshTokenRepository.findByMemberId(memberId) } returns AuthFixture.VALID_REFRESH_TOKEN
+            every { memberRepository.findById(memberId) } returns Optional.of(member)
+            every { jwtProvider.createAccessToken(memberId, "ROLE_STUDENT") } returns "new-access"
+            every { jwtProvider.createRefreshToken(memberId) } returns "new-refresh"
+            every { jwtProvider.getAccessExpirationDate() } returns LocalDateTime.now().plusHours(2)
+            every { jwtProvider.getRefreshExpirationDate() } returns LocalDateTime.now().plusDays(7)
+            every {
+                refreshTokenRepository.rotate(memberId, AuthFixture.VALID_REFRESH_TOKEN, "new-refresh", any())
+            } returns false
+
+            it("When: 재발급 시 Then: INVALID_REFRESH_TOKEN 예외가 발생한다") {
+                shouldThrow<GlobalException> {
+                    service.reissue(bearerHeader)
+                }.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
             }
         }
 
@@ -119,6 +146,47 @@ class ReissueServiceImplTest : DescribeSpec({
                 shouldThrow<GlobalException> {
                     service.reissue(bearerHeader)
                 }.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
+            }
+        }
+
+        context("Given: 만료되어 파싱할 수 없는 리프레시 토큰") {
+            every { jwtProvider.parseClaims("expired-refresh-token") } throws
+                ExpiredJwtException(null, null, "expired")
+
+            it("When: 재발급 시 Then: 401 INVALID_REFRESH_TOKEN 예외가 발생한다") {
+                val exception = shouldThrow<GlobalException> {
+                    service.reissue("Bearer expired-refresh-token")
+                }
+
+                exception.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
+                exception.errorCode.status shouldBe 401
+            }
+        }
+
+        context("Given: 서명 또는 형식이 잘못된 리프레시 토큰") {
+            every { jwtProvider.parseClaims("malformed-refresh-token") } throws
+                MalformedJwtException("malformed")
+
+            it("When: 재발급 시 Then: 401 INVALID_REFRESH_TOKEN 예외가 발생한다") {
+                val exception = shouldThrow<GlobalException> {
+                    service.reissue("Bearer malformed-refresh-token")
+                }
+
+                exception.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
+                exception.errorCode.status shouldBe 401
+            }
+        }
+
+        context("Given: 비어 있는 리프레시 토큰") {
+            every { jwtProvider.parseClaims("") } throws IllegalArgumentException("empty")
+
+            it("When: 재발급 시 Then: 401 INVALID_REFRESH_TOKEN 예외가 발생한다") {
+                val exception = shouldThrow<GlobalException> {
+                    service.reissue("Bearer ")
+                }
+
+                exception.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
+                exception.errorCode.status shouldBe 401
             }
         }
     }

@@ -24,6 +24,10 @@ enum class ErrorCode(
     INVALID_REQUEST(400, "요청 정보가 유효하지 않습니다."),
     FORBIDDEN(403, "접근 권한이 없습니다."),
     TOO_MANY_REQUESTS(429, "요청이 너무 많습니다."),
+    NOT_FOUND_RESOURCE(404, "요청한 리소스를 찾을 수 없습니다."),
+    METHOD_NOT_ALLOWED(405, "지원하지 않는 HTTP 메서드입니다."),
+    PAYLOAD_TOO_LARGE(413, "요청 크기가 너무 큽니다."),
+    UNSUPPORTED_MEDIA_TYPE(415, "지원하지 않는 Content-Type입니다."),
 
     // MEMBER
     NOT_FOUND_MEMBER(404, "해당 사용자를 찾을 수 없습니다."),

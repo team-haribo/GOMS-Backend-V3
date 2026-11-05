@@ -2,6 +2,7 @@ package com.teamharibo.goms.domain.auth.service.impl
 
 import com.teamharibo.goms.domain.auth.repository.redis.RefreshTokenRedisRepository
 import com.teamharibo.goms.domain.auth.service.SignoutService
+import com.teamharibo.goms.domain.auth.util.RefreshTokenClaimsParser
 import com.teamharibo.goms.global.exception.ErrorCode
 import com.teamharibo.goms.global.exception.GlobalException
 import com.teamharibo.goms.global.jwt.JwtProvider
@@ -26,7 +27,7 @@ class SignoutServiceImpl(
         )
 
         val token = refreshTokenHeader.removePrefix("Bearer ").trim()
-        val claims = jwtProvider.parseClaims(token)
+        val claims = RefreshTokenClaimsParser.parse(jwtProvider, token, log, "로그아웃 실패")
 
         if (claims["type"] != "REFRESH") {
             log.warn(
@@ -66,7 +67,17 @@ class SignoutServiceImpl(
             throw GlobalException(ErrorCode.INVALID_REFRESH_TOKEN)
         }
 
-        refreshTokenRedisRepository.deleteByMemberId(memberId)
+        if (!refreshTokenRedisRepository.deleteIfMatch(memberId, token)) {
+            log.warn(
+                LogFormat.message(
+                    domain = "AUTH",
+                    event = "로그아웃 실패",
+                    "memberId" to memberId,
+                    "reason" to "다른 요청이 리프레시 토큰을 먼저 변경함"
+                )
+            )
+            throw GlobalException(ErrorCode.INVALID_REFRESH_TOKEN)
+        }
 
         log.info(
             LogFormat.message(

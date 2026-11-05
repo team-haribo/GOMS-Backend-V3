@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
+import java.util.UUID
 import javax.crypto.SecretKey
 
 class JwtProvider(
@@ -39,6 +40,7 @@ class JwtProvider(
         return Jwts.builder()
             .subject(memberId.toString())
             .claim("type", "REFRESH")
+            .id(UUID.randomUUID().toString())
             .issuedAt(now)
             .expiration(exp)
             .signWith(key)
