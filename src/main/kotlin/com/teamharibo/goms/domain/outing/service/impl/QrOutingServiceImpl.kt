@@ -9,18 +9,22 @@ import com.teamharibo.goms.domain.outing.exception.AlreadyOutingException
 import com.teamharibo.goms.domain.outing.exception.CannotOutingException
 import com.teamharibo.goms.domain.outing.repository.OutingRepository
 import com.teamharibo.goms.domain.outing.service.QrOutingService
+import com.teamharibo.goms.domain.outing.util.OutingTimeValidator
 import com.teamharibo.goms.domain.outing.util.QrExpValidator
 import com.teamharibo.goms.global.log.LogFormat
 import com.teamharibo.goms.global.util.MemberUtil
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Clock
 import java.time.LocalDateTime
 
 @Service
 class QrOutingServiceImpl(
     private val memberUtil: MemberUtil,
-    private val outingRepository: OutingRepository
+    private val outingRepository: OutingRepository,
+    private val outingTimeValidator: OutingTimeValidator,
+    private val clock: Clock
 ) : QrOutingService {
 
     private val log = LoggerFactory.getLogger(QrOutingServiceImpl::class.java)
@@ -68,7 +72,9 @@ class QrOutingServiceImpl(
             throw AlreadyOutingException()
         }
 
-        val now = LocalDateTime.now()
+        outingTimeValidator.validate(member.grade)
+
+        val now = LocalDateTime.now(clock)
 
         member.status = Status.OUTING
 

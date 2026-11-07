@@ -32,7 +32,8 @@ import org.testcontainers.mariadb.MariaDBContainer
     StudentCouncilForceOutServiceImpl::class,
     StudentCouncilOutingAllowedServiceImpl::class,
     LateAutoCreateJob::class,
-    ConcurrencyRepositoryGateConfiguration::class
+    ConcurrencyRepositoryGateConfiguration::class,
+    OutingTimeTestConfiguration::class
 )
 class MariaDbOutingConcurrencyTest @Autowired constructor(
     memberRepository: MemberRepository,

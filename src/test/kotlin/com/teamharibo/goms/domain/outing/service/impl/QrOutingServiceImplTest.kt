@@ -7,6 +7,7 @@ import com.teamharibo.goms.domain.outing.exception.AlreadyOutingException
 import com.teamharibo.goms.domain.outing.exception.CannotOutingException
 import com.teamharibo.goms.domain.outing.exception.QrExpiredException
 import com.teamharibo.goms.domain.outing.repository.OutingRepository
+import com.teamharibo.goms.domain.outing.util.OutingTimeValidator
 import com.teamharibo.goms.fixture.MemberFixture
 import com.teamharibo.goms.fixture.OutingFixture
 import com.teamharibo.goms.global.util.MemberUtil
@@ -16,12 +17,14 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.Clock
 
 class QrOutingServiceImplTest : DescribeSpec({
 
     val memberUtil = mockk<MemberUtil>()
     val outingRepository = mockk<OutingRepository>()
-    val service = QrOutingServiceImpl(memberUtil, outingRepository)
+    val outingTimeValidator = mockk<OutingTimeValidator>(relaxed = true)
+    val service = QrOutingServiceImpl(memberUtil, outingRepository, outingTimeValidator, Clock.systemDefaultZone())
 
     describe("QrOutingService") {
 
