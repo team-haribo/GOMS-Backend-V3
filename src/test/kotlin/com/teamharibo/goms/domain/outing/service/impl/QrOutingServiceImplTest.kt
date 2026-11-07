@@ -5,8 +5,10 @@ import com.teamharibo.goms.domain.common.enums.Status
 import com.teamharibo.goms.domain.outing.dto.request.QrToggleRequest
 import com.teamharibo.goms.domain.outing.exception.AlreadyOutingException
 import com.teamharibo.goms.domain.outing.exception.CannotOutingException
+import com.teamharibo.goms.domain.outing.exception.OutingTimeNotAllowedException
 import com.teamharibo.goms.domain.outing.exception.QrExpiredException
 import com.teamharibo.goms.domain.outing.repository.OutingRepository
+import com.teamharibo.goms.domain.outing.util.OutingTimeValidator
 import com.teamharibo.goms.fixture.MemberFixture
 import com.teamharibo.goms.fixture.OutingFixture
 import com.teamharibo.goms.global.util.MemberUtil
@@ -16,12 +18,14 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.Clock
 
 class QrOutingServiceImplTest : DescribeSpec({
 
     val memberUtil = mockk<MemberUtil>()
     val outingRepository = mockk<OutingRepository>()
-    val service = QrOutingServiceImpl(memberUtil, outingRepository)
+    val outingTimeValidator = mockk<OutingTimeValidator>(relaxed = true)
+    val service = QrOutingServiceImpl(memberUtil, outingRepository, outingTimeValidator, Clock.systemDefaultZone())
 
     describe("QrOutingService") {
 
@@ -66,6 +70,20 @@ class QrOutingServiceImplTest : DescribeSpec({
                 shouldThrow<QrExpiredException> {
                     service.outing(QrToggleRequest(uuid = "uuid-1", exp = OutingFixture.pastExpMs()))
                 }
+            }
+        }
+
+        context("Given: COMING 상태 멤버 + 외출 가능 시각 이전") {
+            val member = MemberFixture.student(id = 5L, status = Status.COMING)
+            every { memberUtil.currentMemberForUpdate() } returns member
+            every { outingTimeValidator.validate(member.grade) } throws OutingTimeNotAllowedException()
+
+            it("When: 외출 QR 스캔 시 Then: OutingTimeNotAllowedException이 발생하고 상태와 Outing 레코드는 변경되지 않는다") {
+                shouldThrow<OutingTimeNotAllowedException> {
+                    service.outing(QrToggleRequest(uuid = "uuid-1", exp = OutingFixture.futureExpMs()))
+                }
+                member.status shouldBe Status.COMING
+                verify(exactly = 0) { outingRepository.save(match { it.member.id == 5L }) }
             }
         }
     }
