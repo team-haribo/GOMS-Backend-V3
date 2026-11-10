@@ -3,9 +3,12 @@ package com.teamharibo.goms.domain.notification.service.impl
 import com.teamharibo.goms.domain.notification.repository.DeviceTokenRepository
 import com.google.firebase.messaging.BatchResponse
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingException
+import com.google.firebase.messaging.MessagingErrorCode
 import com.google.firebase.messaging.MulticastMessage
 import com.google.firebase.messaging.SendResponse
 import io.kotest.core.spec.style.DescribeSpec
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -18,7 +21,32 @@ class PushSendServiceImplTest : DescribeSpec({
     val firebaseMessaging = mockk<FirebaseMessaging>()
     val service = PushSendServiceImpl(deviceTokenRepository)
 
+    fun successResponse(): SendResponse {
+        val response = mockk<SendResponse>()
+        every { response.isSuccessful } returns true
+        every { response.exception } returns null
+        return response
+    }
+
+    fun failureResponse(errorCode: MessagingErrorCode?): SendResponse {
+        val exception = mockk<FirebaseMessagingException>()
+        every { exception.messagingErrorCode } returns errorCode
+        val response = mockk<SendResponse>()
+        every { response.isSuccessful } returns false
+        every { response.exception } returns exception
+        return response
+    }
+
+    fun batchResponse(vararg responses: SendResponse): BatchResponse {
+        val batch = mockk<BatchResponse>()
+        every { batch.responses } returns responses.toList()
+        every { batch.successCount } returns responses.count { it.isSuccessful }
+        every { batch.failureCount } returns responses.count { !it.isSuccessful }
+        return batch
+    }
+
     beforeEach {
+        clearMocks(deviceTokenRepository, firebaseMessaging)
         mockkStatic(FirebaseMessaging::class)
         every { FirebaseMessaging.getInstance() } returns firebaseMessaging
     }
@@ -39,14 +67,12 @@ class PushSendServiceImplTest : DescribeSpec({
         }
 
         context("Given: 모든 토큰 발송 성공") {
-            val response = mockk<BatchResponse>()
-            every { response.failureCount } returns 0
-            every { response.successCount } returns 2
-            every { response.responses } returns emptyList()
-
-            every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns response
-
             it("When: 푸시 발송 시 Then: 토큰 삭제 없이 종료된다") {
+                every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns batchResponse(
+                    successResponse(),
+                    successResponse()
+                )
+
                 service.send(listOf("token-1", "token-2"), "제목", "본문")
 
                 verify(exactly = 1) { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) }
@@ -54,24 +80,45 @@ class PushSendServiceImplTest : DescribeSpec({
             }
         }
 
-        context("Given: 일부 토큰 발송 실패") {
-            val success = mockk<SendResponse>()
-            val failure = mockk<SendResponse>()
-            val response = mockk<BatchResponse>()
+        context("Given: 일부 토큰이 UNREGISTERED로 실패") {
+            it("When: 푸시 발송 시 Then: UNREGISTERED 토큰만 삭제한다") {
+                every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns batchResponse(
+                    successResponse(),
+                    failureResponse(MessagingErrorCode.UNREGISTERED)
+                )
 
-            every { success.isSuccessful } returns true
-            every { failure.isSuccessful } returns false
-
-            every { response.failureCount } returns 1
-            every { response.successCount } returns 1
-            every { response.responses } returns listOf(success, failure)
-
-            every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns response
-
-            it("When: 푸시 발송 시 Then: 실패한 토큰을 삭제한다") {
                 service.send(listOf("token-1", "token-2"), "제목", "본문")
 
                 verify(exactly = 1) { deviceTokenRepository.deleteAllByFcmTokenIn(listOf("token-2")) }
+            }
+        }
+
+        context("Given: 일부 토큰이 SENDER_ID_MISMATCH로 실패") {
+            it("When: 푸시 발송 시 Then: SENDER_ID_MISMATCH 토큰을 삭제한다") {
+                every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns batchResponse(
+                    failureResponse(MessagingErrorCode.SENDER_ID_MISMATCH),
+                    successResponse()
+                )
+
+                service.send(listOf("token-1", "token-2"), "제목", "본문")
+
+                verify(exactly = 1) { deviceTokenRepository.deleteAllByFcmTokenIn(listOf("token-1")) }
+            }
+        }
+
+        context("Given: Firebase 요청 자체가 실패") {
+            it("When: 푸시 발송 시 Then: 예외를 전파하지 않고 토큰을 보존한다") {
+                val exception = mockk<FirebaseMessagingException>()
+                every { exception.message } returns "Firebase 요청 실패"
+                every { exception.localizedMessage } returns "Firebase 요청 실패"
+                every { exception.cause } returns null
+                every { exception.stackTrace } returns emptyArray()
+                every { exception.suppressed } returns emptyArray()
+                every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } throws exception
+
+                service.send(listOf("token-1", "token-2"), "제목", "본문")
+
+                verify(exactly = 0) { deviceTokenRepository.deleteAllByFcmTokenIn(any()) }
             }
         }
     }
