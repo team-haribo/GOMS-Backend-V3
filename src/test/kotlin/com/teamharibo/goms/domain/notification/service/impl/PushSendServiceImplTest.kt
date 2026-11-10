@@ -106,6 +106,62 @@ class PushSendServiceImplTest : DescribeSpec({
             }
         }
 
+        context("Given: 모든 실패가 일시 오류") {
+            it("When: 푸시 발송 시 Then: 토큰을 삭제하지 않는다") {
+                every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns batchResponse(
+                    failureResponse(MessagingErrorCode.UNAVAILABLE),
+                    failureResponse(MessagingErrorCode.INTERNAL),
+                    failureResponse(MessagingErrorCode.QUOTA_EXCEEDED),
+                    failureResponse(MessagingErrorCode.THIRD_PARTY_AUTH_ERROR)
+                )
+
+                service.send(listOf("token-1", "token-2", "token-3", "token-4"), "제목", "본문")
+
+                verify(exactly = 0) { deviceTokenRepository.deleteAllByFcmTokenIn(any()) }
+            }
+        }
+
+        context("Given: INVALID_ARGUMENT로 실패") {
+            it("When: 푸시 발송 시 Then: payload 오류 가능성 때문에 토큰을 보존한다") {
+                every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns batchResponse(
+                    failureResponse(MessagingErrorCode.INVALID_ARGUMENT),
+                    failureResponse(MessagingErrorCode.INVALID_ARGUMENT)
+                )
+
+                service.send(listOf("token-1", "token-2"), "제목", "본문")
+
+                verify(exactly = 0) { deviceTokenRepository.deleteAllByFcmTokenIn(any()) }
+            }
+        }
+
+        context("Given: 실패 응답에 오류 코드가 없음") {
+            it("When: 푸시 발송 시 Then: 토큰을 보존한다") {
+                every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns batchResponse(
+                    failureResponse(null)
+                )
+
+                service.send(listOf("token-1"), "제목", "본문")
+
+                verify(exactly = 0) { deviceTokenRepository.deleteAllByFcmTokenIn(any()) }
+            }
+        }
+
+        context("Given: 영구 무효와 일시 오류가 섞여 실패") {
+            it("When: 푸시 발송 시 Then: 영구 무효 토큰만 삭제한다") {
+                every { firebaseMessaging.sendEachForMulticast(any<MulticastMessage>()) } returns batchResponse(
+                    failureResponse(MessagingErrorCode.UNAVAILABLE),
+                    successResponse(),
+                    failureResponse(MessagingErrorCode.UNREGISTERED),
+                    failureResponse(MessagingErrorCode.INTERNAL),
+                    failureResponse(MessagingErrorCode.UNREGISTERED)
+                )
+
+                service.send(listOf("token-1", "token-2", "token-3", "token-4", "token-5"), "제목", "본문")
+
+                verify(exactly = 1) { deviceTokenRepository.deleteAllByFcmTokenIn(listOf("token-3", "token-5")) }
+            }
+        }
+
         context("Given: Firebase 요청 자체가 실패") {
             it("When: 푸시 발송 시 Then: 예외를 전파하지 않고 토큰을 보존한다") {
                 val exception = mockk<FirebaseMessagingException>()
