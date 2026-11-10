@@ -100,6 +100,17 @@ class PushSendServiceImpl(
             )
         }
 
+        val retainedFailureCount = response.failureCount - invalidTokens.size
+        if (retainedFailureCount > 0) {
+            log.warn(
+                LogFormat.message(
+                    domain = "NOTIFICATION",
+                    event = "일시 오류 토큰 보존",
+                    "count" to retainedFailureCount
+                )
+            )
+        }
+
         log.info(
             LogFormat.message(
                 domain = "NOTIFICATION",
