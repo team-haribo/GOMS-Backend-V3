@@ -17,6 +17,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import java.util.Optional
 
 class ReviewCreateServiceImplTest : DescribeSpec({
@@ -51,6 +52,11 @@ class ReviewCreateServiceImplTest : DescribeSpec({
                 verify(exactly = 1) { reviewRepository.save(any()) }
                 verify(exactly = 1) { memberUtil.currentMemberForUpdate() }
                 verify(exactly = 0) { memberUtil.currentMember() }
+                verifyOrder {
+                    memberUtil.currentMemberForUpdate()
+                    placeRepository.findByIdAndIsActiveTrue(placeId)
+                    reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!)
+                }
             }
         }
 

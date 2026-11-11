@@ -62,6 +62,11 @@ class ReviewCreateServiceImpl(
             throw ReviewContentTooLongException()
         }
 
+        // 회원 row 잠금은 트랜잭션의 첫 조회여야 한다.
+        // REPEATABLE READ에서는 첫 일반 SELECT 시점에 snapshot이 고정되므로,
+        // 잠금 대기 전에 다른 조회를 하면 대기 후 중복 검사가 선행 트랜잭션의 후기를 보지 못한다.
+        val member = memberUtil.currentMemberForUpdate()
+
         val place = placeRepository.findByIdAndIsActiveTrue(placeId).orElseThrow {
             log.warn(
                 LogFormat.message(
@@ -73,8 +78,6 @@ class ReviewCreateServiceImpl(
             )
             NotFoundPlaceException()
         }
-
-        val member = memberUtil.currentMemberForUpdate()
 
         if (reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!)) {
             log.warn(
