@@ -14,7 +14,7 @@ GOMS(GSM Outing Management System)는 광주소프트웨어마이스터고등학
 | 지각 | 지각 랭킹 조회, 미복귀 외출의 지각 자동 처리 |
 | 장소 | 장소 목록·상세·검색, 핫플레이스, 추천·추천 취소, Kakao 장소 데이터 동기화 |
 | 후기·신고 | 장소 후기 작성·삭제, 후기 신고와 내 신고 조회 |
-| 알림 | FCM 기기 토큰 등록·삭제, 복귀 시간 알림 푸시 |
+| 알림 | FCM 기기 토큰 등록·삭제, 복귀 시간 알림 푸시, 영구 무효 토큰만 정리하는 발송 실패 처리 |
 | Discord 연동 | Discord 봇이 호출하는 학생회 권한 반영 내부 API, 서버 시작·종료 webhook 알림 |
 | 회원 프로필 | 프로필 조회, S3 프로필 이미지 업로드·삭제 |
 
@@ -52,12 +52,11 @@ flowchart LR
     API --> Kakao["Kakao Local API"]
     API --> Mail["SMTP 메일"]
     API -->|"시작·종료 알림"| Webhook["Discord webhook"]
-
-    Prom["Prometheus"] -.->|"/actuator/prometheus 수집"| API
+    API -.-|"메트릭 노출"| Metrics["Actuator<br/>/actuator/prometheus"]
 ```
 
 - Discord 봇은 서버의 내부 API(`/api/v3/internal/student-council/discord/apply`)를 호출하고, 서버는 별도로 Discord webhook에 서버 시작·종료를 알립니다.
-- 이 저장소는 `/actuator/prometheus`로 메트릭을 노출합니다. Prometheus 수집 설정은 이 저장소에 포함되어 있지 않습니다.
+- 서버는 Actuator로 Prometheus 형식의 메트릭을 노출합니다. 메트릭 수집·시각화 설정은 이 저장소에 포함되어 있지 않습니다.
 
 ## 프로젝트 구조
 
@@ -113,15 +112,19 @@ docker compose up -d mariadb redis
 - 현재 `dev` 프로필은 `fcm.credentials-path`(`FCM_CREDENTIALS_PATH`)를 정의하지만 `FirebaseConfig`는 `fcm.credentials-json`을 읽습니다. 이 불일치가 해결되기 전까지 `dev` 프로필은 FCM 설정을 찾지 못해 시작되지 않습니다.
 - 실제 credential은 저장소에 커밋하지 않습니다.
 
-### 3. 실행
+### 3. 실행·테스트
 
 ```bash
-./gradlew bootRun
+export SPRING_PROFILES_ACTIVE=prod   # 미지정 시에도 prod
+./gradlew bootRun                     # Windows: gradlew.bat bootRun
+./gradlew test
 ```
+
+로컬 실행은 위 환경변수가 모두 준비된 경우에만 가능하며, 저장소 기본 설정만으로 바로 실행되지는 않습니다.
 
 ## API · Test · Documentation
 
-- **API 문서**: 서버 실행 후 `/swagger-ui.html`(Swagger UI), `/v3/api-docs`(OpenAPI JSON). 두 경로는 인증 없이 접근할 수 있고 프로필별로 비활성화하지 않습니다.
+- **API 문서**: 서버 실행 후 `/swagger-ui.html`(Swagger UI), `/v3/api-docs`(OpenAPI JSON). 두 경로는 인증 없이 접근할 수 있고, 프로필 설정으로 비활성화하지 않습니다. 경로는 `SPRINGDOC_API_DOCS_PATH`, `SPRINGDOC_SWAGGER_UI_PATH`로 바꿀 수 있습니다.
 - **헬스 체크·메트릭**: `/actuator/health`, `/actuator/info`, `/actuator/prometheus`
 - **테스트**: `./gradlew test`. Testcontainers를 쓰는 MariaDB·Redis 통합 테스트는 Docker가 없으면 건너뜁니다.
 - **CI**: GitHub Actions가 PR과 `develop`·`main` push에서 `./gradlew build --no-daemon`을 실행합니다.
