@@ -27,3 +27,62 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
+      - name: Generate coverage report
+        if: always()
+        run: ./gradlew jacocoTestReport -x test --no-daemon
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/
+          if-no-files-found: error
+
+      - name: Coverage summary
+        if: always()
+        shell: python3 {0}
+        run: |
+          import os
+          import xml.etree.ElementTree as ET
+          from collections import defaultdict
+
+          report = "build/reports/jacoco/test/jacocoTestReport.xml"
+          if not os.path.exists(report):
+              raise SystemExit(f"{report} not found")
+
+          root = ET.parse(report).getroot()
+
+          def counters(node):
+              return {c.get("type"): (int(c.get("covered")), int(c.get("missed"))) for c in node.findall("counter")}
+
+          def rate(covered, missed):
+              total = covered + missed
+              return f"{covered / total * 100:.2f}% ({covered}/{total})" if total else "-"
+
+          total = counters(root)
+          domains = defaultdict(lambda: {"LINE": [0, 0], "BRANCH": [0, 0]})
+          prefix = "com/teamharibo/goms/domain/"
+          for package in root.findall("package"):
+              name = package.get("name")
+              if not name.startswith(prefix):
+                  continue
+              domain = name[len(prefix):].split("/")[0]
+              for kind, (covered, missed) in counters(package).items():
+                  if kind in domains[domain]:
+                      domains[domain][kind][0] += covered
+                      domains[domain][kind][1] += missed
+
+          lines = [
+              "## Coverage",
+              "",
+              "| 범위 | Line | Branch |",
+              "| --- | ---: | ---: |",
+              f"| 전체 | {rate(*total.get('LINE', (0, 0)))} | {rate(*total.get('BRANCH', (0, 0)))} |",
+          ]
+          for domain in sorted(domains):
+              value = domains[domain]
+              lines.append(f"| domain/{domain} | {rate(*value['LINE'])} | {rate(*value['BRANCH'])} |")
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              summary.write("\n".join(lines) + "\n")

@@ -5,6 +5,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.jetbrains.kotlin.plugin.jpa' version '2.2.21'
     id 'io.github.inryeok-office.config-contract' version '0.1.0'
+    id 'jacoco'
 }
 
 group = 'com.teamharibo.goms'
@@ -108,6 +109,14 @@ allOpen {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.named('jacocoTestReport') {
+    dependsOn tasks.named('test')
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
 
 configContract {
