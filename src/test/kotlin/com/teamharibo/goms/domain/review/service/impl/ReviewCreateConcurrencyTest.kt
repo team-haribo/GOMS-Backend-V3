@@ -33,14 +33,6 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * 후기 작성의 동시 요청 경합을 실제 DB(H2 및 MariaDB Testcontainers)와 스레드로 검증한다.
- *
- * 테스트 메서드는 트랜잭션 밖에서 실행하고(Propagation.NOT_SUPPORTED),
- * 서비스의 @Transactional이 스레드마다 독립적으로 커밋되도록 한다.
- * 회원 row 잠금 때문에 같은 회원의 요청은 잠금 단계에서 대기하므로,
- * 중복 검사 이후 지점이 아닌 서비스 호출 직전에서만 동시 출발을 맞춘다.
- */
 @DataJpaTest
 @TestPropertySource(properties = ["spring.profiles.active="])
 @Import(MemberUtil::class, ReviewCreateServiceImpl::class)
