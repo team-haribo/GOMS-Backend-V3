@@ -27,3 +27,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
+      - name: Generate coverage report
+        if: always()
+        run: ./gradlew jacocoTestReport -x test --no-daemon
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/
+          if-no-files-found: error
