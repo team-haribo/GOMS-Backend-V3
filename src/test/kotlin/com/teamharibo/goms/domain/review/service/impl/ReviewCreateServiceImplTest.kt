@@ -34,7 +34,7 @@ class ReviewCreateServiceImplTest : DescribeSpec({
 
         context("Given: 유효한 내용 + 첫 리뷰") {
             every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
-            every { memberUtil.currentMember() } returns member
+            every { memberUtil.currentMemberForUpdate() } returns member
             every { reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!) } returns false
             every { reviewRepository.save(any()) } answers {
                 ReviewFixture.review(
@@ -49,6 +49,8 @@ class ReviewCreateServiceImplTest : DescribeSpec({
                 val response = service.create(placeId, ReviewCreateRequest("좋은 장소입니다."))
                 response.review_id shouldBe 10L
                 verify(exactly = 1) { reviewRepository.save(any()) }
+                verify(exactly = 1) { memberUtil.currentMemberForUpdate() }
+                verify(exactly = 0) { memberUtil.currentMember() }
             }
         }
 
@@ -78,7 +80,7 @@ class ReviewCreateServiceImplTest : DescribeSpec({
 
         context("Given: 정확히 500자 내용") {
             every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
-            every { memberUtil.currentMember() } returns member
+            every { memberUtil.currentMemberForUpdate() } returns member
             every { reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!) } returns false
             every { reviewRepository.save(any()) } answers {
                 ReviewFixture.review(
@@ -107,7 +109,7 @@ class ReviewCreateServiceImplTest : DescribeSpec({
 
         context("Given: 이미 리뷰한 장소") {
             every { placeRepository.findByIdAndIsActiveTrue(placeId) } returns Optional.of(place)
-            every { memberUtil.currentMember() } returns member
+            every { memberUtil.currentMemberForUpdate() } returns member
             every { reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!) } returns true
 
             it("When: 리뷰 작성 시 Then: AlreadyReviewedPlaceException이 발생한다") {

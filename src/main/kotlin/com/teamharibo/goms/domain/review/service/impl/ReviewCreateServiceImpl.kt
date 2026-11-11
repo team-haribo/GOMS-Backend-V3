@@ -74,7 +74,7 @@ class ReviewCreateServiceImpl(
             NotFoundPlaceException()
         }
 
-        val member = memberUtil.currentMember()
+        val member = memberUtil.currentMemberForUpdate()
 
         if (reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!)) {
             log.warn(
