@@ -62,6 +62,8 @@ class ReviewCreateServiceImpl(
             throw ReviewContentTooLongException()
         }
 
+        val member = memberUtil.currentMemberForUpdate()
+
         val place = placeRepository.findByIdAndIsActiveTrue(placeId).orElseThrow {
             log.warn(
                 LogFormat.message(
@@ -73,8 +75,6 @@ class ReviewCreateServiceImpl(
             )
             NotFoundPlaceException()
         }
-
-        val member = memberUtil.currentMember()
 
         if (reviewRepository.existsByPlaceIdAndMemberIdAndDeletedAtIsNull(placeId, member.id!!)) {
             log.warn(

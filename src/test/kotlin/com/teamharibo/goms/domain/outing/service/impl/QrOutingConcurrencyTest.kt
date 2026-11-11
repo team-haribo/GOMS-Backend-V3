@@ -54,7 +54,8 @@ import java.util.concurrent.atomic.AtomicInteger
     StudentCouncilForceOutServiceImpl::class,
     StudentCouncilOutingAllowedServiceImpl::class,
     LateAutoCreateJob::class,
-    ConcurrencyRepositoryGateConfiguration::class
+    ConcurrencyRepositoryGateConfiguration::class,
+    OutingTimeTestConfiguration::class
 )
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 open class QrOutingConcurrencyTest @Autowired constructor(

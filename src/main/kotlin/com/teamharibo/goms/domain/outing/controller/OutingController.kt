@@ -80,7 +80,8 @@ class OutingController(
         ),
         responses = [
             ApiResponse(responseCode = "200", description = "외출 처리 성공"),
-            ApiResponse(responseCode = "400", description = "QR 정보 오류")
+            ApiResponse(responseCode = "400", description = "QR 정보 오류"),
+            ApiResponse(responseCode = "403", description = "외출 금지 사용자, 외출 가능 시간 아님, 외출 가능 학년 아님")
         ]
     )
     @PostMapping("/out")

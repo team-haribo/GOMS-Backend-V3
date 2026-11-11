@@ -5,8 +5,10 @@ import com.teamharibo.goms.domain.notification.service.PushSendService
 import com.teamharibo.goms.global.log.LogFormat
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingException
+import com.google.firebase.messaging.MessagingErrorCode
 import com.google.firebase.messaging.MulticastMessage
 import com.google.firebase.messaging.Notification
+import com.google.firebase.messaging.SendResponse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -81,7 +83,7 @@ class PushSendServiceImpl(
         val invalidTokens = mutableListOf<String>()
 
         response.responses.forEachIndexed { index, r ->
-            if (!r.isSuccessful) {
+            if (isPermanentlyInvalid(r)) {
                 invalidTokens.add(tokens[index])
             }
         }
@@ -98,6 +100,17 @@ class PushSendServiceImpl(
             )
         }
 
+        val retainedFailureCount = response.failureCount - invalidTokens.size
+        if (retainedFailureCount > 0) {
+            log.warn(
+                LogFormat.message(
+                    domain = "NOTIFICATION",
+                    event = "일시 오류 토큰 보존",
+                    "count" to retainedFailureCount
+                )
+            )
+        }
+
         log.info(
             LogFormat.message(
                 domain = "NOTIFICATION",
@@ -107,6 +120,18 @@ class PushSendServiceImpl(
                 "successCount" to response.successCount,
                 "failureCount" to response.failureCount
             )
+        )
+    }
+
+    private fun isPermanentlyInvalid(r: SendResponse): Boolean {
+        val errorCode = r.exception?.messagingErrorCode ?: return false
+        return errorCode in PERMANENT_INVALID_ERROR_CODES
+    }
+
+    companion object {
+        private val PERMANENT_INVALID_ERROR_CODES = setOf(
+            MessagingErrorCode.UNREGISTERED,
+            MessagingErrorCode.SENDER_ID_MISMATCH
         )
     }
 }

@@ -40,6 +40,8 @@ enum class ErrorCode(
     ALREADY_OUTING(409, "이미 외출 중인 사용자입니다."),
     NOT_OUTING(409, "현재 외출 중이 아닙니다."),
     EMPTY_NAME(400, "name 값 누락 또는 공백입니다."),
+    OUTING_TIME_NOT_ALLOWED(403, "외출 가능 시간이 아닙니다."),
+    OUTING_GRADE_NOT_ALLOWED(403, "외출 가능한 학년이 아닙니다."),
 
     // STUDENT-COUNCIL
     ROLE_CONFLICT(409, "이미 동일한 권한입니다."),

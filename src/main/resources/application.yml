@@ -34,3 +34,13 @@ springdoc:
     operations-sorter: ${SPRINGDOC_OPERATIONS_SORTER:method}
     tags-sorter: ${SPRINGDOC_TAGS_SORTER:alpha}
     display-request-duration: ${SPRINGDOC_DISPLAY_REQUEST_DURATION:true}
+
+outing:
+  time:
+    first-admission-year: 2017
+    school-year-start-month: 3
+    school-year-start-day: 1
+    start-times:
+      1: "18:50:00"
+      2: "18:45:00"
+      3: "18:40:00"
