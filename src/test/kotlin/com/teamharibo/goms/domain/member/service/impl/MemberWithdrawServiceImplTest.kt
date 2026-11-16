@@ -55,7 +55,7 @@ class MemberWithdrawServiceImplTest : DescribeSpec({
     describe("MemberWithdrawService") {
 
         context("Given: 비밀번호가 일치함") {
-            every { memberUtil.currentMember() } returns member
+            every { memberUtil.currentMemberForUpdate() } returns member
             every { passwordEncoder.matches("1234", member.password) } returns true
             every { reviewReportRepository.deleteAllByMemberId(member.id!!) } returns 1L
             every { reviewReportRepository.deleteAllByReview_Member_Id(member.id!!) } returns 1L
@@ -91,7 +91,7 @@ class MemberWithdrawServiceImplTest : DescribeSpec({
         }
 
         context("Given: 비밀번호가 일치하지 않음") {
-            every { memberUtil.currentMember() } returns member
+            every { memberUtil.currentMemberForUpdate() } returns member
             every { passwordEncoder.matches("wrong", member.password) } returns false
 
             it("When: 회원 탈퇴 시 Then: MemberWithdrawPasswordMismatchException이 발생한다") {
