@@ -15,7 +15,7 @@ if printf '%s' "$payload" | grep -Eiq '(JWT_SECRET|MAIL_PASSWORD|KAKAO_REST_API_
 fi
 
 if [[ -n "$category" ]]; then
-  echo "secret-guard 차단: secret 의심 패턴($category)이 감지되었습니다. 값과 파일 경로는 출력하지 않습니다." >&2
+  echo "secret-guard blocked: a suspected secret pattern ($category) was detected. The value and file path are not printed." >&2
   exit 3
 fi
 exit 0
