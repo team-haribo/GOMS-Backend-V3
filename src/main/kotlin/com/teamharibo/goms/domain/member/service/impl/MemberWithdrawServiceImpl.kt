@@ -40,7 +40,7 @@ class MemberWithdrawServiceImpl(
 
     @Transactional
     override fun withdraw(request: MemberWithdrawRequest) {
-        val member = memberUtil.currentMember()
+        val member = memberUtil.currentMemberForUpdate()
         val memberId = member.id!!
 
         log.info(
