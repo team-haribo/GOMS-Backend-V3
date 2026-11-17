@@ -1,6 +1,6 @@
 ---
 name: api-design
-description: GOMS API 계약과 Controller를 검토한다.
+description: Review GOMS API contracts and Controllers.
 ---
 
-공통 기준본 .agents/skills/api-design/SKILL.md를 읽고 그대로 따른다. Claude 작업에서도 GOMS의 ResponseEntity, @field: validation, GlobalException/ErrorCode, /api/v3/**와 실제 테스트 관례를 우선한다.
+Read the shared source of truth .agents/skills/api-design/SKILL.md and follow it as is. In Claude work as well, prioritize GOMS's ResponseEntity, @field: validation, GlobalException/ErrorCode, /api/v3/**, and actual test conventions.

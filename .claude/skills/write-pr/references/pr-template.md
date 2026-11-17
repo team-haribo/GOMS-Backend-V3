@@ -1,1 +1,1 @@
-공통 기준본 .agents/skills/write-pr/references/pr-template.md를 따른다.
+Follow the shared source of truth .agents/skills/write-pr/references/pr-template.md.

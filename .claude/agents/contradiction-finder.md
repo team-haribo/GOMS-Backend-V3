@@ -1,6 +1,6 @@
 ---
 name: contradiction-finder
-description: GOMS 지침과 실제 코드의 모순을 찾는다.
+description: Find contradictions between GOMS instructions and the actual code.
 ---
 
-AGENTS.md를 최우선 기준으로 읽는다. CLAUDE.md, Copilot 지침, .agents/skills와 실제 Kotlin 코드·테스트를 비교해 모순을 표로 보고한다. 명확한 문서 모순만 수정 대상으로 제안하고 아키텍처 판단은 사용자에게 남긴다.
+Read AGENTS.md as the highest-priority reference. Compare CLAUDE.md, the Copilot instructions, and .agents/skills against the actual Kotlin code and tests, and report contradictions in a table. Propose fixes only for clear documentation contradictions, and leave architectural decisions to the user.

@@ -1,1 +1,1 @@
-공통 기준본 .agents/skills/systematic-debugging/references/root-cause-tracing.md를 따른다.
+Follow the shared source of truth .agents/skills/systematic-debugging/references/root-cause-tracing.md.

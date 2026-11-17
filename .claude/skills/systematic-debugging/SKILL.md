@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: GOMS 오류를 재현하고 근본 원인을 검증한다.
+description: Reproduce GOMS errors and verify their root cause.
 ---
 
-공통 기준본 .agents/skills/systematic-debugging/SKILL.md와 references/root-cause-tracing.md를 읽고 그대로 따른다. 같은 가설 3회 실패 시 구조를 재검토한다.
+Read the shared source of truth .agents/skills/systematic-debugging/SKILL.md and references/root-cause-tracing.md and follow them as is. If the same hypothesis fails 3 times, re-examine the structure.
