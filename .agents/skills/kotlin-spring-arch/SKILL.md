@@ -1,38 +1,38 @@
 ---
 name: kotlin-spring-arch
-description: GOMS Kotlin/Spring 계층과 실제 코드 컨벤션을 검토한다.
+description: Reviews GOMS Kotlin/Spring layering and actual code conventions.
 ---
 
-# Kotlin Spring 아키텍처
+# Kotlin Spring Architecture
 
-## 발동 조건
+## Trigger
 
-Kotlin/Spring Controller, Service, Repository, Entity, DTO, security 또는 transaction을 추가·리뷰할 때 사용한다.
+Use when adding or reviewing Kotlin/Spring Controllers, Services, Repositories, Entities, DTOs, security, or transactions.
 
-## 필요한 도구
+## Required Tools
 
-rg, 관련 Kotlin 파일, build.gradle, 테스트와 Gradle compileKotlin test를 사용한다.
+Use rg, related Kotlin files, build.gradle, tests, and Gradle compileKotlin test.
 
-## 조사 단계
+## Investigation Steps
 
-동일 도메인의 구현과 테스트를 먼저 읽고 생성자 주입, val/var, null safety, @field: validation, ResponseEntity, GlobalException, LogFormat, transaction 위치를 비교한다.
+First read the implementation and tests of the same domain, and compare constructor injection, val/var, null safety, @field: validation, ResponseEntity, GlobalException, LogFormat, and transaction placement.
 
-## 실행 단계
+## Execution Steps
 
-data class DTO, 생성자 주입, val 우선, Service/ServiceImpl 분리와 책임 분리를 따른다. 조회에는 readOnly transaction, write에는 transaction을 적용한다. 외부 API 호출을 장시간 transaction에 넣지 않는다. Coroutine/Reactive는 실제 동일 흐름이 있을 때만 사용한다.
+Follow data class DTOs, constructor injection, val first, Service/ServiceImpl separation, and separation of responsibilities. Apply readOnly transactions to reads and transactions to writes. Do not put external API calls inside long-running transactions. Use Coroutine/Reactive only when an equivalent flow actually exists.
 
-## 검증 단계
+## Verification Steps
 
-compileKotlin과 관련 테스트를 실행하고 전체 build를 가능하면 실행한다. 새 formatter나 lint task를 가정하지 않는다.
+Run compileKotlin and related tests, and run the full build when possible. Do not assume new formatter or lint tasks.
 
-## 중단 조건
+## Stop Conditions
 
-기존 스타일이 서로 다르거나 API·DB·Security 경계가 바뀌는 판단이 필요하면 근거를 모아 사용자에게 보고한다.
+If existing styles differ from each other or a decision changes API, DB, or Security boundaries, gather evidence and report to the user.
 
-## 금지 행동
+## Prohibited Actions
 
-!! 남용, 무단 전역 리팩터링, record/SDK wrapper/ExpectedException 도입, Controller에 비즈니스 로직 집중을 하지 않는다.
+Do not overuse !!, perform unauthorized global refactoring, introduce record/SDK wrapper/ExpectedException, or concentrate business logic in Controllers.
 
-## 최종 보고
+## Final Report
 
-참조한 기존 패턴, 계층별 변경, transaction·null safety 판단, 테스트 결과를 보고한다.
+Report the existing patterns referenced, changes per layer, transaction and null safety decisions, and test results.

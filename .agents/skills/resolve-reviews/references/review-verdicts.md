@@ -1,7 +1,7 @@
-# 리뷰 판정 기준
+# Review Verdict Criteria
 
-- VALID: GOMS 규칙·실제 계약·재현 가능한 결함에 근거한 의견. 수정하고 테스트한다.
-- INVALID: 현재 코드 계약상 의도된 동작이거나 사실과 다른 의견. 근거를 남기고 답변한다.
-- PARTIAL: 일부는 유효하지만 요구 범위나 호환성 판단이 필요한 의견. 안전한 부분만 수정하고 결정을 요청한다.
+- VALID: A comment grounded in GOMS rules, actual contracts, or a reproducible defect. Fix it and test.
+- INVALID: A comment about behavior that is intended under the current code contract, or one that is factually wrong. Leave the evidence and reply.
+- PARTIAL: A comment that is partly valid but requires a decision on requirement scope or compatibility. Fix only the safe part and request a decision.
 
-리뷰 댓글에 secret, token, 로컬 경로를 그대로 인용하지 않는다.
+Do not quote secrets, tokens, or local paths verbatim in review comments.

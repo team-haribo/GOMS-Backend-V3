@@ -1,40 +1,40 @@
 ---
 name: resolve-reviews
-description: 현재 PR의 리뷰 의견을 수집·판정하고 유효한 의견만 수정한다.
+description: Collects and classifies review comments on the current PR and applies fixes only for valid comments.
 ---
 
-# 리뷰 해결
+# Resolve Reviews
 
-## 발동 조건
+## Trigger
 
-현재 브랜치 PR의 인라인 리뷰, 일반 댓글, 변경 파일 또는 리뷰 반영 요청이 있을 때 사용한다.
+Use when the current branch's PR has inline reviews, general comments, changed files, or a request to address reviews.
 
-## 필요한 도구
+## Required Tools
 
-gh pr view, gh api, git diff, 관련 소스·테스트, Gradle을 사용한다. 기본 base는 develop이다.
+Use gh pr view, gh api, git diff, related sources and tests, and Gradle. The default base is develop.
 
-## 조사 단계
+## Investigation Steps
 
-1. 현재 branch에 연결된 PR을 자동 탐색한다.
-2. 리뷰 스레드·일반 댓글·변경 diff·CI 상태를 모두 수집한다.
-3. AGENTS.md와 실제 코드·테스트 기준으로 각 의견을 VALID, INVALID, PARTIAL로 분류한다.
+1. Automatically find the PR linked to the current branch.
+2. Collect all review threads, general comments, the changed diff, and CI status.
+3. Classify each comment as VALID, INVALID, or PARTIAL based on AGENTS.md and the actual code and tests.
 
-## 실행 단계
+## Execution Steps
 
-VALID만 최소 변경으로 수정하고 PARTIAL은 불확실한 범위를 분리한다. INVALID는 코드 근거를 갖춰 답변한다. 수정 후 관련 테스트와 전체 build를 실행한다.
+Fix only VALID comments with minimal changes, and separate out the uncertain scope of PARTIAL ones. Reply to INVALID ones with evidence from the code. After fixing, run related tests and the full build.
 
-## 검증 단계
+## Verification Steps
 
-리뷰 의견별 변경·테스트·답변을 대조하고 git diff --check를 확인한다. 사용자가 요청한 경우에만 commit과 push를 수행한다.
+Cross-check changes, tests, and replies for each review comment, and check git diff --check. Commit and push only when the user requests it.
 
-## 중단 조건
+## Stop Conditions
 
-의견이 서로 충돌하거나 아키텍처·API 계약 판단이 필요하면 임의로 결정하지 않는다.
+Do not decide arbitrarily when comments conflict with each other or an architecture/API contract decision is needed.
 
-## 금지 행동
+## Prohibited Actions
 
-리뷰를 숨기거나 무조건 수용하지 않는다. 테스트 삭제·assertion 약화·자동 Merge를 하지 않는다.
+Do not hide reviews or accept them unconditionally. Do not delete tests, weaken assertions, or auto-merge.
 
-## 최종 보고
+## Final Report
 
-PR, 의견별 분류, 수정·미수정 근거, 테스트, 댓글 답변, push 여부를 보고한다.
+Report the PR, classification per comment, reasons for fixing or not fixing, tests, comment replies, and whether you pushed.

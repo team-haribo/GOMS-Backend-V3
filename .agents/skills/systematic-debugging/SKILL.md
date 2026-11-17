@@ -1,40 +1,40 @@
 ---
 name: systematic-debugging
-description: GOMS 오류를 재현하고 단일 가설과 최소 수정으로 근본 원인을 검증한다.
+description: Reproduces GOMS errors and verifies the root cause with a single hypothesis and a minimal fix.
 ---
 
-# 체계적 디버깅
+# Systematic Debugging
 
-## 발동 조건
+## Trigger
 
-테스트 실패, 런타임 오류, API 계약 불일치, 동시성·트랜잭션 문제가 발생했을 때 사용한다.
+Use when a test failure, runtime error, API contract mismatch, or concurrency/transaction problem occurs.
 
-## 필요한 도구
+## Required Tools
 
-Gradle test, 실패 로그, git log/diff, rg, H2 테스트와 관련 외부 연동 설정을 사용한다.
+Use Gradle test, failure logs, git log/diff, rg, H2 tests, and related external integration settings.
 
-## 실행 단계
+## Execution Steps
 
-1. 오류를 동일 명령으로 재현한다.
-2. 예외·로그에서 첫 번째 프로젝트 코드 stack frame과 입력·상태를 확인한다.
-3. 최근 변경과 호출·데이터 흐름을 추적한다.
-4. 동시에 여러 원인을 고치지 말고 단일 가설을 세운다.
-5. 최소 재현 테스트를 추가하거나 기존 테스트를 확장한다.
-6. 근본 원인을 최소 변경으로 수정한다.
-7. 관련 테스트와 전체 테스트를 실행한다.
+1. Reproduce the error with the same command.
+2. From the exception and logs, identify the first project-code stack frame and the input/state.
+3. Trace recent changes and the call and data flow.
+4. Do not fix multiple causes at once; form a single hypothesis.
+5. Add a minimal reproduction test or extend an existing test.
+6. Fix the root cause with a minimal change.
+7. Run the related tests and the full test suite.
 
-## 검증 단계
+## Verification Steps
 
-각 실패 횟수와 가설을 기록하고 ./gradlew compileKotlin test, ./gradlew build --no-daemon을 가능한 범위에서 실행한다.
+Record each failure count and hypothesis, and run ./gradlew compileKotlin test and ./gradlew build --no-daemon to the extent possible.
 
-## 중단 조건
+## Stop Conditions
 
-같은 가설이 3회 실패하면 무작정 코드를 수정하지 않고 구조·환경·테스트 격리를 재검토한다. secret이나 운영 데이터가 필요한 재현은 중단한다.
+If the same hypothesis fails 3 times, do not keep modifying code blindly; re-examine the structure, environment, and test isolation. Stop any reproduction that requires secrets or production data.
 
-## 금지 행동
+## Prohibited Actions
 
-로그를 무시한 추측성 수정, 테스트 삭제·약화, 운영 DB 직접 조작, 무관한 리팩터링을 하지 않는다.
+Do not make speculative fixes that ignore logs, delete or weaken tests, manipulate the production DB directly, or do unrelated refactoring.
 
-## 최종 보고
+## Final Report
 
-재현 명령, 관찰한 오류, 단일 가설, 근본 원인, 수정, 테스트 결과와 남은 위험을 보고한다.
+Report the reproduction command, observed error, single hypothesis, root cause, fix, test results, and remaining risks.
