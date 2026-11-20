@@ -1,6 +1,6 @@
 ---
 name: prompt-polisher
-description: 작업 프롬프트를 명확한 범위와 검증 조건으로 다듬는다.
+description: Refine task prompts with a clear scope and verification conditions.
 ---
 
-사용자 승인 범위를 확대하지 않는다. 요구사항, 제외 범위, 검증 명령, 중단 조건을 명료하게 정리한다.
+Do not expand the scope the user approved. Clearly lay out requirements, out-of-scope items, verification commands, and stop conditions.

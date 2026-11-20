@@ -1,38 +1,38 @@
 ---
 name: goms-error-contract
-description: GOMS GlobalException, ErrorCode, HTTP 상태와 기존 API 예외 계약을 검토한다.
+description: Reviews GOMS GlobalException, ErrorCode, HTTP status, and the existing API exception contract.
 ---
 
-# GOMS 예외 계약
+# GOMS Exception Contract
 
-## 발동 조건
+## Trigger
 
-도메인 오류, 인증·인가 오류, validation, HTTP 상태, ErrorResponse 또는 예외 테스트를 추가·변경할 때 사용한다.
+Use when adding or changing domain errors, authentication/authorization errors, validation, HTTP status, ErrorResponse, or exception tests.
 
-## 필요한 도구
+## Required Tools
 
-ErrorCode, GlobalException, GlobalExceptionHandler, ErrorResponse, Security handler, 관련 Controller·Service·테스트를 사용한다.
+Use ErrorCode, GlobalException, GlobalExceptionHandler, ErrorResponse, Security handlers, and related Controllers, Services, and tests.
 
-## 조사 단계
+## Investigation Steps
 
-기존 ErrorCode를 찾고 status/message, 예외 위치, GlobalExceptionHandler 매핑, 인증·인가 handler의 차이를 확인한다. 같은 의미의 코드를 중복 생성하지 않는다.
+Find existing ErrorCodes and check status/message, where exceptions are thrown, GlobalExceptionHandler mappings, and differences in the authentication/authorization handlers. Do not create duplicate codes with the same meaning.
 
-## 실행 단계
+## Execution Steps
 
-적절한 기존 ErrorCode를 재사용한다. 새 코드가 필요하면 도메인·HTTP 상태·메시지·노출 가능성·하위 호환성을 판단하고 GlobalException(ErrorCode)을 통해 전파한다. Controller 임의 try/catch와 임의 response를 금지한다.
+Reuse an appropriate existing ErrorCode. If a new code is needed, assess its domain, HTTP status, message, whether it is safe to expose, and backward compatibility, and propagate it through GlobalException(ErrorCode). Ad hoc try/catch and ad hoc responses in Controllers are prohibited.
 
-## 검증 단계
+## Verification Steps
 
-정상·validation·인증·인가·비즈니스·예상하지 못한 오류의 HTTP status와 body를 테스트한다. ./gradlew test를 실행한다.
+Test the HTTP status and body for normal, validation, authentication, authorization, business, and unexpected errors. Run ./gradlew test.
 
-## 중단 조건
+## Stop Conditions
 
-새 ErrorCode의 의미·상태 코드·메시지가 기존 클라이언트 계약을 깨뜨릴 수 있으면 사용자 확인 없이는 추가하지 않는다.
+Do not add a new ErrorCode without user confirmation if its meaning, status code, or message could break the existing client contract.
 
-## 금지 행동
+## Prohibited Actions
 
-Washer ExpectedException, SDK response wrapper, 내부 stack trace·secret 노출, 테스트 assertion 약화를 도입하지 않는다.
+Do not introduce Washer ExpectedException, SDK response wrappers, exposure of internal stack traces or secrets, or weakened test assertions.
 
-## 최종 보고
+## Final Report
 
-재사용·신규 ErrorCode 판단, 예외 경로, HTTP 계약, 테스트와 호환성 위험을 보고한다.
+Report the reuse/new ErrorCode decision, exception paths, HTTP contract, tests, and compatibility risks.

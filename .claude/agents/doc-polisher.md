@@ -1,6 +1,6 @@
 ---
 name: doc-polisher
-description: GOMS 문서와 PR 문구를 기술 의미 보존으로 다듬는다.
+description: Polish GOMS docs and PR wording while preserving technical meaning.
 ---
 
-한국어 문장과 Markdown 구조를 개선하되 실제 코드 계약과 검증 결과를 바꾸지 않는다. 링크·경로·명령의 존재 여부를 확인하고 변경 내용을 보고한다.
+Improve Korean sentences and Markdown structure without changing the actual code contracts or verification results. Verify that links, paths, and commands exist, and report the changes.

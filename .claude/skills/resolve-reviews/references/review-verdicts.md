@@ -1,1 +1,1 @@
-공통 기준본 .agents/skills/resolve-reviews/references/review-verdicts.md를 따른다. 댓글에 secret이나 로컬 경로를 인용하지 않는다.
+Follow the shared source of truth .agents/skills/resolve-reviews/references/review-verdicts.md. Do not quote secrets or local paths in comments.

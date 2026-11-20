@@ -1,38 +1,38 @@
 ---
 name: docker
-description: GOMS Docker Compose와 실행환경을 안전하게 변경·검증한다.
+description: Safely changes and verifies GOMS Docker Compose and the runtime environment.
 ---
 
 # Docker
 
-## 발동 조건
+## Trigger
 
-docker-compose.yml, 서비스 포트·network·volume, .env.example 또는 컨테이너 실행을 변경할 때 사용한다.
+Use when changing docker-compose.yml, service ports/networks/volumes, .env.example, or container execution.
 
-## 필요한 도구
+## Required Tools
 
-읽기에는 rg와 Get-Content, 검증에는 docker compose config를 사용한다.
+Use rg and Get-Content for reading, and docker compose config for verification.
 
-## 조사 단계
+## Investigation Steps
 
-docker-compose.yml, .env.example, .dockerignore, CI/CD와 application 설정의 포트·환경변수 이름을 확인한다. 실제 secret과 secrets 디렉터리 내용은 읽거나 출력하지 않는다.
+Check port and environment variable names in docker-compose.yml, .env.example, .dockerignore, CI/CD, and application settings. Do not read or print actual secrets or the contents of the secrets directory.
 
-## 실행 단계
+## Execution Steps
 
-기존 MariaDB/Redis service, port, network, volume을 보존하고 placeholder만 사용한다. 변경이 애플리케이션 동작이나 운영 배포에 영향을 주는지 기록한다.
+Preserve the existing MariaDB/Redis services, ports, networks, and volumes, and use placeholders only. Record whether the change affects application behavior or production deployment.
 
-## 검증 단계
+## Verification Steps
 
-가능하면 docker compose config를 실행하고 git diff --check를 확인한다. 이미지 pull이나 실제 서비스 기동은 사용자가 요청했을 때만 한다.
+Run docker compose config when possible and check git diff --check. Pull images or actually start services only when the user requests it.
 
-## 중단 조건
+## Stop Conditions
 
-필수 환경변수, 운영 volume, secret 주입 방식이 불명확하면 중단하고 필요한 결정을 보고한다.
+If required environment variables, production volumes, or the secret injection method are unclear, stop and report the decisions needed.
 
-## 금지 행동
+## Prohibited Actions
 
-실제 secret 커밋, 광범위한 volume 삭제, docker system prune, 운영 배포를 하지 않는다.
+Do not commit real secrets, delete volumes broadly, run docker system prune, or deploy to production.
 
-## 최종 보고
+## Final Report
 
-변경한 service·port·volume, config 검증, secret 비포함 여부와 운영 주의사항을 보고한다.
+Report the changed services/ports/volumes, config verification, confirmation that no secrets are included, and production caveats.

@@ -1,38 +1,38 @@
 ---
 name: test
-description: GOMS의 Kotest, MockK, H2와 Gradle 검증을 일관되게 수행한다.
+description: Consistently performs GOMS verification with Kotest, MockK, H2, and Gradle.
 ---
 
-# 테스트
+# Test
 
-## 발동 조건
+## Trigger
 
-프로덕션 로직 변경, API 계약 변경, 버그 수정, 하네스 검증 또는 테스트 실패 분석 시 사용한다.
+Use for production logic changes, API contract changes, bug fixes, harness verification, or test failure analysis.
 
-## 필요한 도구
+## Required Tools
 
-Kotest 6.1.3, MockK 1.14.9, H2, Gradle wrapper, 관련 소스·테스트를 사용한다.
+Use Kotest 6.1.3, MockK 1.14.9, H2, the Gradle wrapper, and related sources and tests.
 
-## 조사 단계
+## Investigation Steps
 
-같은 도메인의 DescribeSpec, context/it, shouldBe/shouldThrow, mockk/every/verify 패턴과 테스트 fixture를 읽는다. Controller는 standaloneSetup과 GlobalExceptionHandler 등록 여부를 확인한다.
+Read the DescribeSpec, context/it, shouldBe/shouldThrow, and mockk/every/verify patterns and test fixtures in the same domain. For Controllers, check standaloneSetup and whether GlobalExceptionHandler is registered.
 
-## 실행 단계
+## Execution Steps
 
-Given/When/Then 의미가 분명한 테스트를 추가한다. 외부 협력자는 MockK로 격리하고 JPA가 필요한 경우 H2 기반 테스트를 사용한다. 서비스 수정에는 성공·실패·권한·경계 회귀 테스트를 검토한다.
+Add tests whose Given/When/Then meaning is clear. Isolate external collaborators with MockK, and use H2-based tests when JPA is needed. For service changes, consider success, failure, permission, and boundary regression tests.
 
-## 검증 단계
+## Verification Steps
 
-빠른 검증은 ./gradlew compileKotlin test, 전체 검증은 ./gradlew build --no-daemon이다. Windows에서는 gradlew.bat을 사용한다. 보고에는 전체 테스트 수, 통과/실패/스킵, 실패 테스트, 첫 프로젝트 코드 stack frame, 원인, 하네스 관련 여부, 실행 시간을 포함한다.
+Quick verification is ./gradlew compileKotlin test, and full verification is ./gradlew build --no-daemon. On Windows, use gradlew.bat. The report includes the total number of tests, passed/failed/skipped, failing tests, the first project-code stack frame, the cause, whether it is harness-related, and execution time.
 
-## 중단 조건
+## Stop Conditions
 
-환경·credential·외부 서비스가 필요한 테스트를 안전한 대체 없이 실행할 수 없으면 실패를 숨기지 않고 구분해 보고한다.
+If tests that require environment, credentials, or external services cannot be run without a safe substitute, do not hide the failure; report it separately.
 
-## 금지 행동
+## Prohibited Actions
 
-테스트를 삭제하거나 assertion을 약화하거나 무조건 production/test 중 하나만 옳다고 가정하지 않는다.
+Do not delete tests, weaken assertions, or unconditionally assume that only one of production or test is correct.
 
-## 최종 보고
+## Final Report
 
-실행 명령별 결과와 테스트 집계, 실패 원인, 관련 변경 여부, 미실행 검증을 정확히 보고한다.
+Accurately report results per command, test totals, failure causes, whether related to the change, and verifications not run.

@@ -1,38 +1,38 @@
 ---
 name: git-commit
-description: GOMS 변경 범위를 검토하고 기존 커밋 규칙으로 안전하게 커밋한다.
+description: Reviews the scope of GOMS changes and commits safely using the existing commit rules.
 ---
 
-# Git 커밋
+# Git Commit
 
-## 발동 조건
+## Trigger
 
-사용자가 commit을 요청했거나 PR 전에 응집된 변경을 커밋해야 할 때 사용한다.
+Use when the user requests a commit or when cohesive changes need to be committed before a PR.
 
-## 필요한 도구
+## Required Tools
 
-git status, diff, log, diff --check, show를 사용한다.
+Use git status, diff, log, diff --check, and show.
 
-## 조사 단계
+## Investigation Steps
 
-현재 branch, base, 사용자 변경사항, 최근 30개 커밋 제목을 확인한다. 무관한 파일과 기존 untracked 파일을 구분한다.
+Check the current branch, base, user changes, and the titles of the last 30 commits. Distinguish unrelated files and pre-existing untracked files.
 
-## 실행 단계
+## Execution Steps
 
-하네스 작업은 실제 diff가 chore인지 docs인지 판단한다. 기본 메시지는 chore: AI 개발 하네스 구성이다. 관련 파일만 stage하고 staged diff를 다시 읽는다.
+For harness work, decide whether the actual diff is chore or docs. The default message is `chore: AI 개발 하네스 구성` ("chore: set up AI development harness"). Stage only the related files and re-read the staged diff.
 
-## 검증 단계
+## Verification Steps
 
-git diff --cached --check, git status --short를 실행한 뒤 commit하고 git show --stat --oneline HEAD와 git show --check HEAD로 확인한다.
+Run git diff --cached --check and git status --short, then commit and verify with git show --stat --oneline HEAD and git show --check HEAD.
 
-## 중단 조건
+## Stop Conditions
 
-무관한 변경, secret 의심 값, 사용자 파일 충돌, base 오염이 있으면 커밋하지 않는다.
+Do not commit if there are unrelated changes, suspected secret values, conflicts with user files, or a contaminated base.
 
-## 금지 행동
+## Prohibited Actions
 
-reset --hard, clean -fdx, force push, 자동 Co-authored-by, issue 번호 추측, 세션 URL 추가를 하지 않는다.
+Do not run reset --hard, clean -fdx, or force push, add Co-authored-by automatically, guess issue numbers, or add session URLs.
 
-## 최종 보고
+## Final Report
 
-커밋 SHA, 메시지, 포함 파일, 제외한 사용자 변경, staged 검증 결과를 보고한다.
+Report the commit SHA, message, included files, excluded user changes, and staged verification results.

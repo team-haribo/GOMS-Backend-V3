@@ -1,38 +1,38 @@
 ---
 name: planning
-description: 불명확한 GOMS 기능 요구를 구현 전에 영향 범위와 검증 계획으로 정리한다.
+description: Organizes unclear GOMS feature requirements into an impact scope and verification plan before implementation.
 ---
 
-# 계획
+# Planning
 
-## 발동 조건
+## Trigger
 
-기능 요구가 모호하거나 여러 도메인·권한·DB·외부 연동에 영향을 줄 때 사용한다.
+Use when a feature requirement is ambiguous or affects multiple domains, permissions, the DB, or external integrations.
 
-## 필요한 도구
+## Required Tools
 
-소스·테스트 검색, git log/PR 조회, API·schema·운영 문서 확인 도구를 사용한다.
+Use source and test search, git log/PR lookup, and tools for checking API, schema, and operations documents.
 
-## 조사 단계
+## Investigation Steps
 
-사용자 흐름, 역할, API 계약, DB 영향, 동시성, 외부 연동, 실패 처리, 테스트, 배포·운영 영향을 확인한다.
+Check user flows, roles, API contracts, DB impact, concurrency, external integrations, failure handling, tests, and deployment/operations impact.
 
-## 실행 단계
+## Execution Steps
 
-확정 사실과 가정을 구분한 짧은 계획을 만들고 기존 아키텍처의 최소 변경 경로를 제안한다. 명확한 작업에는 불필요한 인터뷰를 강제하지 않는다.
+Create a short plan that separates confirmed facts from assumptions, and propose the minimal-change path within the existing architecture. Do not force unnecessary interviews for clear tasks.
 
-## 검증 단계
+## Verification Steps
 
-각 계획 항목에 관련 코드·테스트와 검증 명령을 연결하고, 구현 후 실제 결과와 비교한다.
+Link each plan item to related code, tests, and verification commands, and compare against the actual results after implementation.
 
-## 중단 조건
+## Stop Conditions
 
-권한, 데이터 보존, API 호환성처럼 사용자 결정이 필요한 충돌이 해결되지 않으면 구현을 시작하지 않는다.
+Do not start implementation while conflicts that require a user decision, such as permissions, data preservation, or API compatibility, remain unresolved.
 
-## 금지 행동
+## Prohibited Actions
 
-확인하지 않은 요구를 사실처럼 문서화하거나 계획 단계에서 프로덕션 코드·DB를 변경하지 않는다.
+Do not document unverified requirements as facts or change production code or the DB during the planning phase.
 
-## 최종 보고
+## Final Report
 
-확정 사실, 가정, 영향 범위, 단계별 작업, 검증, 남은 결정사항을 보고한다.
+Report confirmed facts, assumptions, impact scope, step-by-step tasks, verification, and remaining decisions.
