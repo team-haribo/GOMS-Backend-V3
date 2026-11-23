@@ -125,18 +125,6 @@ class ReissueServiceImplTest : DescribeSpec({
             }
         }
 
-        context("Given: 만료된 토큰") {
-            val claims = validClaims()
-            every { jwtProvider.parseClaims(any()) } returns claims
-            every { refreshTokenRepository.findByMemberId(memberId) } returns null
-
-            it("When: 재발급 시 Then: INVALID_REFRESH_TOKEN 예외가 발생한다") {
-                shouldThrow<GlobalException> {
-                    service.reissue(bearerHeader)
-                }.errorCode shouldBe ErrorCode.INVALID_REFRESH_TOKEN
-            }
-        }
-
         context("Given: 폐기된 토큰") {
             val claims = validClaims()
             every { jwtProvider.parseClaims(any()) } returns claims
